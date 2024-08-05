@@ -30,6 +30,13 @@ Route::group(['prefix' => 'department', 'middleware' => ['auth:sanctum', 'role:a
     Route::delete('/{id}', [DepartmentController::class, 'destroy']);
 });
 
+Route::group(['prefix' => 'employmentstatus', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [EmploymentStatusController::class, 'index']);
+    Route::post('/', [EmploymentStatusController::class, 'store']);
+    Route::put('/{id}', [EmploymentStatusController::class, 'update']);
+    Route::delete('/{id}', [EmploymentStatusController::class, 'destroy']);
+});
+
 Route::get('/admin', function (Request $request) {
     return response()->json([
         'message' => 'Admin Page',
