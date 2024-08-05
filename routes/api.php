@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmploymentStatusController;
+use App\Http\Controllers\JobTitleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -14,10 +18,17 @@ Route::group(['prefix' => "user", 'middleware' => ['auth:sanctum', 'role:admin']
     Route::post('/', [UserController::class, 'store']);
     Route::delete('/{user_id}', [UserController::class, 'destroy']);
 });
+
 Route::group(['prefix' => "user", 'middleware' => ['auth:sanctum']], function () {
     Route::put('/', [UserController::class, 'changePassword']);
 });
 
+Route::group(['prefix' => 'department', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [DepartmentController::class, 'index']);
+    Route::post('/', [DepartmentController::class, 'store']);
+    Route::put('/{id}', [DepartmentController::class, 'update']);
+    Route::delete('/{id}', [DepartmentController::class, 'destroy']);
+});
 
 Route::get('/admin', function (Request $request) {
     return response()->json([
