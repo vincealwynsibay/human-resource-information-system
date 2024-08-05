@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -23,14 +25,22 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+
+        $newEmployeeId = DB::table('tblemployee')->insertGetId([
+            "firstname" => fake()->firstName(),
+            "lastname" => fake()->lastName(),
+            "joined_date" => Date::now()
+        ]);
+
         return [
             'username' => fake()->unique()->userName(),
             'password' => static::$password ??= Hash::make('password'),
             'firstName' => fake()->firstName(),
             'lastName' => fake()->lastName(),
             'middleName' => fake()->lastName(),
+            'EmployeeID' => $newEmployeeId,
             'RoleID' => 1,
-            'status' => "Active"
+            'status' => "Active",
         ];
     }
 

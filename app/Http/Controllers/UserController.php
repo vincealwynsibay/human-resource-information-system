@@ -17,6 +17,7 @@ class UserController extends Controller
         // TODO: populate role names
         return response()->json($users, 200);
     }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -26,6 +27,7 @@ class UserController extends Controller
             'middleName' => "nullable|string",
             'lastName' => "required|string",
             'role' => "required|exists:tbluserrole,id",
+            'employeeId' => "required|exists:tblemployee,id"
         ]);
 
         DB::table('tbluser')->insert([
@@ -34,6 +36,7 @@ class UserController extends Controller
             'firstName' => $validated["firstName"],
             'lastName' => $validated["lastName"],
             'middleName' => $validated["middleName"],
+            'EmployeeID' => $validated["employeeId"],
             'RoleID' => $validated["role"],
         ]);
 

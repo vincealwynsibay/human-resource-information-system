@@ -1,10 +1,19 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 
 test('add new user as admin', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
+
+    $newEmployeeId = DB::table('tblemployee')->insertGetId([
+        "firstname" => fake()->firstName(),
+        "lastname" => fake()->lastName(),
+        "joined_date" => Date::now()
+    ]);
+
     $response = $this->post('/api/user', [
         'username' => "New User",
         'password' => "Password",
@@ -12,6 +21,7 @@ test('add new user as admin', function () {
         'middleName' => "",
         'lastName' => "User",
         'role' => 1,
+        'employeeId' => $newEmployeeId
     ]);
 
     $response->assertStatus(200);
@@ -27,6 +37,12 @@ test('get all users as admin', function () {
 test('add new user as not admin', function () {
     $user = User::factory()->create(["RoleID" => 2]);
     $this->actingAs($user);
+
+    $newEmployeeId = DB::table('tblemployee')->insertGetId([
+        "firstname" => fake()->firstName(),
+        "lastname" => fake()->lastName(),
+        "joined_date" => Date::now()
+    ]);
     $response = $this->post('/api/user', [
         'username' => "New User",
         'password' => "Password",
@@ -34,6 +50,7 @@ test('add new user as not admin', function () {
         'middleName' => "",
         'lastName' => "User",
         'role' => 1,
+        'employeeId' => $newEmployeeId
     ]);
 
     $response->assertStatus(403);
