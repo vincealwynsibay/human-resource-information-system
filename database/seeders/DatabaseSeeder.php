@@ -25,5 +25,47 @@ class DatabaseSeeder extends Seeder
             'name' => "EMPLOYEE",
             'description' => "User with an employee account"
         ]);
+
+        DB::table('tblemployee')->insert([
+            'id' => 1,
+            'firstname' => "John",
+            'lastname' => "Doe",
+            'middlename' => "Smith",
+            'joined_date' => now()
+        ]);
+
+        DB::table('tblemployee')->insert([
+            'id' => 2,
+            'firstname' => "Jane",
+            'lastname' => "Doe",
+            'middlename' => "Smith",
+            'joined_date' => now()
+        ]);
+
+        DB::table('tblemployee')->insert([
+            'id' => 3,
+            'firstname' => "John",
+            'lastname' => "Smith",
+            'middlename' => "Doe",
+            'joined_date' => now()
+        ]);
+
+        DB::table('tblemploymentstatus')->insert([
+            'id' => 1,
+            'name' => "Full Time"
+        ]);
+
+        DB::table('tbljobtitle')->insert([
+            'id' => 1,
+            'name' => "Software Developer",
+            'description' => "Develops software applications"
+        ]);
+
+        DB::table('tbldepartment')->insert([
+            'id' => 1,
+            'name' => "IT"
+        ]);
+
+
     }
 }
