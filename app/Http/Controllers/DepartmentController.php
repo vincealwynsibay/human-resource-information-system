@@ -40,14 +40,23 @@ class DepartmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDepartmentRequest $request)
+    public function update(UpdateDepartmentRequest $request, string $id)
     {
         $validated = $request->validate([
-            'id' => "required|exists:tbldepartment,id",
             'name' => 'required|string|max:45'
         ]);
 
-        DB::table('tbldepartment')->where('id', $validated['id'])->update([
+        $department = DB::table("tbldepartment")->find($id);
+
+        if ($department == null) {
+            return response()->json([
+                'errors' => [
+                    'Department' => ['Department does not exist']
+                ]
+            ], 404);
+        }
+
+        DB::table('tbldepartment')->where('id', $id)->update([
             'name' => $validated['name']
         ]);
 
@@ -59,13 +68,19 @@ class DepartmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, string $id)
     {
-        $validated = $request->validate([
-            'id' => "required|exists:tbldepartment,id"
-        ]);
+        $department = DB::table("tbldepartment")->find($id);
 
-        DB::table('tbldepartment')->where('id', $validated['id'])->delete();
+        if ($department == null) {
+            return response()->json([
+                'errors' => [
+                    'Department' => ['Department does not exist']
+                ]
+            ], 404);
+        }
+
+        DB::table('tbldepartment')->where('id', $id)->delete();
 
         return response()->json([
             'message' => "Department deleted successfully"
