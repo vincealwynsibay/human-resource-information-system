@@ -29,13 +29,50 @@ Route::group(['prefix' => 'department', 'middleware' => ['auth:sanctum', 'role:a
     Route::put('/{id}', [DepartmentController::class, 'update']);
     Route::delete('/{id}', [DepartmentController::class, 'destroy']);
 });
-
 Route::group(['prefix' => 'employmentstatus', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [EmploymentStatusController::class, 'index']);
     Route::post('/', [EmploymentStatusController::class, 'store']);
     Route::put('/{id}', [EmploymentStatusController::class, 'update']);
     Route::delete('/{id}', [EmploymentStatusController::class, 'destroy']);
 });
+Route::group(['prefix' => 'jobtitle', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [JobTitleController::class, 'index']);
+    Route::post('/', [JobTitleController::class, 'store']);
+    Route::put('/{id}', [JobTitleController::class, 'update']);
+    Route::delete('/{id}', [JobTitleController::class, 'destroy']);
+});
+
+
+Route::group(['prefix' => 'employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [EmployeeController::class, 'index']);
+    Route::post('/', [EmployeeController::class, 'store']);
+    Route::get('/{id}', [EmployeeController::class, 'show']);
+    Route::put('/{id}', [EmployeeController::class, 'update']);
+    Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
+    Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
+    Route::put('/{id}/jobDetails', [EmployeeController::class, 'updateJobDetails']);
+    Route::delete('/{id}', [EmployeeController::class, 'destroy']);
+});
+
+Route::group(['prefix' => 'employee', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
+    Route::get('/{id}', [EmployeeController::class, 'show']);
+    Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
+    Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
+});
+
+
+Route::group(['prefix' => 'role', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+
+    Route::get('/admin', function (Request $request) {
+        return response()->json([
+            'message' => 'Admin Page',
+            'user' => $request->user()
+        ]);
+    });
+
+});
+
+
 
 Route::get('/admin', function (Request $request) {
     return response()->json([
