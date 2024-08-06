@@ -31,8 +31,8 @@ class JobTitleController extends Controller
         ]);
 
         DB::table('tbljobtitle')->insert([
-            'name' => $validated['name'],
-            'description' => $validated['description']
+            'name' => $request->name,
+            'description' => $request->description
         ]);
 
         return response()->json([
@@ -62,9 +62,9 @@ class JobTitleController extends Controller
             ], 404);
         }
 
-        DB::table('tbljobtitle')->where('id', $validated['id'])->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
+        DB::table('tbljobtitle')->where('id', $id)->update([
+            'name' => $request->name,
+            'description' => $request->description,
         ]);
 
         return response()->json([
@@ -91,6 +91,6 @@ class JobTitleController extends Controller
 
         return response()->json([
             'message' => "Job Title deleted successfully"
-        ], 201);
+        ], 200);
     }
 }
