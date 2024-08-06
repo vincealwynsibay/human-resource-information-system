@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\File;
 
 class EmployeeController extends Controller
 {
@@ -49,6 +50,7 @@ class EmployeeController extends Controller
             "employees" => $employees
         ], 200);
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -239,6 +241,38 @@ class EmployeeController extends Controller
 
         return response()->json([
             'message' => "Employee Job Details Updated Successfully"
+        ], 200);
+    }
+
+
+    public function updateImage(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            "image" => ["required", File::image()->max("1mb")]
+        ]);
+
+        $file = $request->file('image')->path();
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $data = base64_encode(file_get_contents($file));
+        $data_uri = 'data:' . finfo_file($finfo, $file) . ';base64,' . $data;
+
+
+        $employee = DB::table("tblemployee")->find($id);
+        if ($employee == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not exist']
+                ]
+            ], 404);
+        }
+
+        DB::table("tblemployee")->where('id', $id)->update([
+            'image' => $data_uri
+        ]);
+
+
+        return response()->json([
+            'message' => "Employee Profile Picture Updated Successfully"
         ], 200);
     }
 

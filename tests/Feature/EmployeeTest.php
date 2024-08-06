@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -137,6 +138,22 @@ test('update an employee\'s job details', function () {
     $response->assertStatus(200);
 });
 
+test('update an employee\'s image', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $id = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $response = $this->put('/api/admin/employee/' . $id . '/image', [
+        'image' => UploadedFile::fake()->image('avatar.jpg')
+    ]);
+    $response->assertStatus(200);
+});
+
 test('delete an employee', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
@@ -157,6 +174,24 @@ test('get an employee by id as an employee', function () {
     ]);
     $this->actingAs($user);
     $response = $this->get('/api/employee/1');
+    $response->assertStatus(200);
+});
+
+test('update an employee\'s image as an employee', function () {
+    $user = User::factory()->create([
+        'RoleID' => 2
+    ]);
+    $this->actingAs($user);
+    $id = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $response = $this->put('/api/employee/' . $id . '/image', [
+        'image' => UploadedFile::fake()->image('avatar.jpg')
+    ]);
     $response->assertStatus(200);
 });
 
