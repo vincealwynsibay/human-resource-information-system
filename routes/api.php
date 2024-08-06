@@ -42,8 +42,7 @@ Route::group(['prefix' => 'jobtitle', 'middleware' => ['auth:sanctum', 'role:adm
     Route::delete('/{id}', [JobTitleController::class, 'destroy']);
 });
 
-
-Route::group(['prefix' => 'employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [EmployeeController::class, 'index']);
     Route::post('/', [EmployeeController::class, 'store']);
     Route::get('/{id}', [EmployeeController::class, 'show']);
@@ -54,7 +53,7 @@ Route::group(['prefix' => 'employee', 'middleware' => ['auth:sanctum', 'role:adm
     Route::delete('/{id}', [EmployeeController::class, 'destroy']);
 });
 
-Route::group(['prefix' => 'employee', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
+Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
     Route::get('/{id}', [EmployeeController::class, 'show']);
     Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
     Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
@@ -82,9 +81,9 @@ Route::get('/admin', function (Request $request) {
 })->middleware(['auth:sanctum', 'role:admin']);
 
 
-Route::get('/employee', function (Request $request) {
-    return response()->json([
-        'message' => 'Employee Page',
-        'user' => $request->user()
-    ]);
-})->middleware(['auth:sanctum', 'role:employee']);
+// Route::get('/employee', function (Request $request) {
+//     return response()->json([
+//         'message' => 'Employee Page',
+//         'user' => $request->user()
+//     ]);
+// })->middleware(['auth:sanctum', 'role:employee']);
