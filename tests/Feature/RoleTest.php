@@ -10,6 +10,14 @@ test('test admin', function () {
     $response->assertStatus(200);
 });
 
+test('test admin2', function () {
+
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $response = $this->get('/api/role/admin');
+    $response->assertStatus(200);
+});
+
 test('test employee cannot access admin', function () {
 
     $user = User::factory()->create(["RoleID" => 2]);

@@ -85,6 +85,6 @@ class EmploymentStatusController extends Controller
 
         return response()->json([
             'message' => "Employment Status deleted successfully"
-        ], 201);
+        ], 200);
     }
 }

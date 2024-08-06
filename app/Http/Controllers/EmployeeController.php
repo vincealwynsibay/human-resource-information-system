@@ -15,34 +15,34 @@ class EmployeeController extends Controller
     {
         $validated = $request->validate([
             "name" => "nullable|string|max:200",
-            "id" => "nullable|number",
+            "id" => "nullable|string",
             "employmentStatus" => "nullable|exists:tblemploymentstatus,id",
             "jobTitle" => "nullable|exists:tbljobtitle,id",
             "department" => "nullable|exists:tbldepartment,id",
-            "sortBy" => "nullable|string",
-            "direction" => "nullable|string|in:asc,desc",
+            "sortField" => "nullable|string",
+            "sortOrder" => "nullable|string|in:asc,desc",
         ]);
 
-        $direction = $validated['direction'] ?? "desc";
-        $sortBy = $validated['sortBy'] ?? "id";
+        $sortOrder = $validated['sortOrder'] ?? "desc";
+        $sortField = $validated['sortField'] ?? "id";
 
         $employees = DB::table('tblemployee')
-            ->when($validated["id"], function ($query, $id) {
+            ->when($request->id, function ($query, $id) {
                 return $query->where('id', $id);
             })
-            ->when($validated["name"], function ($query, $name) {
-                return $query->whereRaw(DB::raw("CONCAT(`firstname`, ' ', `lastname`"), 'LIKE', $name);
+            ->when($request->name, function ($query, $name) {
+                return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
             })
-            ->when($validated["employmentStatus"], function ($query, $employmentStatus) {
+            ->when($request->employmentStatus, function ($query, $employmentStatus) {
                 return $query->where('EmploymentStatusID', $employmentStatus);
             })
-            ->when($validated["jobTitle"], function ($query, $jobTitle) {
+            ->when($request->jobTitle, function ($query, $jobTitle) {
                 return $query->where('JobTitleID', $jobTitle);
             })
-            ->when($validated["department"], function ($query, $department) {
+            ->when($request->department, function ($query, $department) {
                 return $query->where('DepartmentID', $department);
             })
-            ->orderBy($sortBy, $direction)
+            ->orderBy($sortField, $sortOrder)
             ->get();
 
         return response()->json([
@@ -126,7 +126,7 @@ class EmployeeController extends Controller
             'firstname' => $validated["firstname"] ?? "",
             'lastname' => $validated["lastname"] ?? "",
             'middlename' => $validated["middlename"] ?? "",
-            'birth_date' => $validated["birth_date"],
+            'birth_date' => $validated["birth_date"] ?? null,
             'gender' => $validated["gender"] ?? "",
             'marital_status' => $validated["marital_status"] ?? "",
             'mobile_no' => $validated["mobile_no"] ?? "",
@@ -137,9 +137,10 @@ class EmployeeController extends Controller
             'zip_code' => $validated["zip_code"] ?? "",
         ]);
 
+
         return response()->json([
             'message' => "Employee Updated Successfully"
-        ], 201);
+        ], 200);
     }
 
 
@@ -168,14 +169,14 @@ class EmployeeController extends Controller
             'firstname' => $validated["firstname"] ?? "",
             'lastname' => $validated["lastname"] ?? "",
             'middlename' => $validated["middlename"] ?? "",
-            'birth_date' => $validated["birth_date"],
+            'birth_date' => $validated["birth_date"] ?? null,
             'gender' => $validated["gender"] ?? "",
             'marital_status' => $validated["marital_status"] ?? "",
         ]);
 
         return response()->json([
             'message' => "Employee Personal Details Updated Successfully"
-        ], 201);
+        ], 200);
     }
 
 
@@ -210,7 +211,7 @@ class EmployeeController extends Controller
 
         return response()->json([
             'message' => "Employee Contact Details Updated Successfully"
-        ], 201);
+        ], 200);
     }
     public function updateJobDetails(Request $request, string $id)
     {
@@ -238,7 +239,7 @@ class EmployeeController extends Controller
 
         return response()->json([
             'message' => "Employee Job Details Updated Successfully"
-        ], 201);
+        ], 200);
     }
 
     /**
@@ -259,6 +260,6 @@ class EmployeeController extends Controller
         DB::table("tblemployee")->where('id', $id)->delete();
         return response()->json([
             'message' => "Employee Deleted Successfully"
-        ], 201);
+        ], 200);
     }
 }
