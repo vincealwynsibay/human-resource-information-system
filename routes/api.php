@@ -54,6 +54,18 @@ Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'ro
     Route::delete('/{id}', [EmployeeController::class, 'destroy']);
 });
 
+Route::group(['prefix' => 'supervisor/employee', 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
+    Route::get('/', [EmployeeController::class, 'index']);
+    Route::get('/{id}', [EmployeeController::class, 'show']);
+    Route::put('/{id}', [EmployeeController::class, 'update']);
+    Route::put('/{id}/image', [EmployeeController::class, 'updateImage']);
+    Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
+    Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
+    Route::put('/{id}/jobDetails', [EmployeeController::class, 'updateJobDetails']);
+    Route::delete('/{id}', [EmployeeController::class, 'destroy']);
+});
+
+
 Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
     Route::get('/{id}', [EmployeeController::class, 'show']);
     Route::put('/{id}/image', [EmployeeController::class, 'updateImage']);

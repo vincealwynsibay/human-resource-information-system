@@ -24,27 +24,54 @@ class EmployeeController extends Controller
             "sortOrder" => "nullable|string|in:asc,desc",
         ]);
 
+
         $sortOrder = $validated['sortOrder'] ?? "desc";
         $sortField = $validated['sortField'] ?? "id";
 
-        $employees = DB::table('tblemployee')
-            ->when($request->id, function ($query, $id) {
-                return $query->where('id', $id);
-            })
-            ->when($request->name, function ($query, $name) {
-                return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
-            })
-            ->when($request->employmentStatus, function ($query, $employmentStatus) {
-                return $query->where('EmploymentStatusID', $employmentStatus);
-            })
-            ->when($request->jobTitle, function ($query, $jobTitle) {
-                return $query->where('JobTitleID', $jobTitle);
-            })
-            ->when($request->department, function ($query, $department) {
-                return $query->where('DepartmentID', $department);
-            })
-            ->orderBy($sortField, $sortOrder)
-            ->get();
+
+        $employees = [];
+        if ($request->user()->roleID == 2) {
+            $employees = DB::table('tblemployee')
+                ->where('SupervisorID', $request->user()->id)
+                ->when($request->id, function ($query, $id) {
+                    return $query->where('id', $id);
+                })
+                ->when($request->name, function ($query, $name) {
+                    return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
+                })
+                ->when($request->employmentStatus, function ($query, $employmentStatus) {
+                    return $query->where('EmploymentStatusID', $employmentStatus);
+                })
+                ->when($request->jobTitle, function ($query, $jobTitle) {
+                    return $query->where('JobTitleID', $jobTitle);
+                })
+                ->when($request->department, function ($query, $department) {
+                    return $query->where('DepartmentID', $department);
+                })
+                ->orderBy($sortField, $sortOrder)
+                ->get();
+        } else {
+            $employees = DB::table('tblemployee')
+                ->where('SupervisorID', $request->user()->id)
+                ->when($request->id, function ($query, $id) {
+                    return $query->where('id', $id);
+                })
+                ->when($request->name, function ($query, $name) {
+                    return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
+                })
+                ->when($request->employmentStatus, function ($query, $employmentStatus) {
+                    return $query->where('EmploymentStatusID', $employmentStatus);
+                })
+                ->when($request->jobTitle, function ($query, $jobTitle) {
+                    return $query->where('JobTitleID', $jobTitle);
+                })
+                ->when($request->department, function ($query, $department) {
+                    return $query->where('DepartmentID', $department);
+                })
+                ->orderBy($sortField, $sortOrder)
+                ->get();
+        }
+
 
         return response()->json([
             "employees" => $employees
@@ -79,9 +106,31 @@ class EmployeeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
+
+
         $employee = DB::table("tblemployee")->find($id);
+
+        if ($request->user()->roleID == 2) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($request->user()->roleID == 3) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot view other employees\'s details']
+                    ]
+                ], 404);
+            }
+        }
 
         if ($employee == null) {
             return response()->json([
@@ -94,6 +143,49 @@ class EmployeeController extends Controller
         return response()->json(["employee" => $employee], 200);
     }
 
+    public function assignSupervisor(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'supervisor' => "required|exists:tblemployee,id"
+        ]);
+
+        if ($validated["supervisor"] == $id) {
+            return response()->json([
+                'errors' => [
+                    'Supervisor' => ['Employee cannot be their own supervisor']
+                ]
+            ], 400);
+        }
+
+        // check if supervisor is a supervisor
+        $supervisor = DB::table("tblemployee")->find($validated["supervisor"]);
+
+        if ($supervisor->JobTitleID > 2) {
+            return response()->json([
+                'errors' => [
+                    'Supervisor' => ['Supervisor must be a supervisor']
+                ]
+            ], 400);
+        }
+
+        $employee = DB::table("tblemployee")->find($id);
+        if ($employee == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not exist']
+                ]
+            ], 404);
+        }
+
+        DB::table("tblemployee")->where('id', $id)->update([
+            'SupervisorID' => $validated["supervisor"]
+        ]);
+
+
+        return response()->json([
+            'message' => "Supervisor assigned successfully"
+        ], 200);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -114,7 +206,28 @@ class EmployeeController extends Controller
             'province' => "nullable|string|max:100",
             'zip_code' => "nullable|string|max:20",
         ]);
+
         $employee = DB::table("tblemployee")->find($id);
+
+        if ($request->user()->roleID == 2) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($request->user()->roleID == 3) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
 
         if ($employee == null) {
             return response()->json([
@@ -159,6 +272,28 @@ class EmployeeController extends Controller
 
 
         $employee = DB::table("tblemployee")->find($id);
+
+        if ($request->user()->roleID == 2) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+
+        if ($request->user()->roleID == 3) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
+
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -194,6 +329,27 @@ class EmployeeController extends Controller
         ]);
         $employee = DB::table("tblemployee")->find($id);
 
+        if ($request->user()->roleID == 2) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+
+        if ($request->user()->roleID == 3) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
+
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -225,6 +381,27 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
+        if ($request->user()->roleID == 2) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+
+        if ($request->user()->roleID == 3) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
+
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -251,13 +428,25 @@ class EmployeeController extends Controller
             "image" => ["required", File::image()->max("1mb")]
         ]);
 
-        $file = $request->file('image')->path();
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $data = base64_encode(file_get_contents($file));
-        $data_uri = 'data:' . finfo_file($finfo, $file) . ';base64,' . $data;
-
+        if ($request->user()->roleID == 2) {
+            return response()->json([
+                'errors' => [
+                    'Authorization' => ['Access not allowed']
+                ]
+            ], 404);
+        }
 
         $employee = DB::table("tblemployee")->find($id);
+        if ($request->user()->roleID == 3) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
+
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -265,6 +454,12 @@ class EmployeeController extends Controller
                 ]
             ], 404);
         }
+
+        $file = $request->file('image')->path();
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $data = base64_encode(file_get_contents($file));
+        $data_uri = 'data:' . finfo_file($finfo, $file) . ';base64,' . $data;
+
 
         DB::table("tblemployee")->where('id', $id)->update([
             'image' => $data_uri
@@ -279,9 +474,29 @@ class EmployeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $employee = DB::table("tblemployee")->find($id);
+
+        if ($request->user()->roleID == 2) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($request->user()->roleID == 3) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot delete other\'s details']
+                    ]
+                ], 404);
+            }
+        }
 
         if ($employee == null) {
             return response()->json([

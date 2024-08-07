@@ -54,7 +54,7 @@ class User extends Authenticatable
     {
         // get id of role
         $roleId = DB::table('tbluserrole')->where('name', $role)->first(['id'])->id;
-        return $roleId == $this->RoleID;
+        return $roleId >= $this->RoleID;
     }
 
     /**
