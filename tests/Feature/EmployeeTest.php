@@ -67,6 +67,55 @@ test('get an employee by id', function () {
     $response->assertStatus(200);
 });
 
+test('assign employee to a supervisor as admin', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $employeeId = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $supervisorId = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $response = $this->put('/api/admin/employee/' . $employeeId . '/assignSupervisor', [
+        'supervisor' => $supervisorId
+    ]);
+    $response->assertStatus(200);
+});
+
+test('remove assigned supervisor from an employee', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $employeeId = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $supervisorId = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $this->put('/api/admin/employee/' . $employeeId . '/assignSupervisor', [
+        'supervisor' => $supervisorId
+    ]);
+
+    $response = $this->put('/api/admin/employee/' . $employeeId . '/removeSupervisor', [
+        'supervisor' => $supervisorId
+    ]);
+    $response->assertStatus(200);
+});
 
 test('update an employee', function () {
     $user = User::factory()->create();
@@ -152,6 +201,56 @@ test('update an employee\'s image', function () {
 
     $response = $this->put('/api/admin/employee/' . $id . '/image', [
         'image' => UploadedFile::fake()->image('avatar.jpg')
+    ]);
+    $response->assertStatus(200);
+});
+
+test('assign work shift as admin', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $employeeId = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $workShiftId = DB::table('tblworkshift')->insertGetId([
+        'name' => 'Morning',
+        'hours_per_day' => 8,
+        'start_time' => '08:00:00',
+        'end_time' => '17:00:00'
+    ]);
+
+    $response = $this->put('/api/admin/employee/' . $employeeId . '/assignWorkShift', [
+        'workShift' => $workShiftId
+    ]);
+    $response->assertStatus(200);
+});
+
+test('remove work shift as admin', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $employeeId = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $workShiftId = DB::table('tblworkshift')->insertGetId([
+        'name' => 'Morning',
+        'hours_per_day' => 8,
+        'start_time' => '08:00:00',
+        'end_time' => '17:00:00'
+    ]);
+
+    $this->put('/api/admin/employee/' . $employeeId . '/assignWorkShift', [
+        'workShift' => $workShiftId
+    ]);
+
+    $response = $this->put('/api/admin/employee/' . $employeeId . '/removeWorkShift', [
+        'workShift' => $workShiftId
     ]);
     $response->assertStatus(200);
 });

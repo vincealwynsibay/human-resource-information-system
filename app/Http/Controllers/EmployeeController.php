@@ -209,6 +209,94 @@ class EmployeeController extends Controller
         ], 200);
     }
 
+    public function assignWorkShift(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'workShift' => "required|exists:tblworkshift,id"
+        ]);
+
+        $employee = DB::table("tblemployee")->find($id);
+
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($employee == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not exist']
+                ]
+            ], 404);
+        }
+
+        DB::table("tblemployeeworkshift")->insert([
+            'EmployeeID' => $id,
+            'WorkShiftID' => $validated["workShift"]
+        ]);
+
+        return response()->json([
+            'message' => "Work Shift assigned successfully"
+        ], 200);
+    }
+
+    public function removeWorkShift(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'workShift' => "required|exists:tblworkshift,id"
+        ]);
+
+        $employee = DB::table("tblemployee")->find($id);
+
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($employee == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not exist']
+                ]
+            ], 404);
+        }
+
+        DB::table("tblemployeeworkshift")->where('EmployeeID', $id)->where('WorkShiftID', $validated["workShift"])->delete();
+
+        return response()->json([
+            'message' => "Work Shift removed successfully"
+        ], 200);
+    }
 
     /**
      * Update the specified resource in storage.

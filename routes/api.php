@@ -55,6 +55,11 @@ Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'ro
     Route::post('/', [EmployeeController::class, 'store']);
     Route::get('/{id}', [EmployeeController::class, 'show']);
     Route::put('/{id}', [EmployeeController::class, 'update']);
+    Route::put('/{id}/assignSupervisor', [EmployeeController::class, 'assignSupervisor']);
+    Route::put('/{id}/removeSupervisor', [EmployeeController::class, 'removeSupervisor']);
+    Route::put('/{id}/assignWorkShift', [EmployeeController::class, 'assignWorkShift']);
+    Route::put('/{id}/removeWorkShift', [EmployeeController::class, 'removeWorkShift']);
+
     Route::put('/{id}/image', [EmployeeController::class, 'updateImage']);
     Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
     Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);

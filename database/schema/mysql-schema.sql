@@ -169,6 +169,20 @@ CREATE TABLE `tblemployee` (
   CONSTRAINT `tblemployee_ibfk_5` FOREIGN KEY (`SupervisorID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblemployeeworkshift`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblemployeeworkshift` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `WorkShiftID` int NOT NULL,
+  `EmployeeID` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `WorkShiftID` (`WorkShiftID`),
+  KEY `EmployeeID` (`EmployeeID`),
+  CONSTRAINT `tblemployeeworkshift_ibfk_1` FOREIGN KEY (`WorkShiftID`) REFERENCES `tblworkshift` (`id`),
+  CONSTRAINT `tblemployeeworkshift_ibfk_2` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblemploymentstatus`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
