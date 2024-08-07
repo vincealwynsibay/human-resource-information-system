@@ -144,6 +144,7 @@ class EmployeeController extends Controller
         return response()->json(["employee" => $employee], 200);
     }
 
+
     public function assignSupervisor(Request $request, string $id)
     {
         $validated = $request->validate([
@@ -187,6 +188,27 @@ class EmployeeController extends Controller
             'message' => "Supervisor assigned successfully"
         ], 200);
     }
+
+    public function removeSupervisor(Request $request, string $id)
+    {
+        $employee = DB::table("tblemployee")->find($id);
+        if ($employee == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not exist']
+                ]
+            ], 404);
+        }
+
+        DB::table("tblemployee")->where('id', $id)->update([
+            'SupervisorID' => null
+        ]);
+
+        return response()->json([
+            'message' => "Supervisor removed successfully"
+        ], 200);
+    }
+
 
     /**
      * Update the specified resource in storage.
