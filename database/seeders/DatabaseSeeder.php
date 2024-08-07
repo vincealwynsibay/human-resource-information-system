@@ -20,8 +20,15 @@ class DatabaseSeeder extends Seeder
             'description' => "User with administration rights"
         ]);
 
+
         DB::table('tbluserrole')->insert([
             'id' => 2,
+            'name' => "SUPERVISOR",
+            'description' => "User that supervises employees"
+        ]);
+
+        DB::table('tbluserrole')->insert([
+            'id' => 3,
             'name' => "EMPLOYEE",
             'description' => "User with an employee account"
         ]);

@@ -139,21 +139,34 @@ DROP TABLE IF EXISTS `tblemployee`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `tblemployee` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `UserID` int NOT NULL,
-  `JobTitleID` int NOT NULL,
-  `EmploymentStatusID` int NOT NULL,
-  `DepartmentID` int NOT NULL,
-  `joineddate` datetime NOT NULL,
+  `firstname` varchar(100) NOT NULL,
+  `lastname` varchar(100) NOT NULL,
+  `middlename` varchar(100) DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
+  `marital_status` varchar(20) DEFAULT NULL,
+  `gender` varchar(6) DEFAULT NULL,
+  `mobile_no` varchar(50) DEFAULT NULL,
+  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `zip_code` varchar(20) DEFAULT NULL,
+  `address` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `province` varchar(100) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `JobTitleID` int DEFAULT NULL,
+  `EmploymentStatusID` int DEFAULT NULL,
+  `SupervisorID` int DEFAULT NULL,
+  `DepartmentID` int DEFAULT NULL,
+  `joined_date` datetime NOT NULL,
   `status` varchar(45) NOT NULL DEFAULT 'ACTIVE',
+  `image` text,
   PRIMARY KEY (`id`),
-  KEY `UserID` (`UserID`),
   KEY `JobTitleID` (`JobTitleID`),
   KEY `EmploymentStatusID` (`EmploymentStatusID`),
   KEY `DepartmentID` (`DepartmentID`),
-  CONSTRAINT `tblemployee_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `tbluser` (`id`),
+  KEY `SupervisorID` (`SupervisorID`),
   CONSTRAINT `tblemployee_ibfk_2` FOREIGN KEY (`JobTitleID`) REFERENCES `tbljobtitle` (`id`),
   CONSTRAINT `tblemployee_ibfk_3` FOREIGN KEY (`EmploymentStatusID`) REFERENCES `tblemploymentstatus` (`id`),
-  CONSTRAINT `tblemployee_ibfk_4` FOREIGN KEY (`DepartmentID`) REFERENCES `tbldepartment` (`id`)
+  CONSTRAINT `tblemployee_ibfk_4` FOREIGN KEY (`DepartmentID`) REFERENCES `tbldepartment` (`id`),
+  CONSTRAINT `tblemployee_ibfk_5` FOREIGN KEY (`SupervisorID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblemploymentstatus`;
@@ -185,11 +198,14 @@ CREATE TABLE `tbluser` (
   `firstName` varchar(45) NOT NULL,
   `lastName` varchar(45) NOT NULL,
   `middleName` varchar(45) DEFAULT NULL,
+  `EmployeeID` int NOT NULL,
   `RoleID` int NOT NULL,
   `status` varchar(45) NOT NULL DEFAULT 'ACTIVE',
   PRIMARY KEY (`id`),
   KEY `RoleID` (`RoleID`),
-  CONSTRAINT `tbluser_ibfk_1` FOREIGN KEY (`RoleID`) REFERENCES `tbluserrole` (`id`)
+  KEY `EmployeeID` (`EmployeeID`),
+  CONSTRAINT `tbluser_ibfk_1` FOREIGN KEY (`RoleID`) REFERENCES `tbluserrole` (`id`),
+  CONSTRAINT `tbluser_ibfk_2` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tbluserrole`;
