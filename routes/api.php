@@ -5,6 +5,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmploymentStatusController;
 use App\Http\Controllers\JobTitleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WorkShiftController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,13 @@ Route::group(['prefix' => 'jobtitle', 'middleware' => ['auth:sanctum', 'role:adm
     Route::post('/', [JobTitleController::class, 'store']);
     Route::put('/{id}', [JobTitleController::class, 'update']);
     Route::delete('/{id}', [JobTitleController::class, 'destroy']);
+});
+
+Route::group(['prefix' => 'workshift', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [WorkShiftController::class, 'index']);
+    Route::post('/', [WorkShiftController::class, 'store']);
+    Route::put('/{id}', [WorkShiftController::class, 'update']);
+    Route::delete('/{id}', [WorkShiftController::class, 'destroy']);
 });
 
 Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
