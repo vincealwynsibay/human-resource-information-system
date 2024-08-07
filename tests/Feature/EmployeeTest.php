@@ -4,6 +4,7 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use App\Enum\RoleEnum;
 
 test('get all employees', function () {
     $user = User::factory()->create();

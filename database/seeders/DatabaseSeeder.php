@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\RoleEnum;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,20 +16,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         DB::table('tbluserrole')->insert([
-            'id' => 1,
+            'id' => RoleEnum::ADMIN->value,
             'name' => "ADMIN",
             'description' => "User with administration rights"
         ]);
 
 
         DB::table('tbluserrole')->insert([
-            'id' => 2,
+            'id' => RoleEnum::SUPERVISOR->value,
             'name' => "SUPERVISOR",
             'description' => "User that supervises employees"
         ]);
 
         DB::table('tbluserrole')->insert([
-            'id' => 3,
+            'id' => RoleEnum::EMPLOYEE->value,
             'name' => "EMPLOYEE",
             'description' => "User with an employee account"
         ]);

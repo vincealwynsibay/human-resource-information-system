@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\RoleEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,7 @@ class EmployeeController extends Controller
 
 
         $employees = [];
-        if ($request->user()->roleID == 2) {
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
             $employees = DB::table('tblemployee')
                 ->where('SupervisorID', $request->user()->id)
                 ->when($request->id, function ($query, $id) {
@@ -112,7 +113,7 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == 2) {
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
             if ($employee->SupervisorID != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -122,7 +123,7 @@ class EmployeeController extends Controller
             }
         }
 
-        if ($request->user()->roleID == 3) {
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -209,7 +210,7 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == 2) {
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
             if ($employee->SupervisorID != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -219,7 +220,7 @@ class EmployeeController extends Controller
             }
         }
 
-        if ($request->user()->roleID == 3) {
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -273,7 +274,7 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == 2) {
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
             if ($employee->SupervisorID != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -284,7 +285,7 @@ class EmployeeController extends Controller
         }
 
 
-        if ($request->user()->roleID == 3) {
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -329,7 +330,7 @@ class EmployeeController extends Controller
         ]);
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == 2) {
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
             if ($employee->SupervisorID != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -340,7 +341,7 @@ class EmployeeController extends Controller
         }
 
 
-        if ($request->user()->roleID == 3) {
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -381,7 +382,7 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == 2) {
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
             if ($employee->SupervisorID != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -392,7 +393,7 @@ class EmployeeController extends Controller
         }
 
 
-        if ($request->user()->roleID == 3) {
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -428,7 +429,7 @@ class EmployeeController extends Controller
             "image" => ["required", File::image()->max("1mb")]
         ]);
 
-        if ($request->user()->roleID == 2) {
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
             return response()->json([
                 'errors' => [
                     'Authorization' => ['Access not allowed']
@@ -437,7 +438,7 @@ class EmployeeController extends Controller
         }
 
         $employee = DB::table("tblemployee")->find($id);
-        if ($request->user()->roleID == 3) {
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -478,7 +479,7 @@ class EmployeeController extends Controller
     {
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == 2) {
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
             if ($employee->SupervisorID != $request->user()->id) {
                 return response()->json([
                     'errors' => [
@@ -488,7 +489,7 @@ class EmployeeController extends Controller
             }
         }
 
-        if ($request->user()->roleID == 3) {
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
