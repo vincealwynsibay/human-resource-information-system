@@ -3,6 +3,7 @@
 // get, post, put, delete
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 test('get all departments', function () {
     $user = User::factory()->create();
@@ -23,7 +24,10 @@ test('create a new department', function () {
 test('update a department', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->put('/api/department/1', [
+    $id = DB::table('tbldepartment')->insertGetId([
+        'name' => 'Department 1'
+    ]);
+    $response = $this->put('/api/department/' . $id, [
         'name' => fake()->company
     ]);
     $response->assertStatus(201);
@@ -32,6 +36,9 @@ test('update a department', function () {
 test('delete a department', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->delete('/api/department/1');
+    $id = DB::table('tbldepartment')->insertGetId([
+        'name' => 'Department 1'
+    ]);
+    $response = $this->delete('/api/department/' . $id);
     $response->assertStatus(200);
 });

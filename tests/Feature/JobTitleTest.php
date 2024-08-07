@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 test('get all job titles', function () {
     $user = User::factory()->create();
@@ -23,8 +24,11 @@ test('create a new job title', function () {
 test('update a job title', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
+    $id = DB::table('tbljobtitle')->insertGetId([
+        'name' => 'Job Title 1'
+    ]);
 
-    $response = $this->put('/api/jobtitle/1', [
+    $response = $this->put('/api/jobtitle/' . $id, [
         'name' => fake()->jobTitle
     ]);
     $response->assertStatus(201);
@@ -34,6 +38,10 @@ test('delete a job title', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $response = $this->delete('/api/jobtitle/1');
+    $id = DB::table('tbljobtitle')->insertGetId([
+        'name' => 'Job Title 1'
+    ]);
+
+    $response = $this->delete('/api/jobtitle/' . $id);
     $response->assertStatus(200);
 });
