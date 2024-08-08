@@ -125,6 +125,22 @@ CREATE TABLE `sessions` (
   KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblattendancerecord`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblattendancerecord` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `EmployeeID` int NOT NULL,
+  `time_in_session1` time DEFAULT NULL,
+  `time_out_session1` time DEFAULT NULL,
+  `time_in_session2` time DEFAULT NULL,
+  `time_out_session2` time DEFAULT NULL,
+  `time_in_overtime` time DEFAULT NULL,
+  `time_out_overtime` time DEFAULT NULL,
+  `date` date NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tbldepartment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -241,6 +257,8 @@ CREATE TABLE `tblworkshift` (
   `hours_per_day` decimal(4,2) NOT NULL,
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
+  `start_break_time` time DEFAULT NULL,
+  `end_break_time` time DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
