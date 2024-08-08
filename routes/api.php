@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmploymentStatusController;
@@ -65,6 +66,9 @@ Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'ro
     Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
     Route::put('/{id}/jobDetails', [EmployeeController::class, 'updateJobDetails']);
     Route::delete('/{id}', [EmployeeController::class, 'destroy']);
+
+    Route::get('/{employeeId}/attendance', [AttendanceController::class, 'getEmployeeAttendanceRecords']);
+
 });
 
 Route::group(['prefix' => 'supervisor/employee', 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
@@ -86,6 +90,28 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
     Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
 });
 
+
+Route::group(['prefix' => "/admin/attendance", 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [AttendanceController::class, 'index']);
+    Route::get('/{id}', [AttendanceController::class, 'show']);
+    Route::put('/{id}', [AttendanceController::class, 'update']);
+    Route::delete('/{id}', [AttendanceController::class, 'destroy']);
+});
+
+Route::group(['prefix' => "/supervisor/attendance", 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
+    Route::get('/', [AttendanceController::class, 'index']);
+    Route::get('/{id}', [AttendanceController::class, 'show']);
+});
+
+Route::group(['prefix' => "/employee/attendance", 'middleware' => ['auth:sanctum', 'role:employee']], function () {
+    Route::get('/', [AttendanceController::class, 'index']);
+    Route::get('/{id}', [AttendanceController::class, 'show']);
+    Route::post('/', [AttendanceController::class, 'attendance']);
+    Route::post('/timeIn', [AttendanceController::class, 'timeIn']);
+    Route::post('/timeOut', [AttendanceController::class, 'timeOut']);
+    Route::put('/{id}', [AttendanceController::class, 'update']);
+    Route::delete('/{id}', [AttendanceController::class, 'destroy']);
+});
 
 Route::group(['prefix' => 'role', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
 
