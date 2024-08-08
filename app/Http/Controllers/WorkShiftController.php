@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreWorkShiftRequest;
 use App\Http\Requests\UpdateWorkShiftRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
 class WorkShiftController extends Controller
@@ -27,14 +28,19 @@ class WorkShiftController extends Controller
             "name" => "required|string|max:100",
             "hours_per_day" => "required|numeric",
             "start_time" => "required|date_format:H:i",
-            "end_time" => "required|date_format:H:i|after:start_time"
+            "end_time" => "required|date_format:H:i|after:start_time",
+            "start_break_time" => "nullable|date_format:H:i",
+            "end_break_time" => "nullable|date_format:H:i|after:start_break_time"
         ]);
 
         DB::table('tblworkshift')->insert([
             'name' => $validated['name'],
             'hours_per_day' => $validated['hours_per_day'],
             'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time']
+            'end_time' => $validated['end_time'],
+            'start_break_time' => $request->start_break_time,
+            'end_break_time' => $request->end_break_time,
+            'date' => Date::today()
         ]);
 
         return response()->json([
@@ -52,7 +58,9 @@ class WorkShiftController extends Controller
             'name' => 'required|string|max:45',
             "hours_per_day" => "required|numeric",
             "start_time" => "required|date_format:H:i",
-            "end_time" => "required|date_format:H:i|after:start_time"
+            "end_time" => "required|date_format:H:i|after:start_time",
+            "start_break_time" => "nullable|date_format:H:i",
+            "end_break_time" => "nullable|date_format:H:i|after:start_break_time"
         ]);
 
         $workShift = DB::table("tblworkshift")->find($id);
@@ -69,7 +77,9 @@ class WorkShiftController extends Controller
             'name' => $validated['name'],
             'hours_per_day' => $validated['hours_per_day'],
             'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time']
+            'end_time' => $validated['end_time'],
+            'start_break_time' => $request->start_break_time,
+            'end_break_time' => $request->end_break_time
         ]);
 
         return response()->json([

@@ -60,10 +60,12 @@ class DatabaseSeeder extends Seeder
 
         DB::table('tblworkshift')->insert([
             'id' => 1,
-            'name' => "Morning",
+            'name' => "Full Time",
             'hours_per_day' => 8,
             'start_time' => "08:00:00",
-            'end_time' => "17:00:00"
+            'end_time' => "17:00:00",
+            'start_break_time' => "12:00:00",
+            'end_break_time' => "13:00:00"
         ]);
 
         DB::table('tblworkshift')->insert([
