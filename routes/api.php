@@ -5,6 +5,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmploymentStatusController;
 use App\Http\Controllers\JobTitleController;
+use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkShiftController;
 use Illuminate\Http\Request;
@@ -31,12 +32,14 @@ Route::group(['prefix' => 'department', 'middleware' => ['auth:sanctum', 'role:a
     Route::put('/{id}', [DepartmentController::class, 'update']);
     Route::delete('/{id}', [DepartmentController::class, 'destroy']);
 });
+
 Route::group(['prefix' => 'employmentstatus', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [EmploymentStatusController::class, 'index']);
     Route::post('/', [EmploymentStatusController::class, 'store']);
     Route::put('/{id}', [EmploymentStatusController::class, 'update']);
     Route::delete('/{id}', [EmploymentStatusController::class, 'destroy']);
 });
+
 Route::group(['prefix' => 'jobtitle', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [JobTitleController::class, 'index']);
     Route::post('/', [JobTitleController::class, 'store']);
@@ -49,6 +52,13 @@ Route::group(['prefix' => 'workshift', 'middleware' => ['auth:sanctum', 'role:ad
     Route::post('/', [WorkShiftController::class, 'store']);
     Route::put('/{id}', [WorkShiftController::class, 'update']);
     Route::delete('/{id}', [WorkShiftController::class, 'destroy']);
+});
+
+Route::group(['prefix' => 'leavetype', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [LeaveTypeController::class, 'index']);
+    Route::post('/', [LeaveTypeController::class, 'store']);
+    Route::put('/{id}', [LeaveTypeController::class, 'update']);
+    Route::delete('/{id}', [LeaveTypeController::class, 'destroy']);
 });
 
 Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
