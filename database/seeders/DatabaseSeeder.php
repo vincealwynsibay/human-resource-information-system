@@ -92,6 +92,11 @@ class DatabaseSeeder extends Seeder
             'name' => "IT"
         ]);
 
+        DB::table('tblleavetype')->insert([
+            'id' => 1,
+            'name' => "Annual Leave",
+        ]);
+
 
     }
 }

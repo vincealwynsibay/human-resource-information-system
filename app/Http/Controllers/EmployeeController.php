@@ -53,7 +53,6 @@ class EmployeeController extends Controller
                 ->get();
         } else {
             $employees = DB::table('tblemployee')
-                ->where('SupervisorID', $request->user()->id)
                 ->when($request->id, function ($query, $id) {
                     return $query->where('id', $id);
                 })

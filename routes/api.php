@@ -5,6 +5,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmploymentStatusController;
 use App\Http\Controllers\JobTitleController;
+use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkShiftController;
@@ -59,6 +60,16 @@ Route::group(['prefix' => 'leavetype', 'middleware' => ['auth:sanctum', 'role:ad
     Route::post('/', [LeaveTypeController::class, 'store']);
     Route::put('/{id}', [LeaveTypeController::class, 'update']);
     Route::delete('/{id}', [LeaveTypeController::class, 'destroy']);
+});
+
+Route::group(['prefix' => "leaveentitlement", 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    // get leave entitlements by user
+    Route::get('/', [LeaveEntitlementController::class, 'index']);
+    Route::get('/me', [LeaveEntitlementController::class, 'getUserLeaveEntitlements']);
+    Route::post('/', [LeaveEntitlementController::class, 'store']);
+    Route::put('/{id}', [LeaveEntitlementController::class, 'update']);
+    Route::put('/{id}/daysUsed', [LeaveEntitlementController::class, 'updateDaysUsed']);
+    Route::delete('/{id}', [LeaveEntitlementController::class, 'destroy']);
 });
 
 Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
