@@ -218,6 +218,64 @@ CREATE TABLE `tbljobtitle` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblleave`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblleave` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `EmployeeID` int NOT NULL,
+  `LeaveTypeID` int NOT NULL,
+  `no_of_days` int NOT NULL,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `reason` varchar(255) NOT NULL,
+  `status` varchar(50) DEFAULT 'PENDING',
+  `approval_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `EmployeeID` (`EmployeeID`),
+  KEY `LeaveTypeID` (`LeaveTypeID`),
+  CONSTRAINT `tblleave_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
+  CONSTRAINT `tblleave_ibfk_2` FOREIGN KEY (`LeaveTypeID`) REFERENCES `tblleavetype` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblleaveentitlement`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblleaveentitlement` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `EmployeeID` int NOT NULL,
+  `LeaveTypeID` int NOT NULL,
+  `entitlement` decimal(19,15) NOT NULL,
+  `days_used` decimal(8,4) NOT NULL DEFAULT '0.0000',
+  `valid_from` datetime NOT NULL,
+  `valid_to` datetime DEFAULT NULL,
+  `date_created` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `EmployeeID` (`EmployeeID`),
+  KEY `LeaveTypeID` (`LeaveTypeID`),
+  CONSTRAINT `tblleaveentitlement_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
+  CONSTRAINT `tblleaveentitlement_ibfk_2` FOREIGN KEY (`LeaveTypeID`) REFERENCES `tblleavetype` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblleavestatus`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblleavestatus` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblleavetype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblleavetype` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `status` varchar(50) DEFAULT 'ACTIVE',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tbluser`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
