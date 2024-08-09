@@ -5,6 +5,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmploymentStatusController;
 use App\Http\Controllers\JobTitleController;
+use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\UserController;
@@ -70,6 +71,23 @@ Route::group(['prefix' => "leaveentitlement", 'middleware' => ['auth:sanctum', '
     Route::put('/{id}', [LeaveEntitlementController::class, 'update']);
     Route::put('/{id}/daysUsed', [LeaveEntitlementController::class, 'updateDaysUsed']);
     Route::delete('/{id}', [LeaveEntitlementController::class, 'destroy']);
+});
+
+Route::group(['prefix' => 'leave', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
+    // get own leaves
+    Route::get('/me', [LeaveController::class, 'getOwnLeave']);
+    // apply leave
+    Route::post('/', [LeaveController::class, 'applyForLeave']);
+    // update leave
+    Route::put('/{id}', [LeaveController::class, 'update']);
+    // delete leave
+    Route::delete('/{id}', [LeaveController::class, 'destroy']);
+});
+
+Route::group(['prefix' => 'leave', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [LeaveController::class, 'index']);
+    Route::put('/approve', [LeaveController::class, 'approveLeave']);
+    Route::put('/reject', [LeaveController::class, 'rejectLeave']);
 });
 
 Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
