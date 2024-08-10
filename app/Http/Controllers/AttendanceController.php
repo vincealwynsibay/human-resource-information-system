@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\LeaveRequestEnum;
 use App\Enum\RoleEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -446,10 +447,20 @@ class AttendanceController extends Controller
         $absences = [];
         $currentAttendance = $attendances[0];
         foreach ($attendances as $attendance) {
-            // TODO: CHECK LEAVES AND HOLIDAYS
             if ($attendance->date != $currentAttendance->date) {
                 $currentAttendance = $attendance;
             }
+
+            // check if there is a leave record on the date, if there is, do not record as absence
+            $leave = DB::table('tblleave')->where('status', LeaveRequestEnum::APPROVED)->where('EmployeeID', $employeeID)->where(function ($query) use ($currentAttendance) {
+                $query->where('start_date', "<=", $currentAttendance->date);
+                $query->where('end_date', ">=", $currentAttendance->date);
+            })->first();
+
+            if ($leave != null) {
+                continue;
+            }
+            // TODO: CHECK HOLIDAYS
 
             // compare if there is a gap between attendance records (later date - earlier date > 1)
             if (Date::format("Y-m-d", $attendance->date)->diffInDays(Date::format("Y-m-d", $currentAttendance->date)) > 1) {
