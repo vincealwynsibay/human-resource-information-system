@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enum\LeaveRequestEnum;
+use App\Enum\RoleEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -20,12 +21,62 @@ class LeaveController extends Controller
             'toDate' => 'nullable|date',
             'status' => 'nullable|string',
             'leaveType' => 'nullable|exists:tblleavetype,id',
-
         ]);
-        $leaveRequests = DB::table('tblleave')
-            ->when($request->employeeId, function ($query, $employeeId) {
-                return $query->where('EmployeeID', $employeeId);
-            })
+
+        if ($request->user()->RoleID == RoleEnum::SUPERVISOR) {
+            $assignedEmployees = DB::table('tblemployee')->where('SupervisorID', $request->user()->EmployeeID)->pluck('id');
+            $leaveRequests = DB::table('tblleave')
+                ->whereIn('EmployeeID', $assignedEmployees)
+                ->when($request->employeeId, function ($query, $employeeId) {
+                    return $query->where('EmployeeID', $employeeId);
+                })
+                ->when($request->fromDate, function ($query, $fromDate) {
+                    return $query->whereDate('start_date', '>=', $fromDate);
+                })
+                ->when($request->toDate, function ($query, $toDate) {
+                    return $query->whereDate('end_date', '<=', $toDate);
+                })
+                ->when($request->status, function ($query, $status) {
+                    return $query->where('status', $status);
+                })
+                ->when($request->leaveType, function ($query, $leaveType) {
+                    return $query->where('LeaveTypeID', $leaveType);
+                })
+                ->get();
+        } else {
+            $leaveRequests = DB::table('tblleave')
+                ->when($request->employeeId, function ($query, $employeeId) {
+                    return $query->where('EmployeeID', $employeeId);
+                })
+                ->when($request->fromDate, function ($query, $fromDate) {
+                    return $query->whereDate('start_date', '>=', $fromDate);
+                })
+                ->when($request->toDate, function ($query, $toDate) {
+                    return $query->whereDate('end_date', '<=', $toDate);
+                })
+                ->when($request->status, function ($query, $status) {
+                    return $query->where('status', $status);
+                })
+                ->when($request->leaveType, function ($query, $leaveType) {
+                    return $query->where('LeaveTypeID', $leaveType);
+                })
+                ->get();
+        }
+
+
+        return response()->json($leaveRequests);
+    }
+
+    public function getOwnLeave(Request $request)
+    {
+        $validated = $request->validate([
+            'fromDate' => 'nullable|date',
+            'toDate' => 'nullable|date',
+            'status' => 'nullable|string',
+            'leaveType' => 'nullable|exists:tblleavetype,id',
+        ]);
+
+        $leaves = DB::table('tblleave')->where('EmployeeID', $request->user()->EmployeeID)
             ->when($request->fromDate, function ($query, $fromDate) {
                 return $query->whereDate('start_date', '>=', $fromDate);
             })
@@ -39,13 +90,6 @@ class LeaveController extends Controller
                 return $query->where('LeaveTypeID', $leaveType);
             })
             ->get();
-        return response()->json($leaveRequests);
-    }
-
-    public function getOwnLeave(Request $request)
-    {
-        // get all leave requests
-        $leaves = DB::table('tblleave')->where('EmployeeID', $request->user()->EmployeeID)->get();
         return response()->json($leaves);
     }
 
