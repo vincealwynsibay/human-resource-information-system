@@ -97,6 +97,36 @@ class DatabaseSeeder extends Seeder
             'name' => "Annual Leave",
         ]);
 
+        DB::table('leavetype')->insert([
+            'id' => 2,
+            'name' => 'Vacation Leave'
+        ]);
+
+        // 5 days per year
+        DB::table('leavetype')->insert([
+            'id' => 3,
+            'name' => 'Sick Leave'
+        ]);
+
+        // 105 days of leave paid 
+        DB::table('leavetype')->insert([
+            'id' => 4,
+            'name' => 'Maternity Leave'
+        ]);
+
+        // 7 days of leave paid (up to 14 days) 
+        DB::table('leavetype')->insert([
+            'id' => 5,
+            'name' => 'Paternity Leave'
+        ]);
+
+        // 7 days of leave paid (up to 14 days) 
+        DB::table('leavetype')->insert([
+            'id' => 6,
+            'name' => 'Parental Leave for Solo Parents'
+        ]);
+
+
 
     }
 }

@@ -224,7 +224,7 @@ DROP TABLE IF EXISTS `tblleave`;
 CREATE TABLE `tblleave` (
   `id` int NOT NULL AUTO_INCREMENT,
   `EmployeeID` int NOT NULL,
-  `LeaveTypeID` int NOT NULL,
+  `LeaveTypeID` int DEFAULT NULL,
   `no_of_days` int NOT NULL,
   `start_date` datetime NOT NULL,
   `end_date` datetime NOT NULL,

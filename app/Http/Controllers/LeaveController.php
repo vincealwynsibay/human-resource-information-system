@@ -98,21 +98,43 @@ class LeaveController extends Controller
     {
         $validated = $request->validate([
             'employeeId' => 'required|exists:tblemployee,id',
-            'leaveType' => 'required|exists:tblleavetype,id',
+            'leaveType' => 'required',
             'startDate' => 'required|date',
             'endDate' => 'required|date',
             'reason' => 'required|string',
         ]);
+
+
+        // no of days between start and end date
+        $startDate = Date::createFromFormat('Y-m-d', $validated['startDate']);
+        $endDate = Date::createFromFormat('Y-m-d', $validated['endDate']);
+
+        // if leave type null means unpaid leave
+        if ($request->leaveType == null) {
+            $leave = DB::table('tblleave')->insert([
+                'EmployeeID' => $validated['employeeId'],
+                'LeaveTypeID' => null,
+                'start_date' => $validated['startDate'],
+                'end_date' => $validated['endDate'],
+                'reason' => $validated['reason'],
+                'status' => LeaveRequestEnum::PENDING,
+                'no_of_days' => $startDate->diffInDays($endDate),
+            ]);
+
+            return response()->json($leave);
+        }
+
+        $leaveType = DB::table('tblleavetype')->where('id', $validated['leaveType'])->first();
+
+        if ($leaveType == null) {
+            return response()->json(['error' => 'Leave Type not found'], 400);
+        }
 
         // check if have leave entitlement
         $leaveEntitlement = DB::table('tblleaveentitlement')->where('EmployeeID', $validated['employeeId'])->where('LeaveTypeID', $validated['leaveType'])->first();
         if (!$leaveEntitlement) {
             return response()->json(['error' => 'Leave Type not allowed. No leave entitlement'], 400);
         }
-
-        // no of days between start and end date
-        $startDate = Date::createFromFormat('Y-m-d', $validated['startDate']);
-        $endDate = Date::createFromFormat('Y-m-d', $validated['endDate']);
 
         // check if leave is valid, based on entitlement
         $leaveEntitlement = DB::table('tblleaveentitlement')->where('EmployeeID', $validated['employeeId'])->where('LeaveTypeID', $validated['leaveType'])->first();
