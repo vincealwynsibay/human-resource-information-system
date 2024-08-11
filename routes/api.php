@@ -11,6 +11,7 @@ use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkShiftController;
+use App\Http\Controllers\WorkWeekController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,18 +30,31 @@ Route::group(['prefix' => "user", 'middleware' => ['auth:sanctum']], function ()
     Route::put('/', [UserController::class, 'changePassword']);
 });
 
+
+Route::group(['prefix' => 'workweek', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [WorkWeekController::class, 'index']);
+    Route::get('/nice', function () {
+        return response()->json([
+            'message' => 'Work Week'
+        ]);
+    });
+    Route::put('/', [WorkWeekController::class, 'update']);
+});
+
 Route::group(['prefix' => 'department', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [DepartmentController::class, 'index']);
     Route::post('/', [DepartmentController::class, 'store']);
     Route::put('/{id}', [DepartmentController::class, 'update']);
     Route::delete('/{id}', [DepartmentController::class, 'destroy']);
 });
+
 Route::group(['prefix' => 'holiday', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [HolidayController::class, 'index']);
     Route::post('/', [HolidayController::class, 'store']);
     Route::put('/{id}', [HolidayController::class, 'update']);
     Route::delete('/{id}', [HolidayController::class, 'destroy']);
 });
+
 
 Route::group(['prefix' => 'employmentstatus', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [EmploymentStatusController::class, 'index']);

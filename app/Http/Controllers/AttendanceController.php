@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\DayLengthEnum;
 use App\Enum\LeaveRequestEnum;
 use App\Enum\RoleEnum;
 use Illuminate\Http\Request;
@@ -226,6 +227,7 @@ class AttendanceController extends Controller
             $today = DB::table('tblattendancerecord')->where("id", $newAttendance)->get();
         }
 
+
         // check current time
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first('id');
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->id)->first();
@@ -447,35 +449,51 @@ class AttendanceController extends Controller
         $absences = [];
         $currentAttendance = $attendances[0];
         foreach ($attendances as $attendance) {
-            if ($attendance->date != $currentAttendance->date) {
-                $currentAttendance = $attendance;
-            }
-
-            // check if there is a holiday on the date, if there is, do not record as absence
-            $holiday = DB::table('tblholiday')->where('date', $currentAttendance->date)->first();
-
-            if ($holiday != null) {
+            if ($attendance->date == $currentAttendance->date) {
                 continue;
             }
 
-            // TODO: check if no work day
+            $currentAttendance = $attendance;
 
-            // check if there is a leave record on the date, if there is, do not record as absence
-            $leave = DB::table('tblleave')->where('status', LeaveRequestEnum::APPROVED)->where('EmployeeID', $employeeID)->where(function ($query) use ($currentAttendance) {
-                $query->where('start_date', "<=", $currentAttendance->date);
-                $query->where('end_date', ">=", $currentAttendance->date);
-            })->first();
-
-            if ($leave != null) {
-                continue;
-            }
-
-            // compare if there is a gap between attendance records (later date - earlier date > 1)
+            // compare if there is a gap between attendance records (later date - earlier date > 1), this means that the gap could be an absence.
             if (Date::format("Y-m-d", $attendance->date)->diffInDays(Date::format("Y-m-d", $currentAttendance->date)) > 1) {
                 // start from the day after the earlier attendance record
                 $date = Date::parse($currentAttendance->date)->addDay();
+
                 // get all dates between the two attendance records gap
                 while ($date->lt(Date::parse($attendance->date))) {
+                    $currentDate = $date->format('Y-m-d');
+
+                    // check if the day is not a work day, if it is, do not record as absence
+                    $day = strtolower(Date::parse($currentDate)->format('D'));
+                    $workWeek = DB::table('tblworkweek')->first();
+                    $dayLength = $workWeek->$day;
+
+                    if (DayLengthEnum::from($dayLength)->isFullDay()) {
+                        $date = $date->addDay();
+                        continue;
+                    }
+
+                    // check if there is a holiday on the date, if there is, do not record as absence
+                    $holiday = DB::table('tblholiday')->where('date', $currentDate)->first();
+
+                    if ($holiday != null) {
+                        $date = $date->addDay();
+                        continue;
+                    }
+
+                    // check if there is a leave record on the date, if there is, do not record as absence
+                    $leave = DB::table('tblleave')->where('status', LeaveRequestEnum::APPROVED)->where('EmployeeID', $employeeID)->where(function ($query) use ($currentDate) {
+                        $query->where('start_date', "<=", $currentDate);
+                        $query->where('end_date', ">=", $currentDate);
+                    })->first();
+
+                    if ($leave != null) {
+                        $date = $date->addDay();
+                        continue;
+                    }
+
+                    // if no work day, holiday, or leave record, record as absence
                     $absences[] = $date->format('Y-m-d');
                     $date = $date->addDay();
                 }
