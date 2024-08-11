@@ -208,6 +208,18 @@ CREATE TABLE `tblemploymentstatus` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblholiday`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblholiday` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `recurring` tinyint NOT NULL DEFAULT '0' COMMENT 'every year or not',
+  `is_full_day` tinyint DEFAULT '0' COMMENT 'full day / half day',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tbljobtitle`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -317,6 +329,21 @@ CREATE TABLE `tblworkshift` (
   `end_time` time NOT NULL,
   `start_break_time` time DEFAULT NULL,
   `end_break_time` time DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblworkweek`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblworkweek` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `mon` tinyint unsigned NOT NULL DEFAULT '0',
+  `tue` tinyint unsigned NOT NULL DEFAULT '0',
+  `wed` tinyint unsigned NOT NULL DEFAULT '0',
+  `thu` tinyint unsigned NOT NULL DEFAULT '0',
+  `fri` tinyint unsigned NOT NULL DEFAULT '0',
+  `sat` tinyint unsigned NOT NULL DEFAULT '0',
+  `sun` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

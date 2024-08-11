@@ -4,6 +4,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmploymentStatusController;
+use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\JobTitleController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveEntitlementController;
@@ -33,6 +34,12 @@ Route::group(['prefix' => 'department', 'middleware' => ['auth:sanctum', 'role:a
     Route::post('/', [DepartmentController::class, 'store']);
     Route::put('/{id}', [DepartmentController::class, 'update']);
     Route::delete('/{id}', [DepartmentController::class, 'destroy']);
+});
+Route::group(['prefix' => 'holiday', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [HolidayController::class, 'index']);
+    Route::post('/', [HolidayController::class, 'store']);
+    Route::put('/{id}', [HolidayController::class, 'update']);
+    Route::delete('/{id}', [HolidayController::class, 'destroy']);
 });
 
 Route::group(['prefix' => 'employmentstatus', 'middleware' => ['auth:sanctum', 'role:admin']], function () {

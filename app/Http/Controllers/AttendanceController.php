@@ -451,6 +451,15 @@ class AttendanceController extends Controller
                 $currentAttendance = $attendance;
             }
 
+            // check if there is a holiday on the date, if there is, do not record as absence
+            $holiday = DB::table('tblholiday')->where('date', $currentAttendance->date)->first();
+
+            if ($holiday != null) {
+                continue;
+            }
+
+            // TODO: check if no work day
+
             // check if there is a leave record on the date, if there is, do not record as absence
             $leave = DB::table('tblleave')->where('status', LeaveRequestEnum::APPROVED)->where('EmployeeID', $employeeID)->where(function ($query) use ($currentAttendance) {
                 $query->where('start_date', "<=", $currentAttendance->date);
@@ -460,7 +469,6 @@ class AttendanceController extends Controller
             if ($leave != null) {
                 continue;
             }
-            // TODO: CHECK HOLIDAYS
 
             // compare if there is a gap between attendance records (later date - earlier date > 1)
             if (Date::format("Y-m-d", $attendance->date)->diffInDays(Date::format("Y-m-d", $currentAttendance->date)) > 1) {
