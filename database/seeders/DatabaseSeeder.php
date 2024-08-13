@@ -137,6 +137,45 @@ class DatabaseSeeder extends Seeder
             'sun' => 0
         ]);
 
+        DB::table('tblpayperiod')->insert([
+            'id' => 1,
+            'name' => "Weekly",
+        ]);
+
+        DB::table('tblpayperiod')->insert([
+            'id' => 2,
+            'name' => "Bi Weekly",
+        ]);
+
+        DB::table('tblpayperiod')->insert([
+            'id' => 3,
+            'name' => "Semi Monthly",
+        ]);
+
+        DB::table('tblpayperiod')->insert([
+            'id' => 4,
+            'name' => "Monthly",
+        ]);
+
+        DB::table('tblpayperiod')->insert([
+            'id' => 5,
+            'name' => "Monthly on first pay of month.",
+        ]);
+
+        DB::table('tblpayperiod')->insert([
+            'id' => 6,
+            'name' => "Hourly",
+        ]);
+
+        // DB::table('tblpayroll')->insert([
+        //     'id' => 1,
+        //     'pay_period_id' => 1,
+        //     'start_date' => now(),
+        //     'end_date' => now(),
+        //     'pay_date' => now(),
+        //     'status' => "PENDING"
+        // ]);
+
 
 
     }
