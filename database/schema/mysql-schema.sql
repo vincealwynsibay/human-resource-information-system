@@ -125,6 +125,29 @@ CREATE TABLE `sessions` (
   KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tablename`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tablename` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `compensation_from` double DEFAULT NULL,
+  `compensation_to` double DEFAULT NULL,
+  `msc_ec` double DEFAULT NULL,
+  `msc_wisp` double DEFAULT NULL,
+  `msc_total` double DEFAULT NULL,
+  `social_security_er` double DEFAULT NULL,
+  `social_security_ee` double DEFAULT NULL,
+  `social_security_total` double DEFAULT NULL,
+  `ec_er` double DEFAULT NULL,
+  `wisp_er` double DEFAULT NULL,
+  `wisp_ee` double DEFAULT NULL,
+  `wisp_total` double DEFAULT NULL,
+  `total_contribution_er` double DEFAULT NULL,
+  `total_contribution_ee` double DEFAULT NULL,
+  `total_contribution_total` double DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblattendancerecord`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -320,6 +343,29 @@ CREATE TABLE `tblpayroll` (
   `net_salary` decimal(10,2) DEFAULT NULL,
   `deductions` decimal(10,2) DEFAULT NULL COMMENT 'unpaid leave, absences, allowance, taxes',
   `created_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblsss`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblsss` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `compensation_from` decimal(13,2) DEFAULT NULL,
+  `compensation_to` decimal(13,2) DEFAULT NULL,
+  `msc_ec` decimal(13,2) DEFAULT NULL,
+  `msc_wisp` decimal(13,2) DEFAULT NULL,
+  `msc_total` decimal(13,2) DEFAULT NULL,
+  `social_security_er` decimal(13,2) DEFAULT NULL,
+  `social_security_ee` decimal(13,2) DEFAULT NULL,
+  `social_security_total` decimal(13,2) DEFAULT NULL,
+  `ec_er` decimal(13,2) DEFAULT NULL,
+  `wisp_er` decimal(13,2) DEFAULT NULL,
+  `wisp_ee` decimal(13,2) DEFAULT NULL,
+  `wisp_total` decimal(13,2) DEFAULT NULL,
+  `total_contribution_er` decimal(13,2) DEFAULT NULL,
+  `total_contribution_ee` decimal(13,2) DEFAULT NULL,
+  `total_contribution_total` decimal(13,2) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

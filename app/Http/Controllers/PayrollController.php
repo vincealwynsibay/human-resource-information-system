@@ -146,6 +146,14 @@ class PayrollController extends Controller
         return $taxes;
     }
 
+    protected function calculateSSSContributions($grossSalary)
+    {
+        // get monthly salary credit
+        $contribution = DB::table('tblsss')->where('compensation_from', ">= $grossSalary")->where('compensation_to', "<= $grossSalary")->first();
+        return $contribution->total_contribution_ee;
+    }
+
+
     protected function calculateGrossSalary($basicSalary, $attendances, $workShift, $hourlyRate)
     {
 
