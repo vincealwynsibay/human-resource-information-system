@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enum\DayLengthEnum;
 use App\Enum\PayFrequencyEnum;
+use App\Enum\LeaveRequestEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -39,12 +40,14 @@ class PayrollController extends Controller
         $employee = DB::table('tblemployee')->where('id', $request->employeeId)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employee->WorkShiftID)->first();
         $workDaysAmount = DB::table('tblworkweek')->select(DB::raw('(mon + tue + wed + thu + fri + sat + sun) AS total_sum'))->first()['total_sum'];
+        // work days amount * hours per day * 52 weeks
         $annualWorkHours = $workDaysAmount * $workShift["hours_per_day"] * 52;
         $monthlyWorkHours = $annualWorkHours / 12;
         $weeklyWorkHours = $annualWorkHours / 52;
         $grossSalary = 0;
 
         //  get total time within time frame based on pay frequency of basic salary
+        $payroll = [];
         if ($basicSalary["pay_frequency"] == PayFrequencyEnum::WEEKLY) {
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->startOfWeek(), Date::today()])->orderBy('date', 'DESC')->get();
             $hourlyRate = $basicSalary["amount"] / ($weeklyWorkHours);
@@ -53,15 +56,14 @@ class PayrollController extends Controller
             $deductions = 0;
             $netSalary = $grossSalary - $deductions;
 
-            DB::table('tblpayroll')->insert([
+            $payroll = [
                 'EmployeeID' => $request->employeeId,
                 'gross_salary' => $grossSalary,
-                'net_salary' => $grossSalary,
                 'deductions' => $deductions,
                 'pay_period_start' => Date::now()->startOfWeek(),
                 'pay_period_end' => Date::today(),
                 'created_date' => Date::now()
-            ]);
+            ];
 
         } else if ($basicSalary["pay_frequency"] == PayFrequencyEnum::MONTHLY) {
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->startOfMonth(), Date::today()])->orderBy('date', 'DESC')->get();
@@ -71,15 +73,13 @@ class PayrollController extends Controller
             $deductions = 0;
             $netSalary = $grossSalary - $deductions;
 
-            DB::table('tblpayroll')->insert([
+            $payroll = [
                 'EmployeeID' => $request->employeeId,
                 'gross_salary' => $grossSalary,
-                'net_salary' => $grossSalary,
-                'deductions' => $deductions,
                 'pay_period_start' => Date::now()->startOfMonth(),
                 'pay_period_end' => Date::today(),
                 'created_date' => Date::now()
-            ]);
+            ];
         } else if ($basicSalary["pay_frequency"] == PayFrequencyEnum::BIWEEKLY->value) {
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->subWeeks(2), Date::today()])->orderBy('date', 'DESC')->get();
             $hourlyRate = $basicSalary["amount"] / ($weeklyWorkHours * 2);
@@ -87,15 +87,13 @@ class PayrollController extends Controller
             $deductions = 0;
             $netSalary = $grossSalary - $deductions;
 
-            DB::table('tblpayroll')->insert([
+            $payroll = [
                 'EmployeeID' => $request->employeeId,
                 'gross_salary' => $grossSalary,
-                'net_salary' => $grossSalary,
-                'deductions' => $deductions,
                 'pay_period_start' => Date::now()->subWeeks(2),
                 'pay_period_end' => Date::today(),
                 'created_date' => Date::now()
-            ]);
+            ];
         } else if ($basicSalary["pay_frequency"] == PayFrequencyEnum::ANNUALLY->value) {
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->startOfYear(), Date::today()])->orderBy('date', 'DESC')->get();
             $hourlyRate = $basicSalary["amount"] / ($annualWorkHours);
@@ -103,16 +101,16 @@ class PayrollController extends Controller
             $deductions = 0;
             $netSalary = $grossSalary - $deductions;
 
-            DB::table('tblpayroll')->insert([
+            $payroll = [
                 'EmployeeID' => $request->employeeId,
                 'gross_salary' => $grossSalary,
-                'net_salary' => $grossSalary,
-                'deductions' => $deductions,
                 'pay_period_start' => Date::now()->startOfYear(),
                 'pay_period_end' => Date::today(),
                 'created_date' => Date::now()
-            ]);
+            ];
         }
+
+        // $payroll["deductions"] = computeTaxes($grossSalary);
 
         return response()->json(['message' => 'Payroll created'], 201);
     }
@@ -125,9 +123,56 @@ class PayrollController extends Controller
         $overtimeRestDay = 0;
         $undertimeHours = 0;
         $lateHours = 0;
+        $absences = 0;
 
+        $left = 0;
+        $right = 0;
+        while ($right < count($attendances)) {
+            $attendance = $attendances[$left];
+            $leftDate = $attendances[$left];
+            $rightDate = $attendances[$right];
 
-        foreach ($attendances as $attendance) {
+            // get gap between two attendances
+            if (Date::parse($leftDate->date)->diffInDays(Date::parse($rightDate->date)) > 1) {
+                $date = Date::parse($leftDate->date)->addDay();
+
+                // left date + 1 to right before the right date, check if there are absences
+                while ($date->lt(Date::parse($rightDate->date))) {
+                    $currentDate = $date->format('Y-m-d');
+
+                    $day = strtolower(Date::parse('Y-m-d', $currentDate)->format('D'));
+                    $workWeek = DB::table('tblworkweek')->first();
+                    $dayLength = $workWeek->$day;
+
+                    if (DayLengthEnum::from($dayLength)->isNoWork()) {
+                        $date = $date->addDay();
+                        continue;
+                    }
+
+                    $holiday = DB::table('tblholiday')->where('date', $currentDate)->first();
+                    if ($holiday != null) {
+                        $date = $date->addDay();
+                        continue;
+                    }
+
+                    $leave = DB::table('tblleave')
+                        ->where('status', LeaveRequestEnum::APPROVED)
+                        // if unpaid leave add to absences
+                        ->whereNot('leaveTypeID', null)
+                        ->where('EmployeeID', $attendance->EmployeeID)
+                        ->where('date', $currentDate)
+                        ->first();
+
+                    if ($leave != null) {
+                        $date = $date->addDay();
+                        continue;
+                    }
+
+                    $absences++;
+                    $date = $date->addDay();
+                }
+            }
+
 
             $timeIn1 = $attendance->time_in_session1;
             $timeOut1 = $attendance->time_out_session1;
@@ -168,6 +213,9 @@ class PayrollController extends Controller
             if ($timeIn2 != null && $timeIn2 > $workShift->start_time) {
                 $lateHours += Date::parse($timeIn2)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
             }
+
+            $left = $right;
+            $right++;
         }
 
         $grossSalary = $basicSalary["amount"];
@@ -175,8 +223,10 @@ class PayrollController extends Controller
         $grossSalary += ($overtimeRestDay * ($hourlyRate * 1.5));
         $grossSalary -= ($lateHours * $hourlyRate);
         $grossSalary -= ($undertimeHours * $hourlyRate);
+        $grossSalary -= ($absences * $workShift->hours_per_day * $hourlyRate);
         return $grossSalary;
     }
+
     // protected function calculateGrossSalary($basicSalary, $hourlyRate, $totalHoursWorked, $overtimeRegularHours, $overtimeRestDay, $lateHours, $undertimeHours)
     // {
     //     $grossSalary = $basicSalary["amount"];
