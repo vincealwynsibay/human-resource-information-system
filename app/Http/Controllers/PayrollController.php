@@ -115,6 +115,37 @@ class PayrollController extends Controller
         return response()->json(['message' => 'Payroll created'], 201);
     }
 
+    protected function calculateTaxes($grossSalary, $payFrequency)
+    {
+        $payFrequencyWithinAMonth = 1;
+
+        if ($payFrequency == PayFrequencyEnum::WEEKLY) {
+            $payFrequencyWithinAMonth = 4;
+        } else if ($payFrequency == PayFrequencyEnum::BIWEEKLY) {
+            $payFrequencyWithinAMonth = 2;
+        } else if ($payFrequency == PayFrequencyEnum::MONTHLY) {
+            $payFrequencyWithinAMonth = 1;
+        } else if ($payFrequency == PayFrequencyEnum::ANNUALLY) {
+            $payFrequencyWithinAMonth = 1 / 12;
+        }
+
+        $annualGrossSalary = $grossSalary * 12 * $payFrequencyWithinAMonth;
+        $taxes = 0;
+        if ($annualGrossSalary > 250000 && $annualGrossSalary <= 400000) {
+            $taxes = ($annualGrossSalary - 250000) * 0.15;
+        } else if ($annualGrossSalary > 400000 && $annualGrossSalary <= 800000) {
+            $taxes = 22500 + ($annualGrossSalary - 400000) * 0.20;
+        } else if ($annualGrossSalary > 800000 && $annualGrossSalary <= 2000000) {
+            $taxes = 102500 + ($annualGrossSalary - 800000) * 0.25;
+        } else if ($annualGrossSalary > 2000000 && $annualGrossSalary <= 8000000) {
+            $taxes = 402500 + ($annualGrossSalary - 2000000) * 0.30;
+        } else if ($annualGrossSalary >= 8000000) {
+            $taxes = 2202500 + ($annualGrossSalary - 8000000) * 0.35;
+        }
+
+        return $taxes;
+    }
+
     protected function calculateGrossSalary($basicSalary, $attendances, $workShift, $hourlyRate)
     {
 
