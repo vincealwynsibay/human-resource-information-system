@@ -52,14 +52,10 @@ class PayrollController extends Controller
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->startOfWeek(), Date::today()])->orderBy('date', 'DESC')->get();
             $hourlyRate = $basicSalary["amount"] / ($weeklyWorkHours);
             $grossSalary = $this->calculateGrossSalary($basicSalary, $attendances, $workShift, $hourlyRate);
-            // TODO: DEDUCTIONS + TAXES + PAYHEADS
-            $deductions = 0;
-            $netSalary = $grossSalary - $deductions;
 
             $payroll = [
                 'EmployeeID' => $request->employeeId,
                 'gross_salary' => $grossSalary,
-                'deductions' => $deductions,
                 'pay_period_start' => Date::now()->startOfWeek(),
                 'pay_period_end' => Date::today(),
                 'created_date' => Date::now()
@@ -110,7 +106,12 @@ class PayrollController extends Controller
             ];
         }
 
-        // $payroll["deductions"] = computeTaxes($grossSalary);
+        $payroll["deductions"] += $this->calculateTaxes($grossSalary, $basicSalary["pay_frequency"]);
+        $payroll["deductions"] += $this->calculateSSSContributions($grossSalary);
+        $payroll["deductions"] += $this->calculatePhilHealthContribution($basicSalary["amount"]);
+        $payroll["deductions"] += $this->calculatePagIbigContribution($basicSalary["amount"]);
+
+        $payroll["net_salary"] = $payroll["gross_salary"] - $payroll["deductions"];
 
         return response()->json(['message' => 'Payroll created'], 201);
     }
@@ -148,9 +149,22 @@ class PayrollController extends Controller
 
     protected function calculateSSSContributions($grossSalary)
     {
-        // get monthly salary credit
         $contribution = DB::table('tblsss')->where('compensation_from', ">= $grossSalary")->where('compensation_to', "<= $grossSalary")->first();
         return $contribution->total_contribution_ee;
+    }
+
+    protected function calculatePhilHealthContribution($basicSalary)
+    {
+        return $basicSalary * 0.05;
+    }
+
+    protected function calculatePagIbigContribution($basicSalary)
+    {
+        if ($basicSalary <= 1500) {
+            return $basicSalary * 0.01;
+        }
+
+        return $basicSalary * 0.02;
     }
 
 
