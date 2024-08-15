@@ -107,9 +107,9 @@ class PayrollController extends Controller
         }
 
         $payroll["deductions"] += $this->calculateTaxes($grossSalary, $basicSalary["pay_frequency"]);
-        $payroll["deductions"] += $this->calculateSSSContributions($grossSalary);
-        $payroll["deductions"] += $this->calculatePhilHealthContribution($basicSalary["amount"]);
-        $payroll["deductions"] += $this->calculatePagIbigContribution($basicSalary["amount"]);
+        // $payroll["deductions"] += $this->calculateSSSContributions($grossSalary);
+        // $payroll["deductions"] += $this->calculatePhilHealthContribution($basicSalary["amount"]);
+        // $payroll["deductions"] += $this->calculatePagIbigContribution($basicSalary["amount"]);
 
         $payroll["net_salary"] = $payroll["gross_salary"] - $payroll["deductions"];
 
