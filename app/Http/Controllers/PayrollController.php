@@ -106,16 +106,42 @@ class PayrollController extends Controller
         //     ];
         // }
 
-        $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->startOfYear(), Date::today()])->orderBy('date', 'DESC')->get();
-        $hourlyRate = $basicSalary["amount"] / ($annualWorkHours);
-        $grossSalary = $this->calculateGrossSalary($basicSalary, $attendances, $workShift, $hourlyRate);
+        // determine if date is 15th or end of month for semi-monthly
+
+        $day = Date::now()->format('d');
+        if ($day == 15) {
+            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->startOfMonth(), Date::today()])->orderBy('date', 'DESC')->get();
+            // TODO: modify basic salary to get from payroll item
+            $hourlyRate = $basicSalary["amount"] / ($monthlyWorkHours / 2);
+            $grossSalary = $this->calculateGrossSalary($basicSalary, $attendances, $workShift, $hourlyRate);
+
+            $payroll = [
+                'EmployeeID' => $request->employeeId,
+                'gross_salary' => $grossSalary,
+                'pay_period_start' => Date::now()->startOfMonth(),
+                'pay_period_end' => Date::now(),
+                'created_date' => Date::now()
+            ];
+        } else if ($day == Date::now()->endOfMonth()->format('d')) {
+            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->dayOfMonth(16), Date::today()])->orderBy('date', 'DESC')->get();
+
+            $payroll = [
+                'EmployeeID' => $request->employeeId,
+                'gross_salary' => $grossSalary,
+                'pay_period_start' => Date::now()->startOfMonth(),
+                'pay_period_end' => Date::now(),
+                'created_date' => Date::now()
+            ];
+
+        }
+
         $deductions = 0;
         $netSalary = $grossSalary - $deductions;
 
         $payroll = [
             'EmployeeID' => $request->employeeId,
             'gross_salary' => $grossSalary,
-            'pay_period_start' => Date::now()->startOfYear(),
+            'pay_period_start' => Date::now()->subWeeks(2),
             'pay_period_end' => Date::today(),
             'created_date' => Date::now()
         ];
