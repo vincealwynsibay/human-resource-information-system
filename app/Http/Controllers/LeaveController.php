@@ -98,7 +98,7 @@ class LeaveController extends Controller
     {
         $validated = $request->validate([
             'employeeId' => 'required|exists:tblemployee,id',
-            'leaveType' => 'required',
+            'leaveType' => 'nullable',
             'startDate' => 'required|date',
             'endDate' => 'required|date',
             'reason' => 'required|string',
