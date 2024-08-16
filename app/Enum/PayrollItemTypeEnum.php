@@ -3,7 +3,7 @@
 enum PayrollItemTypeEnum: string
 {
 
-    case SALARY = 'SALARY';
+    case BASIC_SALARY = 'BASIC_SALARY';
     case OVERTIME = 'OVERTIME';
     case BONUS = 'BONUS';
     case DEDUCTION = 'DEDUCTION';
