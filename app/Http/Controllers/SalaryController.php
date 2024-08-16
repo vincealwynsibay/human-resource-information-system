@@ -35,15 +35,24 @@ class SalaryController extends Controller
     {
         $validated = $request->validate([
             'employeeId' => 'required|exists:tblemployee,id',
-            'payFrequency' => ['required', [Rule::enum(PayFrequencyEnum::class)]],
+            'paygradeId' => 'required',
             'amount' => 'required|numeric',
         ]);
 
+        $paygrade = DB::table('tblpaygrade')->where('id', $validated['paygradeId'])->first();
+
+        if ($paygrade == null) {
+            return response()->json(['message' => 'Paygrade not found'], 404);
+        }
+
+        if ($paygrade->min_salary > $validated['amount'] || $paygrade->max_salary < $validated['amount']) {
+            return response()->json(['message' => 'Amount is not within the paygrade range'], 400);
+        }
+
         DB::table('tblbasicsalary')->insert([
             'EmployeeID' => $validated['employeeId'],
-            'pay_frequency' => $validated['payFrequency'],
+            'PayGradeID' => $validated['paygradeId'],
             'amount' => $validated['amount'],
-            'effective_date_start' => Date::now()
         ]);
 
         return response()->json(['message' => 'Salary created'], 201);
@@ -56,15 +65,24 @@ class SalaryController extends Controller
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'employeeId' => 'required|exists:tblemployee,id',
-            'payFrequency' => ['required', [Rule::enum(PayFrequencyEnum::class)]],
+            'paygradeId' => 'required',
             'amount' => 'required|numeric',
         ]);
 
+        $paygrade = DB::table('tblpaygrade')->where('id', $validated['paygradeId'])->first();
+
+        if ($paygrade == null) {
+            return response()->json(['message' => 'Paygrade not found'], 404);
+        }
+
+        if ($paygrade->min_salary > $validated['amount'] || $paygrade->max_salary < $validated['amount']) {
+            return response()->json(['message' => 'Amount is not within the paygrade range'], 400);
+        }
+
         DB::table('tblbasicsalary')->where('id', $id)->update([
             'EmployeeID' => $validated['employeeId'],
-            'pay_frequency' => $validated['payFrequency'],
-            'amount' => $validated['amount']
+            'PayGradeID' => $validated['paygradeId'],
+            'amount' => $validated['amount'],
         ]);
 
         return response()->json(['message' => 'Salary updated'], 200);
@@ -76,7 +94,7 @@ class SalaryController extends Controller
     public function destroy(string $id)
     {
         DB::table('tblbasicsalary')->where('id', $id)->update([
-            'effective_date_end' => Date::now()
+            'is_deleted' => Date::now()
         ]);
 
         return response()->json(['message' => 'Salary deleted'], 200);

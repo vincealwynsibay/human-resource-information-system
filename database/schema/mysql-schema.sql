@@ -170,9 +170,14 @@ DROP TABLE IF EXISTS `tblbasicsalary`;
 CREATE TABLE `tblbasicsalary` (
   `id` int NOT NULL AUTO_INCREMENT,
   `EmployeeID` int NOT NULL,
-  `PayPeriodID` int DEFAULT NULL,
+  `PayGradeID` int NOT NULL,
   `amount` decimal(10,0) NOT NULL,
-  PRIMARY KEY (`id`)
+  `is_deleted` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `EmployeeID` (`EmployeeID`),
+  KEY `PayGradeID` (`PayGradeID`),
+  CONSTRAINT `tblbasicsalary_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
+  CONSTRAINT `tblbasicsalary_ibfk_2` FOREIGN KEY (`PayGradeID`) REFERENCES `tblpaygrade` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tbldepartment`;
@@ -322,6 +327,18 @@ CREATE TABLE `tblleavetype` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblpaygrade`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblpaygrade` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `min_salary` decimal(10,2) NOT NULL,
+  `max_salary` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblpayperiod`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -354,6 +371,7 @@ CREATE TABLE `tblpayrollitem` (
   `PayrollID` int NOT NULL,
   `item_type` varchar(100) NOT NULL COMMENT 'basic salary, allowance, deductions, overtime, holiday pay, leave',
   `amount` decimal(10,2) NOT NULL,
+  `description` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
