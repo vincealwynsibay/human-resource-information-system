@@ -368,6 +368,55 @@ class EmployeeController extends Controller
         ], 200);
     }
 
+    public function updateContribution(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'sss' => "nullable|string|max:50",
+            'pagibig' => "nullable|string|max:50",
+            'philhealth' => "nullable|string|max:50",
+        ]);
+
+        $employee = DB::table("tblemployee")->find($id);
+
+        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
+            if ($employee->SupervisorID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['Access not allowed']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+            if ($employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($employee == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not exist']
+                ]
+            ], 404);
+        }
+
+        DB::table("tblemployee")->where('id', $id)->update([
+            'sss' => $request->sss ?? "",
+            'pagibig' => $request->pagibig ?? "",
+            'philhealth' => $request->philhealth ?? "",
+        ]);
+
+        return response()->json([
+            'message' => "Employee Contribution Updated Successfully"
+        ], 200);
+
+    }
 
     public function updatePersonalDetails(Request $request, string $id)
     {

@@ -121,6 +121,7 @@ Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'ro
     Route::put('/{id}/assignWorkShift', [EmployeeController::class, 'assignWorkShift']);
     Route::put('/{id}/removeWorkShift', [EmployeeController::class, 'removeWorkShift']);
 
+    Route::put('/{id}/contributions', [EmployeeController::class, 'updateContributions']);
     Route::put('/{id}/image', [EmployeeController::class, 'updateImage']);
     Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
     Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);

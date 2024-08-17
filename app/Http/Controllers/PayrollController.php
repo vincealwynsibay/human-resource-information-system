@@ -108,9 +108,10 @@ class PayrollController extends Controller
         ];
 
         // provide a fixed amount for each employee instead of automating
-        $sssContribution = 0;
-        $philhealthContribution = 0;
-        $pagIbigContribution = 0;
+        $employee = DB::table('tblemployee')->where($request->user()->EmployeeID)->first();
+        $sssContribution = $employee->sss_contribution;
+        $philhealthContribution = $employee->philhealth_contribution;
+        $pagIbigContribution = $employee->pagibig_contribution;
 
         $payroll["deductions"] += $sssContribution;
         $payrollItem[] = [
