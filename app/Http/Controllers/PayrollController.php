@@ -41,12 +41,13 @@ class PayrollController extends Controller
         $employee = DB::table('tblemployee')->where('id', $request->employeeId)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employee->WorkShiftID)->first();
         $workDaysAmount = DB::table('tblworkweek')->select(DB::raw('(mon + tue + wed + thu + fri + sat + sun) AS total_sum'))->first()['total_sum'];
-        // work days amount * hours per day * 52 weeks
+
         $annualWorkHours = $workDaysAmount * $workShift["hours_per_day"] * 52;
         $monthlyWorkHours = $annualWorkHours / 12;
         // $weeklyWorkHours = $annualWorkHours / 52;
-        $grossSalary = 0;
 
+        $grossSalary = 0;
+        $deductions = 0;
         $payroll = [];
         $payrollItems = [];
 
@@ -55,9 +56,15 @@ class PayrollController extends Controller
         $day = Date::now()->format('d');
         if ($day == 15) {
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->startOfMonth(), Date::today()])->orderBy('date', 'DESC')->get();
-            // TODO: modify basic salary to get from payroll item
             $hourlyRate = $basicSalary["amount"] / ($monthlyWorkHours / 2);
-            $grossSalary = $this->calculateGrossSalary($basicSalary, $attendances, $workShift, $hourlyRate);
+
+            // schedule income tax for 15th
+            $deductions += $this->calculateTaxes($grossSalary, $basicSalary["pay_frequency"]);
+            $payrollItems[] = [
+                'item_type' => PayrollItemTypeEnum::DEDUCTION,
+                'amount' => $this->calculateTaxes($grossSalary, $basicSalary["pay_frequency"]),
+                'description' => 'Income Tax'
+            ];
 
             $payroll = [
                 'EmployeeID' => $request->employeeId,
@@ -65,10 +72,36 @@ class PayrollController extends Controller
                 'pay_period_end' => Date::now(),
                 'created_date' => Date::now()
             ];
-
-            // TODO: setup deductions to get from payroll item, schedule deductions for taxes, sss, philhealth, pagibig to be spread out in 2 payrolls
         } else if ($day == Date::now()->endOfMonth()->format('d')) {
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->dayOfMonth(16), Date::today()])->orderBy('date', 'DESC')->get();
+
+            // schedule contributions for 30th
+            $employee = DB::table('tblemployee')->where($request->user()->EmployeeID)->first();
+            $sssContribution = $employee->sss_contribution;
+            $philhealthContribution = $employee->philhealth_contribution;
+            $pagIbigContribution = $employee->pagibig_contribution;
+
+            $payrollItems[] = [
+                'item_type' => PayrollItemTypeEnum::DEDUCTION,
+                'amount' => $sssContribution,
+                'description' => 'SSS Contributions'
+            ];
+
+            $payrollItems[] = [
+                'item_type' => PayrollItemTypeEnum::DEDUCTION,
+                'amount' => $philhealthContribution,
+                'description' => 'PhilHealth Contributions'
+            ];
+
+            $payrollItems[] = [
+                'item_type' => PayrollItemTypeEnum::DEDUCTION,
+                'amount' => $pagIbigContribution,
+                'description' => 'Pag-Ibig Contributions'
+            ];
+
+            $deductions += $sssContribution;
+            $deductions += $philhealthContribution;
+            $deductions += $pagIbigContribution;
 
             $payroll = [
                 'EmployeeID' => $request->employeeId,
@@ -82,57 +115,19 @@ class PayrollController extends Controller
         $payrollItems[] = [
             'payroll_id' => $payroll['id'],
             'item_type' => PayrollItemTypeEnum::BASIC_SALARY,
-            'amount' => $basicSalary["amount"],
+            'amount' => $basicSalary["amount"] / 2,
             'description' => 'Basic Salary'
         ];
 
-        // attendance payroll items (leave, overtime, late, undertime, absences)
-        $payrollItems = array_merge($payrollItems, $this->calculateAttendacePayrollItems($attendances, $workShift, $hourlyRate));
+        // attendance payroll items (leave, overtime, late, undertime, absences, holiday)
+        $payrollItems = array_merge($payrollItems, $this->getAttendancePayrollItems($attendances, $workShift, $hourlyRate));
 
         // calculate gross salary with basic salary, overtime pay, bonuses, allowance holiday pay, commissions, leave pay, 
-        // TODO: setup a workflow for other payroll item (overtime, bonus, allowance, commission, leave, holiday)
-        $grossSalary = 0;
+        // TODO: setup a workflow for other payroll item (bonus, allowance, commission)
 
-        foreach ($payrollItems as $item) {
-            if ($item["item_type"] != PayrollItemTypeEnum::DEDUCTION) {
-                $grossSalary += $item["amount"];
-            }
-        }
+        // calculate gross salary
+        $grossSalary = $this->calculateGrossSalary($payrollItems);
 
-        $deductions = 0;
-        $payroll["deductions"] += $this->calculateTaxes($grossSalary, $basicSalary["pay_frequency"]);
-        $payrollItem[] = [
-            'item_type' => PayrollItemTypeEnum::DEDUCTION,
-            'amount' => $this->calculateTaxes($grossSalary, $basicSalary["pay_frequency"]),
-            'description' => 'Income Tax'
-        ];
-
-        // provide a fixed amount for each employee instead of automating
-        $employee = DB::table('tblemployee')->where($request->user()->EmployeeID)->first();
-        $sssContribution = $employee->sss_contribution;
-        $philhealthContribution = $employee->philhealth_contribution;
-        $pagIbigContribution = $employee->pagibig_contribution;
-
-        $payroll["deductions"] += $sssContribution;
-        $payrollItem[] = [
-            'item_type' => PayrollItemTypeEnum::DEDUCTION,
-            'amount' => $sssContribution,
-            'description' => 'SSS Contributions'
-        ];
-
-        $payroll["deductions"] += $philhealthContribution;
-        $payrollItem[] = [
-            'item_type' => PayrollItemTypeEnum::DEDUCTION,
-            'amount' => $philhealthContribution,
-            'description' => 'PhilHealth Contributions'
-        ];
-
-        $payroll["deductions"] += $pagIbigContribution;
-        $payrollItem[] = [
-            'item_type' => PayrollItemTypeEnum::DEDUCTION,
-            'amount' => $pagIbigContribution,
-            'description' => 'Pag-Ibig Contributions'
-        ];
 
         $payroll["net_salary"] = $grossSalary - $deductions;
 
@@ -140,6 +135,17 @@ class PayrollController extends Controller
         DB::table('tblpayrollitem')->insert($payrollItems);
 
         return response()->json(['message' => 'Payroll created'], 201);
+    }
+
+    protected function calculateGrossSalary($payrollItems)
+    {
+        $grossSalary = 0;
+        foreach ($payrollItems as $item) {
+            if ($item["item_type"] != PayrollItemTypeEnum::DEDUCTION) {
+                $grossSalary += $item["amount"];
+            }
+        }
+        return $grossSalary;
     }
 
     protected function calculateTaxes($grossSalary, $payFrequency)
@@ -173,28 +179,7 @@ class PayrollController extends Controller
         return $taxes;
     }
 
-    // protected function calculateSSSContributions($grossSalary)
-    // {
-    //     $contribution = DB::table('tblsss')->where('compensation_from', ">= $grossSalary")->where('compensation_to', "<= $grossSalary")->first();
-    //     return $contribution->total_contribution_ee;
-    // }
-
-    // protected function calculatePhilHealthContribution($basicSalary)
-    // {
-    //     return $basicSalary * 0.05;
-    // }
-
-    // protected function calculatePagIbigContribution($basicSalary)
-    // {
-    //     if ($basicSalary <= 1500) {
-    //         return $basicSalary * 0.01;
-    //     }
-
-    //     return $basicSalary * 0.02;
-    // }
-
-
-    protected function calculateAttendacePayrollItems($attendances, $workShift, $hourlyRate)
+    protected function getAttendancePayrollItems($attendances, $workShift, $hourlyRate)
     {
 
         $totalHoursWorked = 0;
@@ -330,7 +315,7 @@ class PayrollController extends Controller
 
         if ($overtimeHoliday > 0) {
             $payrollItems[] = [
-                'item_type' => PayrollItemTypeEnum::OVERTIME,
+                'item_type' => PayrollItemTypeEnum::HOLIDAY,
                 'amount' => $overtimeHoliday * ($hourlyRate * 2),
                 'description' => 'Overtime Holiday'
             ];
@@ -368,129 +353,6 @@ class PayrollController extends Controller
         // $grossSalary -= ($absences * $workShift->hours_per_day * $hourlyRate);
         return $payrollItems;
     }
-
-    protected function calculateGrossSalary($basicSalary, $attendances, $workShift, $hourlyRate)
-    {
-
-        $totalHoursWorked = 0;
-        $overtimeRegularHours = 0;
-        $overtimeRestDay = 0;
-        $undertimeHours = 0;
-        $lateHours = 0;
-        $absences = 0;
-
-        $left = 0;
-        $right = 0;
-        while ($right < count($attendances)) {
-            $attendance = $attendances[$left];
-            $leftDate = $attendances[$left];
-            $rightDate = $attendances[$right];
-
-            // get gap between two attendances
-            if (Date::parse($leftDate->date)->diffInDays(Date::parse($rightDate->date)) > 1) {
-                $date = Date::parse($leftDate->date)->addDay();
-
-                // left date + 1 to right before the right date, check if there are absences
-                while ($date->lt(Date::parse($rightDate->date))) {
-                    $currentDate = $date->format('Y-m-d');
-
-                    $day = strtolower(Date::parse('Y-m-d', $currentDate)->format('D'));
-                    $workWeek = DB::table('tblworkweek')->first();
-                    $dayLength = $workWeek->$day;
-
-                    if (DayLengthEnum::from($dayLength)->isNoWork()) {
-                        $date = $date->addDay();
-                        continue;
-                    }
-
-                    $holiday = DB::table('tblholiday')->where('date', $currentDate)->first();
-                    if ($holiday != null) {
-                        $date = $date->addDay();
-                        continue;
-                    }
-
-                    $leave = DB::table('tblleave')
-                        ->where('status', LeaveRequestEnum::APPROVED)
-                        // if unpaid leave add to absences
-                        ->whereNot('leaveTypeID', null)
-                        ->where('EmployeeID', $attendance->EmployeeID)
-                        ->where('date', $currentDate)
-                        ->first();
-
-                    if ($leave != null) {
-                        $date = $date->addDay();
-                        continue;
-                    }
-
-                    $absences++;
-                    $date = $date->addDay();
-                }
-            }
-
-
-            $timeIn1 = $attendance->time_in_session1;
-            $timeOut1 = $attendance->time_out_session1;
-            $timeIn2 = $attendance->time_in_session2;
-            $timeOut2 = $attendance->time_out_session2;
-
-
-            if ($timeIn1 != null && $timeOut1 != null) {
-                $totalHoursWorked += Date::parse($timeOut1)->diffInMinutes(Date::parse($timeIn1)) / 60;
-            }
-
-            if ($timeIn2 != null && $timeOut2 != null) {
-                $totalHoursWorked += Date::parse($timeOut2)->diffInMinutes(Date::parse($timeIn2)) / 60;
-            }
-
-            // check if date is rest day (check work week)
-            $day = strtolower(Date::parse('Y-m-d', $attendance->date)->format('D'));
-            $workWeek = DB::table('tblworkweek')->first();
-            $dayLength = $workWeek->$day;
-            $holiday = DB::table('tblholiday')->where('date', $attendance->date)->first();
-
-            // check if either holiday or rest day, because there is a different rate for that, 
-            // if also holiday or rest day, it is impossible to overtime because all work hours is an overtime
-            if (DayLengthEnum::from($dayLength)->isNoWork()) {
-                $overtimeRestDay += $totalHoursWorked;
-            } else if ($holiday != null) {
-                $overtimeRestDay += $totalHoursWorked;
-            } else if ($totalHoursWorked > $workShift->hours_per_day) {
-                $overtimeRegularHours += $totalHoursWorked - $workShift->hours_per_day;
-            } else if ($totalHoursWorked < $workShift->hours_per_day) {
-                $undertimeHours = $workShift->hours_per_day - $totalHoursWorked;
-            }
-
-            if ($timeIn1 != null && $timeIn1 > $workShift->start_time) {
-                $lateHours += Date::parse($timeIn1)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
-            }
-
-            if ($timeIn2 != null && $timeIn2 > $workShift->start_time) {
-                $lateHours += Date::parse($timeIn2)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
-            }
-
-            $left = $right;
-            $right++;
-        }
-
-        $grossSalary = $basicSalary["amount"];
-        // $grossSalary += ($overtimeRegularHours * ($hourlyRate * 1.25));
-        // $grossSalary += ($overtimeRestDay * ($hourlyRate * 1.5));
-        $grossSalary -= ($lateHours * $hourlyRate);
-        $grossSalary -= ($undertimeHours * $hourlyRate);
-        $grossSalary -= ($absences * $workShift->hours_per_day * $hourlyRate);
-        return $grossSalary;
-    }
-
-    // protected function calculateGrossSalary($basicSalary, $hourlyRate, $totalHoursWorked, $overtimeRegularHours, $overtimeRestDay, $lateHours, $undertimeHours)
-    // {
-    //     $grossSalary = $basicSalary["amount"];
-    //     $grossSalary += ($overtimeRegularHours * ($hourlyRate * 1.25));
-    //     $grossSalary += ($overtimeRestDay * ($hourlyRate * 1.5));
-    //     $grossSalary -= ($lateHours * $hourlyRate);
-    //     $grossSalary -= ($undertimeHours * $hourlyRate);
-    //     return $grossSalary;
-    // }
-
 
     /**
      * Display the specified resource.
