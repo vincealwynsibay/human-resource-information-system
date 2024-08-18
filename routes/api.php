@@ -9,6 +9,7 @@ use App\Http\Controllers\JobTitleController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
+use App\Http\Controllers\PayrollItemController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkShiftController;
 use App\Http\Controllers\WorkWeekController;
@@ -84,6 +85,17 @@ Route::group(['prefix' => 'leavetype', 'middleware' => ['auth:sanctum', 'role:ad
     Route::delete('/{id}', [LeaveTypeController::class, 'destroy']);
 });
 
+Route::group(['prefix' => "payrollitem", 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [PayrollItemController::class, 'index']);
+    Route::post('/', [PayrollItemController::class, 'store']);
+    Route::put('/{id}', [PayrollItemController::class, 'update']);
+    Route::delete('/{id}', [PayrollItemController::class, 'destroy']);
+    Route::post('/bonus', [PayrollItemController::class, 'addBonus']);
+    Route::post('/deduction', [PayrollItemController::class, 'addDeduction']);
+    Route::post('/commission', [PayrollItemController::class, 'addCommission']);
+    Route::post('/allowance', [PayrollItemController::class, 'addAllowance']);
+});
+
 Route::group(['prefix' => "leaveentitlement", 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     // get leave entitlements by user
     Route::get('/', [LeaveEntitlementController::class, 'index']);
@@ -111,6 +123,8 @@ Route::group(['prefix' => 'leave', 'middleware' => ['auth:sanctum', 'role:admin'
     Route::put('/reject', [LeaveController::class, 'rejectLeave']);
 });
 
+
+
 Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [EmployeeController::class, 'index']);
     Route::post('/', [EmployeeController::class, 'store']);
@@ -127,9 +141,7 @@ Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'ro
     Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
     Route::put('/{id}/jobDetails', [EmployeeController::class, 'updateJobDetails']);
     Route::delete('/{id}', [EmployeeController::class, 'destroy']);
-
     Route::get('/{employeeId}/attendance', [AttendanceController::class, 'getEmployeeAttendanceRecords']);
-
 });
 
 Route::group(['prefix' => 'supervisor/employee', 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {

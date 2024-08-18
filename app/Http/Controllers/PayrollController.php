@@ -44,104 +44,117 @@ class PayrollController extends Controller
 
         $annualWorkHours = $workDaysAmount * $workShift["hours_per_day"] * 52;
         $monthlyWorkHours = $annualWorkHours / 12;
-        // $weeklyWorkHours = $annualWorkHours / 52;
+        $hourlyRate = $basicSalary["amount"] / ($monthlyWorkHours / 2);
 
         $grossSalary = 0;
         $deductions = 0;
-        $payroll = [];
         $payrollItems = [];
+        $employee = DB::table('tblemployee')->where($request->user()->EmployeeID)->first();
+        $dateFrom = null;
+        $dateTo = null;
 
+        $day = Date::now()->format('d');
 
         // determine if date is 15th or end of month for semi-monthly
-        $day = Date::now()->format('d');
+        // if 15th, schedule income tax
         if ($day == 15) {
-            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->startOfMonth(), Date::today()])->orderBy('date', 'DESC')->get();
-            $hourlyRate = $basicSalary["amount"] / ($monthlyWorkHours / 2);
+            $dateFrom = Date::now()->startOfMonth();
+            $dateTo = Date::today();
 
-            // schedule income tax for 15th
-            $deductions += $this->calculateTaxes($grossSalary, $basicSalary["pay_frequency"]);
             $payrollItems[] = [
+                'EmployeeID' => $employee->id,
                 'item_type' => PayrollItemTypeEnum::DEDUCTION,
                 'amount' => $this->calculateTaxes($grossSalary, $basicSalary["pay_frequency"]),
-                'description' => 'Income Tax'
-            ];
-
-            $payroll = [
-                'EmployeeID' => $request->employeeId,
-                'pay_period_start' => Date::now()->startOfMonth(),
-                'pay_period_end' => Date::now(),
+                'description' => 'Income Tax',
                 'created_date' => Date::now()
             ];
-        } else if ($day == Date::now()->endOfMonth()->format('d')) {
-            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->where('date', [Date::now()->dayOfMonth(16), Date::today()])->orderBy('date', 'DESC')->get();
 
-            // schedule contributions for 30th
-            $employee = DB::table('tblemployee')->where($request->user()->EmployeeID)->first();
+        } else if ($day == Date::now()->endOfMonth()->format('d')) {
+            // if end of month, schedule SSS, PhilHealth, Pag-Ibig
+            $dateFrom = Date::now()->dayOfMonth(16);
+            $dateTo = Date::today();
+
             $sssContribution = $employee->sss_contribution;
             $philhealthContribution = $employee->philhealth_contribution;
             $pagIbigContribution = $employee->pagibig_contribution;
 
             $payrollItems[] = [
+                'EmployeeID' => $employee->id,
                 'item_type' => PayrollItemTypeEnum::DEDUCTION,
                 'amount' => $sssContribution,
-                'description' => 'SSS Contributions'
+                'description' => 'SSS Contributions',
+                'created_date' => Date::now()
             ];
 
             $payrollItems[] = [
+                'EmployeeID' => $employee->id,
                 'item_type' => PayrollItemTypeEnum::DEDUCTION,
                 'amount' => $philhealthContribution,
-                'description' => 'PhilHealth Contributions'
+                'description' => 'PhilHealth Contributions',
+                'created_date' => Date::now()
             ];
 
             $payrollItems[] = [
+                'EmployeeID' => $employee->id,
                 'item_type' => PayrollItemTypeEnum::DEDUCTION,
                 'amount' => $pagIbigContribution,
-                'description' => 'Pag-Ibig Contributions'
-            ];
-
-            $deductions += $sssContribution;
-            $deductions += $philhealthContribution;
-            $deductions += $pagIbigContribution;
-
-            $payroll = [
-                'EmployeeID' => $request->employeeId,
-                'pay_period_start' => Date::now()->startOfMonth(),
-                'pay_period_end' => Date::now(),
+                'description' => 'Pag-Ibig Contributions',
                 'created_date' => Date::now()
             ];
         }
 
         // basic salary
         $payrollItems[] = [
-            'payroll_id' => $payroll['id'],
+            'EmployeeID' => $employee->id,
             'item_type' => PayrollItemTypeEnum::BASIC_SALARY,
             'amount' => $basicSalary["amount"] / 2,
-            'description' => 'Basic Salary'
+            'description' => 'Basic Salary',
+            'created_date' => Date::now()
         ];
 
         // attendance payroll items (leave, overtime, late, undertime, absences, holiday)
-        $payrollItems = array_merge($payrollItems, $this->getAttendancePayrollItems($attendances, $workShift, $hourlyRate));
+        $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->whereBetween('date', [$dateFrom, $dateTo])->orderBy('date', 'DESC')->get();
+        $payrollItems = array_merge($payrollItems, $this->getAttendancePayrollItems($employee->id, $attendances, $workShift, $hourlyRate));
 
-        // calculate gross salary with basic salary, overtime pay, bonuses, allowance holiday pay, commissions, leave pay, 
-        // TODO: setup a workflow for other payroll item (bonus, allowance, commission)
+        // insert all payroll items (basic salary, deductions, attendance)
+        DB::table('tblpayrollitem')->insert($payrollItems);
 
         // calculate gross salary
-        $grossSalary = $this->calculateGrossSalary($payrollItems);
-
-
-        $payroll["net_salary"] = $grossSalary - $deductions;
-
-        $payrollId = DB::table('tblpayroll')->insert($payroll);
-        DB::table('tblpayrollitem')->insert($payrollItems);
+        $grossSalary = $this->calculateGrossSalary($employee->id, $dateFrom, $dateTo);
+        $deductions = $this->calculateDeductions($employee->id, $dateFrom, $dateTo);
+        $netSalary = $grossSalary - $deductions;
+        $payrollId = DB::table('tblpayroll')->insert([
+            'EmployeeID' => $employee->id,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'gross_salary' => $grossSalary,
+            'deductions' => $deductions,
+            'net_salary' => $netSalary,
+            'created_at' => Date::now()
+        ]);
 
         return response()->json(['message' => 'Payroll created'], 201);
     }
 
-    protected function calculateGrossSalary($payrollItems)
+    protected function calculateGrossSalary($employeeId, $dateFrom, $dateTo)
     {
+        // get all valid payroll items within the date range (salary, overtime, bonuses, allowance, holiday pay, commissions, leave pay)
+        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_at', ">=", $dateFrom)->whereDate('created_at', "<=", $dateTo)->get();
         $grossSalary = 0;
         foreach ($payrollItems as $item) {
             if ($item["item_type"] != PayrollItemTypeEnum::DEDUCTION) {
+                $grossSalary += $item["amount"];
+            }
+        }
+        return $grossSalary;
+    }
+
+    protected function calculateDeductions($employeeId, $dateFrom, $dateTo)
+    {
+        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_at', ">=", $dateFrom)->whereDate('created_at', "<=", $dateTo)->get();
+        $grossSalary = 0;
+        foreach ($payrollItems as $item) {
+            if ($item["item_type"] == PayrollItemTypeEnum::DEDUCTION) {
                 $grossSalary += $item["amount"];
             }
         }
@@ -179,7 +192,7 @@ class PayrollController extends Controller
         return $taxes;
     }
 
-    protected function getAttendancePayrollItems($attendances, $workShift, $hourlyRate)
+    protected function getAttendancePayrollItems($employeeId, $attendances, $workShift, $hourlyRate)
     {
 
         $totalHoursWorked = 0;
@@ -190,7 +203,6 @@ class PayrollController extends Controller
         $lateHours = 0;
         $absences = 0;
         $leave = 0;
-
         $left = 0;
         $right = 0;
         while ($right < count($attendances)) {
@@ -291,33 +303,41 @@ class PayrollController extends Controller
 
         if ($leave > 0) {
             $payrollItems[] = [
+                'EmployeeID' => $employeeId,
                 'item_type' => PayrollItemTypeEnum::LEAVE,
                 'amount' => $leave * $workShift->hours_per_day * $hourlyRate,
-                'description' => 'Leave'
+                'description' => 'Leave',
+                'created_date' => Date::now()
             ];
         }
 
         if ($overtimeRegularHours > 0) {
             $payrollItems[] = [
+                'EmployeeID' => $employeeId,
                 'item_type' => PayrollItemTypeEnum::OVERTIME,
                 'amount' => $overtimeRegularHours * ($hourlyRate * 1.25),
-                'description' => 'Overtime Regular Hours'
+                'description' => 'Overtime Regular Hours',
+                'created_date' => Date::now()
             ];
         }
 
         if ($overtimeRestDay > 0) {
             $payrollItems[] = [
+                'EmployeeID' => $employeeId,
                 'item_type' => PayrollItemTypeEnum::OVERTIME,
                 'amount' => $overtimeRestDay * ($hourlyRate * 1.5),
-                'description' => 'Overtime Rest Day'
+                'description' => 'Overtime Rest Day',
+                'created_date' => Date::now()
             ];
         }
 
         if ($overtimeHoliday > 0) {
             $payrollItems[] = [
+                'EmployeeID' => $employeeId,
                 'item_type' => PayrollItemTypeEnum::HOLIDAY,
                 'amount' => $overtimeHoliday * ($hourlyRate * 2),
-                'description' => 'Overtime Holiday'
+                'description' => 'Overtime Holiday',
+                'created_date' => Date::now()
             ];
         }
 
@@ -325,6 +345,7 @@ class PayrollController extends Controller
         // TODO: DECIDE IF DEDUCTION BY LATE OR UNDERTIME
         // if ($lateHours > 0) {
         //     $payrollItems[] = [
+        // 'EmployeeID' => $employeeId,
         //         'item_type' => PayrollItemTypeEnum::DEDUCTION,
         //         'amount' => $lateHours * $hourlyRate,
         //         'description' => 'Late Hours'
@@ -333,17 +354,21 @@ class PayrollController extends Controller
 
         if ($undertimeHours > 0) {
             $payrollItems[] = [
+                'EmployeeID' => $employeeId,
                 'item_type' => PayrollItemTypeEnum::DEDUCTION,
                 'amount' => $undertimeHours * $hourlyRate,
-                'description' => 'Undertime Hours'
+                'description' => 'Undertime Hours',
+                'created_date' => Date::now()
             ];
         }
 
         if ($absences > 0) {
             $payrollItems[] = [
+                'EmployeeID' => $employeeId,
                 'item_type' => PayrollItemTypeEnum::DEDUCTION,
                 'amount' => $absences * $workShift->hours_per_day * $hourlyRate,
-                'description' => 'Absences'
+                'description' => 'Absences',
+                'created_date' => Date::now()
             ];
         }
 
