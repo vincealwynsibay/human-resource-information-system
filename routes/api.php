@@ -9,8 +9,8 @@ use App\Http\Controllers\JobTitleController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
-use App\Http\Controllers\PayrollItemController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PayrollItemController;
 use App\Http\Controllers\WorkShiftController;
 use App\Http\Controllers\WorkWeekController;
 use Illuminate\Http\Request;
@@ -30,6 +30,7 @@ Route::group(['prefix' => "user", 'middleware' => ['auth:sanctum', 'role:admin']
 Route::group(['prefix' => "user", 'middleware' => ['auth:sanctum']], function () {
     Route::put('/', [UserController::class, 'changePassword']);
 });
+
 
 
 Route::group(['prefix' => 'workweek', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
@@ -85,7 +86,9 @@ Route::group(['prefix' => 'leavetype', 'middleware' => ['auth:sanctum', 'role:ad
     Route::delete('/{id}', [LeaveTypeController::class, 'destroy']);
 });
 
-Route::group(['prefix' => "payrollitem", 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+
+
+Route::group(['prefix' => "admin/payrollitem", 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [PayrollItemController::class, 'index']);
     Route::post('/', [PayrollItemController::class, 'store']);
     Route::put('/{id}', [PayrollItemController::class, 'update']);
@@ -94,6 +97,10 @@ Route::group(['prefix' => "payrollitem", 'middleware' => ['auth:sanctum', 'role:
     Route::post('/deduction', [PayrollItemController::class, 'addDeduction']);
     Route::post('/commission', [PayrollItemController::class, 'addCommission']);
     Route::post('/allowance', [PayrollItemController::class, 'addAllowance']);
+});
+
+Route::group(['prefix' => "payrollitem", 'middleware' => ['auth:sanctum', 'role:employee']], function () {
+    Route::get('/me', [PayrollItemController::class, 'getUserPayrollItems']);
 });
 
 Route::group(['prefix' => "leaveentitlement", 'middleware' => ['auth:sanctum', 'role:admin']], function () {
