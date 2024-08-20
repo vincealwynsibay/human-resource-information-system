@@ -128,11 +128,11 @@ class DatabaseSeeder extends Seeder
 
         DB::table('tblworkweek')->insert([
             'id' => 1,
-            'mon' => 0,
-            'tue' => 0,
-            'wed' => 0,
-            'thu' => 0,
-            'fri' => 0,
+            'mon' => 1,
+            'tue' => 1,
+            'wed' => 1,
+            'thu' => 1,
+            'fri' => 1,
             'sat' => 0,
             'sun' => 0
         ]);
@@ -175,8 +175,12 @@ class DatabaseSeeder extends Seeder
         //     'pay_date' => now(),
         //     'status' => "PENDING"
         // ]);
-
-
+        DB::table('tblpaygrade')->insert([
+            'id' => 1,
+            'name' => "Grade 1",
+            'min_salary' => 10000,
+            'max_salary' => 20000
+        ]);
 
     }
 }

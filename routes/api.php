@@ -11,6 +11,7 @@ use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayrollItemController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\WorkShiftController;
 use App\Http\Controllers\WorkWeekController;
 use Illuminate\Http\Request;
@@ -55,6 +56,13 @@ Route::group(['prefix' => 'holiday', 'middleware' => ['auth:sanctum', 'role:admi
     Route::post('/', [HolidayController::class, 'store']);
     Route::put('/{id}', [HolidayController::class, 'update']);
     Route::delete('/{id}', [HolidayController::class, 'destroy']);
+});
+
+Route::group(['prefix' => 'payroll', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [PayrollController::class, 'index']);
+    Route::get('/{employeeId}', [PayrollController::class, 'getEmployeePayroll']);
+    Route::post('/{employeeId}', [PayrollController::class, 'store']);
+    Route::delete('/{employeeId}', [PayrollController::class, 'destroy']);
 });
 
 
