@@ -9,6 +9,7 @@ use App\Http\Controllers\JobTitleController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
+use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayrollItemController;
 use App\Http\Controllers\PayrollController;
@@ -139,6 +140,18 @@ Route::group(['prefix' => 'leave', 'middleware' => ['auth:sanctum', 'role:admin'
 });
 
 
+Route::group(['prefix' => 'overtime', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
+    Route::get('/me', [OvertimeController::class, 'getOwnOvertime']);
+    Route::post('/', [OvertimeController::class, 'applyForOvertime']);
+    Route::put('/{id}', [OvertimeController::class, 'update']);
+    Route::delete('/{id}', [OvertimeController::class, 'destroy']);
+});
+
+Route::group(['prefix' => 'overtime', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [OvertimeController::class, 'index']);
+    Route::put('/approve', [OvertimeController::class, 'approveOvertime']);
+    Route::put('/reject', [OvertimeController::class, 'rejectOvertime']);
+});
 
 Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [EmployeeController::class, 'index']);
