@@ -330,6 +330,19 @@ CREATE TABLE `tblleavetype` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblovertime`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblovertime` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `EmployeeID` int NOT NULL,
+  `reason` varchar(255) NOT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `requested_date` datetime NOT NULL,
+  `approval_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblpaygrade`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
