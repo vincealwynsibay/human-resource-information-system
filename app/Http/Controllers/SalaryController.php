@@ -37,6 +37,7 @@ class SalaryController extends Controller
             'employeeId' => 'required|exists:tblemployee,id',
             'paygradeId' => 'required',
             'amount' => 'required|numeric',
+            'change_reason' => 'nullable'
         ]);
 
         $paygrade = DB::table('tblpaygrade')->where('id', $validated['paygradeId'])->first();
@@ -49,10 +50,23 @@ class SalaryController extends Controller
             return response()->json(['message' => 'Amount is not within the paygrade range'], 400);
         }
 
+
+        $salary = DB::table('tblbasicsalary')->where('EmployeeID', $validated['employeeId'])->first();
+
+        if ($salary == null) {
+            DB::table('tblbasicsalary')->insert([
+                'EmployeeID' => $validated['employeeId'],
+                'PayGradeID' => $validated['paygradeId'],
+                'amount' => $validated['amount'],
+                'change_reason' => 'Starting Salary'
+            ]);
+        }
+
         DB::table('tblbasicsalary')->insert([
             'EmployeeID' => $validated['employeeId'],
             'PayGradeID' => $validated['paygradeId'],
             'amount' => $validated['amount'],
+            'change_reason' => $validated['change_reason']
         ]);
 
         return response()->json(['message' => 'Salary created'], 201);
@@ -67,6 +81,7 @@ class SalaryController extends Controller
         $validated = $request->validate([
             'paygradeId' => 'required',
             'amount' => 'required|numeric',
+            'change_reason' => 'required'
         ]);
 
         $paygrade = DB::table('tblpaygrade')->where('id', $validated['paygradeId'])->first();
@@ -83,6 +98,7 @@ class SalaryController extends Controller
             'EmployeeID' => $validated['employeeId'],
             'PayGradeID' => $validated['paygradeId'],
             'amount' => $validated['amount'],
+            'change_reason' => $validated['change_reason']
         ]);
 
         return response()->json(['message' => 'Salary updated'], 200);

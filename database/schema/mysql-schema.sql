@@ -172,6 +172,8 @@ CREATE TABLE `tblbasicsalary` (
   `EmployeeID` int NOT NULL,
   `PayGradeID` int NOT NULL,
   `amount` decimal(10,0) NOT NULL,
+  `change_reason` varchar(255) NOT NULL COMMENT 'starting salary to promotions',
+  `comments` text,
   `is_deleted` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
