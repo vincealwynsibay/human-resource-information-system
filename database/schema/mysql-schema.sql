@@ -191,6 +191,30 @@ CREATE TABLE `tbldepartment` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tbleducation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tbleducation` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblemergencycontact`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblemergencycontact` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `EmployeeID` int NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `relationship` varchar(100) NOT NULL,
+  `mobile_no` varchar(50) NOT NULL,
+  `office_no` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `EmployeeID` (`EmployeeID`),
+  CONSTRAINT `tblemergencycontact_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblemployee`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -200,6 +224,7 @@ CREATE TABLE `tblemployee` (
   `lastname` varchar(100) NOT NULL,
   `middlename` varchar(100) DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
+  `blood_type` varchar(20) DEFAULT NULL,
   `marital_status` varchar(20) DEFAULT NULL,
   `gender` varchar(6) DEFAULT NULL,
   `mobile_no` varchar(50) DEFAULT NULL,
@@ -227,6 +252,55 @@ CREATE TABLE `tblemployee` (
   CONSTRAINT `tblemployee_ibfk_3` FOREIGN KEY (`EmploymentStatusID`) REFERENCES `tblemploymentstatus` (`id`),
   CONSTRAINT `tblemployee_ibfk_4` FOREIGN KEY (`DepartmentID`) REFERENCES `tbldepartment` (`id`),
   CONSTRAINT `tblemployee_ibfk_5` FOREIGN KEY (`SupervisorID`) REFERENCES `tblemployee` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblemployeecertificate`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblemployeecertificate` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `EmployeeID` int NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `issued_by` varchar(100) DEFAULT NULL,
+  `issue_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `EmployeeID` (`EmployeeID`),
+  CONSTRAINT `tblemployeecertificate_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblemployeeeducation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblemployeeeducation` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `EmployeeID` int NOT NULL,
+  `EducationID` int NOT NULL COMMENT 'could be a separate table (bachelors, high school, master''s, etc)',
+  `institute` varchar(100) DEFAULT NULL,
+  `major` varchar(100) DEFAULT NULL,
+  `year` decimal(4,0) DEFAULT NULL,
+  `gpa` varchar(25) DEFAULT NULL,
+  `start_date` datetime DEFAULT NULL,
+  `end_date` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `EmployeeID` (`EmployeeID`),
+  KEY `EducationID` (`EducationID`),
+  CONSTRAINT `tblemployeeeducation_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
+  CONSTRAINT `tblemployeeeducation_ibfk_2` FOREIGN KEY (`EducationID`) REFERENCES `tbleducation` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblemployeeworkexperience`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblemployeeworkexperience` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `EmployeeID` int NOT NULL,
+  `employer` varchar(100) NOT NULL,
+  `job_title` varchar(100) NOT NULL,
+  `from_date` datetime NOT NULL,
+  `to_date` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `EmployeeID` (`EmployeeID`),
+  CONSTRAINT `tblemployeeworkexperience_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblemployeeworkshift`;
