@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayrollItemController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\WorkShiftController;
+use App\Http\Controllers\EmergencyContactController;
 use App\Http\Controllers\WorkWeekController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -189,6 +190,11 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
     Route::put('/{id}/image', [EmployeeController::class, 'updateImage']);
     Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
     Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
+
+    Route::get('/{id}/emergencyContacts', [EmergencyContactController::class, 'index']);
+    Route::post('/{id}/emergencyContacts', [EmergencyContactController::class, 'store']);
+    Route::put('/{id}/emergencyContacts/{emergencyContactId}', [EmergencyContactController::class, 'update']);
+    Route::delete('/{id}/emergencyContacts/{emergencyContactId}', [EmergencyContactController::class, 'destroy']);
 });
 
 

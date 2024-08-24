@@ -209,7 +209,7 @@ CREATE TABLE `tblemergencycontact` (
   `name` varchar(255) NOT NULL,
   `relationship` varchar(100) NOT NULL,
   `mobile_no` varchar(50) NOT NULL,
-  `office_no` varchar(50) DEFAULT NULL,
+  `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
   CONSTRAINT `tblemergencycontact_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
