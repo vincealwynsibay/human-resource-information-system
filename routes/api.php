@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\EmployeeController;
@@ -216,6 +217,10 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
     Route::put('/{id}/education/{educationId}', [EmployeeEducationController::class, 'update']);
     Route::delete('/{id}/education/{educationId}', [EmployeeEducationController::class, 'destroy']);
 
+    Route::get('/id/certificates', [CertificateController::class, 'index']);
+    Route::post('/id/certificates', [CertificateController::class, 'store']);
+    Route::put('/id/certificates/{certificateId}', [CertificateController::class, 'update']);
+    Route::delete('/id/certificates/{certificateId}', [CertificateController::class, 'destroy']);
 });
 
 
