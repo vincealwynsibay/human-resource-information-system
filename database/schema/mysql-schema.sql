@@ -277,7 +277,7 @@ CREATE TABLE `tblemployeeeducation` (
   `EducationID` int NOT NULL COMMENT 'could be a separate table (bachelors, high school, master''s, etc)',
   `institute` varchar(100) DEFAULT NULL,
   `major` varchar(100) DEFAULT NULL,
-  `year` decimal(4,0) DEFAULT NULL,
+  `year_graduated` decimal(4,0) DEFAULT NULL,
   `gpa` varchar(25) DEFAULT NULL,
   `start_date` datetime DEFAULT NULL,
   `end_date` datetime DEFAULT NULL,

@@ -30,10 +30,10 @@ class EmployeeEducationController extends Controller
     public function store(Request $request, $employeeId)
     {
         $validated = $request->validate([
-            'education' => 'required|string|exists:tbleducation,id',
+            'education' => 'required|exists:tbleducation,id',
             'institute' => 'required|string',
             'major' => 'required|string',
-            'yearGraduated' => 'required|date',
+            'yearGraduated' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
             'gpa' => 'required|numeric',
             'startDate' => 'required|date',
             'endDate' => 'required|date',
@@ -61,10 +61,10 @@ class EmployeeEducationController extends Controller
     public function update(Request $request, string $id, string $educationId)
     {
         $validated = $request->validate([
-            'education' => 'required|string|exists:tbleducation,id',
+            'education' => 'required|exists:tbleducation,id',
             'institute' => 'required|string',
             'major' => 'required|string',
-            'yearGraduated' => 'required|date',
+            'yearGraduated' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
             'gpa' => 'required|numeric',
             'startDate' => 'required|date',
             'endDate' => 'required|date',
