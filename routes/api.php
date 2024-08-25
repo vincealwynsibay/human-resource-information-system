@@ -197,10 +197,10 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
     Route::put('/{id}/emergencyContacts/{emergencyContactId}', [EmergencyContactController::class, 'update']);
     Route::delete('/{id}/emergencyContacts/{emergencyContactId}', [EmergencyContactController::class, 'destroy']);
 
-    Route::get('/{id}/workExperience', [WorkExperienceController::class, 'index']);
-    Route::post('/{id}/workExperience', [WorkExperienceController::class, 'store']);
-    Route::put('/{id}/workExperience/{workExperienceId}', [WorkExperienceController::class, 'update']);
-    Route::delete('/{id}/workExperience/{workExperienceId}', [WorkExperienceController::class, 'destroy']);
+    Route::get('/{id}/workExperiences', [WorkExperienceController::class, 'index']);
+    Route::post('/{id}/workExperiences', [WorkExperienceController::class, 'store']);
+    Route::put('/{id}/workExperiences/{workExperienceId}', [WorkExperienceController::class, 'update']);
+    Route::delete('/{id}/workExperiences/{workExperienceId}', [WorkExperienceController::class, 'destroy']);
 });
 
 
