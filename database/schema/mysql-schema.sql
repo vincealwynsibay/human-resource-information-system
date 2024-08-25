@@ -262,7 +262,7 @@ CREATE TABLE `tblemployeecertificate` (
   `EmployeeID` int NOT NULL,
   `name` varchar(100) NOT NULL,
   `issued_by` varchar(100) DEFAULT NULL,
-  `issue_date` date DEFAULT NULL,
+  `issued_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
   CONSTRAINT `tblemployeecertificate_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
