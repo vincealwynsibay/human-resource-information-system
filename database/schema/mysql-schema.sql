@@ -308,7 +308,7 @@ CREATE TABLE `tblemployeeworkexperience` (
   `id` int NOT NULL AUTO_INCREMENT,
   `EmployeeID` int NOT NULL,
   `employer` varchar(100) NOT NULL,
-  `job_title` varchar(100) NOT NULL,
+  `position` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `from_date` datetime NOT NULL,
   `to_date` datetime NOT NULL,
   PRIMARY KEY (`id`),

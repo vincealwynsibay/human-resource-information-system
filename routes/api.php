@@ -13,6 +13,7 @@ use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayrollItemController;
 use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\WorkExperienceController;
 use App\Http\Controllers\WorkShiftController;
 use App\Http\Controllers\EmergencyContactController;
 use App\Http\Controllers\WorkWeekController;
@@ -195,6 +196,11 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
     Route::post('/{id}/emergencyContacts', [EmergencyContactController::class, 'store']);
     Route::put('/{id}/emergencyContacts/{emergencyContactId}', [EmergencyContactController::class, 'update']);
     Route::delete('/{id}/emergencyContacts/{emergencyContactId}', [EmergencyContactController::class, 'destroy']);
+
+    Route::get('/{id}/workExperience', [WorkExperienceController::class, 'index']);
+    Route::post('/{id}/workExperience', [WorkExperienceController::class, 'store']);
+    Route::put('/{id}/workExperience/{workExperienceId}', [WorkExperienceController::class, 'update']);
+    Route::delete('/{id}/workExperience/{workExperienceId}', [WorkExperienceController::class, 'destroy']);
 });
 
 
