@@ -4,6 +4,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeEducationController;
 use App\Http\Controllers\EmploymentStatusController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\JobTitleController;
@@ -209,6 +210,12 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
     Route::post('/{id}/workExperiences', [WorkExperienceController::class, 'store']);
     Route::put('/{id}/workExperiences/{workExperienceId}', [WorkExperienceController::class, 'update']);
     Route::delete('/{id}/workExperiences/{workExperienceId}', [WorkExperienceController::class, 'destroy']);
+
+    Route::get('/{id}/education', [EmployeeEducationController::class, 'index']);
+    Route::post('/{id}/education', [EmployeeEducationController::class, 'store']);
+    Route::put('/{id}/education/{educationId}', [EmployeeEducationController::class, 'update']);
+    Route::delete('/{id}/education/{educationId}', [EmployeeEducationController::class, 'destroy']);
+
 });
 
 
