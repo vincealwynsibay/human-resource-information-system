@@ -182,5 +182,22 @@ class DatabaseSeeder extends Seeder
             'max_salary' => 20000
         ]);
 
+        DB::table('tbleducation')->insert([
+            'id' => 1,
+            'name' => "High School"
+        ]);
+
+        DB::table('tbleducation')->insert([
+            'id' => 2,
+            'name' => "Bachelor's Degree"
+        ]);
+
+        DB::table('tbleducation')->insert([
+            'id' => 3,
+            'name' => "Master's Degree"
+        ]);
+
+
+
     }
 }
