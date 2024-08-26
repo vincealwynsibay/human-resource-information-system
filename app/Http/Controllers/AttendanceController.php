@@ -24,7 +24,7 @@ class AttendanceController extends Controller
         ]);
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            DB::table('tblattendancerecord')
+            $attendances = DB::table('tblattendancerecord')
                 ->join('tblemployee', 'tblattendancerecord.EmployeeID', '=', 'tblemployee.id')
                 ->join('tblemployeesupervisor', 'tblemployeesupervisor.SubordinateID', '=', 'tblemployee.id')
                 ->where('tblemployeesupervisor.SupervisorID', $request->user()->EmployeeID)
@@ -161,52 +161,6 @@ class AttendanceController extends Controller
             'absences' => $absences
         ]);
     }
-
-    // public function getTotalHoursWorkedInAMonth(Request $request, string $id)
-    // {
-    //     $employee = DB::table('tblemployee')->where('id', $id)->first();
-
-    //     if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-    //         if ($employee->SupervisorID != $request->user()->id) {
-    //             return response()->json([
-    //                 'errors' => [
-    //                     'Authorization' => ['Access not allowed']
-    //                 ]
-    //             ], 404);
-    //         }
-    //     }
-
-    //     if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-    //         if ($id != $request->user()->id) {
-    //             return response()->json([
-    //                 'errors' => [
-    //                     'Authorization' => ['You view other\'s attendance records']
-    //                 ]
-    //             ], 404);
-    //         }
-    //     }
-    //     $attendanceWithinTheMonth = DB::table('tblattendancerecord')->where('EmployeeID', $id)->where('date', '>=', Date::now()->startOfMonth())->where('date', '<=', Date::now()->endOfMonth())->get();
-    //     $totalHoursWorked = 0;
-    //     foreach ($attendanceWithinTheMonth as $attendance) {
-    //         $workShift = DB::table('tblworkshift')->where('id', $employee->WorkShiftID)->first();
-
-    //         $timeIn1 = $attendance->time_in_session1;
-    //         $timeOut1 = $attendance->time_out_session1;
-    //         $timeIn2 = $attendance->time_in_session2;
-    //         $timeOut2 = $attendance->time_out_session2;
-
-    //         if ($timeIn1 != null && $timeOut1 != null) {
-    //             $totalHoursWorked += Date::parse($timeOut1)->diffInMinutes(Date::parse($timeIn1)) / 60;
-    //         }
-
-    //         if ($timeIn2 != null && $timeOut2 != null) {
-    //             $totalHoursWorked += Date::parse($timeOut2)->diffInMinutes(Date::parse($timeIn2)) / 60;
-    //         }
-    //     }
-    //     return response()->json([
-    //         'Total Hours Worked' => $totalHoursWorked
-    //     ]);
-    // }
 
 
     // for not able to differentiate punch in and punch out
