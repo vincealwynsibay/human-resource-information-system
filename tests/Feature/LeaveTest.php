@@ -59,9 +59,16 @@ test('get all employee leave with all filters as admin', function () {
     $response->assertStatus(200);
 });
 
+test('get subordinates leaves', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $response = $this->get('/api/leave/');
+    $response->assertStatus(200);
+});
+
 test('get own leave as employee', function () {
     $user = User::factory()->create([
-        'RoleID' => 3
+        'RoleID' => 2
     ]);
     $this->actingAs($user);
     $response = $this->get('/api/leave/me');
@@ -70,7 +77,7 @@ test('get own leave as employee', function () {
 
 test('apply for a leave as employee', function () {
     $user = User::factory()->create([
-        'RoleID' => 3
+        'RoleID' => 2
     ]);
     $this->actingAs($user);
 
@@ -98,7 +105,7 @@ test('apply for a leave as employee', function () {
 
 test('update leave as employee', function () {
     $user = User::factory()->create([
-        'RoleID' => 3
+        'RoleID' => 2
     ]);
     $this->actingAs($user);
 
@@ -122,7 +129,7 @@ test('update leave as employee', function () {
 
 test('delete leave as employee', function () {
     $user = User::factory()->create([
-        'RoleID' => 3
+        'RoleID' => 2
     ]);
     $this->actingAs($user);
 

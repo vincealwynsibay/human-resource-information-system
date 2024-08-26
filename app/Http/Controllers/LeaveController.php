@@ -23,10 +23,11 @@ class LeaveController extends Controller
             'leaveType' => 'nullable|exists:tblleavetype,id',
         ]);
 
-        if ($request->user()->RoleID == RoleEnum::SUPERVISOR) {
-            $assignedEmployees = DB::table('tblemployee')->where('SupervisorID', $request->user()->EmployeeID)->pluck('id');
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
             $leaveRequests = DB::table('tblleave')
-                ->whereIn('EmployeeID', $assignedEmployees)
+                ->join('tblemployee', 'tblleave.EmployeeID', '=', 'tblemployee.id')
+                ->join('tblemployeesupervisor', 'tblemployeesupervisor.SubordinateID', '=', 'tblemployee.id')
+                ->where('tblemployeesupervisor.SupervisorID', $request->user()->EmployeeID)
                 ->when($request->employeeId, function ($query, $employeeId) {
                     return $query->where('EmployeeID', $employeeId);
                 })

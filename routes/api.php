@@ -136,6 +136,7 @@ Route::group(['prefix' => "leaveentitlement", 'middleware' => ['auth:sanctum', '
 
 Route::group(['prefix' => 'leave', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
     // get own leaves
+    Route::get('/', [LeaveController::class, 'index']);
     Route::get('/me', [LeaveController::class, 'getOwnLeave']);
     // apply leave
     Route::post('/', [LeaveController::class, 'applyForLeave']);
