@@ -184,19 +184,19 @@ Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'ro
     Route::get('/{employeeId}/attendance', [AttendanceController::class, 'getEmployeeAttendanceRecords']);
 });
 
-Route::group(['prefix' => 'supervisor/employee', 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
-    Route::get('/', [EmployeeController::class, 'index']);
-    Route::get('/{id}', [EmployeeController::class, 'show']);
-    Route::put('/{id}', [EmployeeController::class, 'update']);
-    Route::put('/{id}/image', [EmployeeController::class, 'updateImage']);
-    Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
-    Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
-    Route::put('/{id}/jobDetails', [EmployeeController::class, 'updateJobDetails']);
-    Route::delete('/{id}', [EmployeeController::class, 'destroy']);
-});
+// Route::group(['prefix' => 'supervisor/employee', 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
+//     Route::get('/{id}', [EmployeeController::class, 'show']);
+//     Route::put('/{id}', [EmployeeController::class, 'update']);
+//     Route::put('/{id}/image', [EmployeeController::class, 'updateImage']);
+//     Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
+//     Route::put('/{id}/contactDetails', [EmployeeController::class, 'updateContactDetails']);
+//     Route::put('/{id}/jobDetails', [EmployeeController::class, 'updateJobDetails']);
+//     Route::delete('/{id}', [EmployeeController::class, 'destroy']);
+// });
 
 
 Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
+    Route::get('/', [EmployeeController::class, 'index']);
     Route::get('/{id}', [EmployeeController::class, 'show']);
     Route::put('/{id}/image', [EmployeeController::class, 'updateImage']);
     Route::put('/{id}/personalDetails', [EmployeeController::class, 'updatePersonalDetails']);
@@ -231,10 +231,10 @@ Route::group(['prefix' => "/admin/attendance", 'middleware' => ['auth:sanctum', 
     Route::delete('/{id}', [AttendanceController::class, 'destroy']);
 });
 
-Route::group(['prefix' => "/supervisor/attendance", 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
-    Route::get('/', [AttendanceController::class, 'index']);
-    Route::get('/{id}', [AttendanceController::class, 'show']);
-});
+// Route::group(['prefix' => "/supervisor/attendance", 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
+//     Route::get('/', [AttendanceController::class, 'index']);
+//     Route::get('/{id}', [AttendanceController::class, 'show']);
+// });
 
 Route::group(['prefix' => "/employee/attendance", 'middleware' => ['auth:sanctum', 'role:employee']], function () {
     Route::get('/', [AttendanceController::class, 'index']);

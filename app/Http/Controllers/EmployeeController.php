@@ -31,12 +31,10 @@ class EmployeeController extends Controller
 
 
         $employees = [];
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             $employees = DB::table('tblemployee')
-                ->where('SupervisorID', $request->user()->id)
-                ->when($request->id, function ($query, $id) {
-                    return $query->where('id', $id);
-                })
+                ->join('tblemployeesupervisor', 'tblemployee.id', '=', 'tblemployeesupervisor.SubordinateID')
+                ->where('tblemployeesupervisor.SupervisorID', $request->user()->EmployeeID)
                 ->when($request->name, function ($query, $name) {
                     return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
                 })
@@ -112,18 +110,11 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot view other employees\'s details']
@@ -158,17 +149,6 @@ class EmployeeController extends Controller
             ], 400);
         }
 
-        // check if supervisor is a supervisor
-        $supervisor = DB::table("tblemployee")->find($validated["supervisor"]);
-
-        if ($supervisor->JobTitleID > 2) {
-            return response()->json([
-                'errors' => [
-                    'Supervisor' => ['Supervisor must be a supervisor']
-                ]
-            ], 400);
-        }
-
         $employee = DB::table("tblemployee")->find($id);
         if ($employee == null) {
             return response()->json([
@@ -178,10 +158,10 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployee")->where('id', $id)->update([
-            'SupervisorID' => $validated["supervisor"]
+        DB::table('tblemployeesupervisor')->insert([
+            'SupervisorID' => $validated['supervisor'],
+            'SubordinateID' => $employee->id
         ]);
-
 
         return response()->json([
             'message' => "Supervisor assigned successfully"
@@ -190,7 +170,12 @@ class EmployeeController extends Controller
 
     public function removeSupervisor(Request $request, string $id)
     {
+        $validated = $request->validate([
+            'supervisor' => "required|exists:tblemployee,id"
+        ]);
+
         $employee = DB::table("tblemployee")->find($id);
+
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -199,9 +184,7 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployee")->where('id', $id)->update([
-            'SupervisorID' => null
-        ]);
+        DB::table('tblemployeesupervisor')->where('SupervisorID', $validated['supervisor'])->where('SubordinateID', $employee->id)->delete();
 
         return response()->json([
             'message' => "Supervisor removed successfully"
@@ -216,18 +199,13 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s details']
@@ -262,18 +240,13 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s details']
@@ -281,6 +254,7 @@ class EmployeeController extends Controller
                 ], 404);
             }
         }
+
 
         if ($employee == null) {
             return response()->json([
@@ -319,18 +293,12 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s details']
@@ -338,6 +306,7 @@ class EmployeeController extends Controller
                 ], 404);
             }
         }
+
 
         if ($employee == null) {
             return response()->json([
@@ -378,18 +347,12 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s details']
@@ -397,6 +360,8 @@ class EmployeeController extends Controller
                 ], 404);
             }
         }
+
+
 
         if ($employee == null) {
             return response()->json([
@@ -432,19 +397,12 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s details']
@@ -452,6 +410,8 @@ class EmployeeController extends Controller
                 ], 404);
             }
         }
+
+
 
         if ($employee == null) {
             return response()->json([
@@ -488,19 +448,12 @@ class EmployeeController extends Controller
         ]);
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s details']
@@ -508,6 +461,8 @@ class EmployeeController extends Controller
                 ], 404);
             }
         }
+
+
 
         if ($employee == null) {
             return response()->json([
@@ -540,19 +495,12 @@ class EmployeeController extends Controller
 
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s details']
@@ -560,6 +508,8 @@ class EmployeeController extends Controller
                 ], 404);
             }
         }
+
+
 
         if ($employee == null) {
             return response()->json([
@@ -587,17 +537,13 @@ class EmployeeController extends Controller
             "image" => ["required", File::image()->max("1mb")]
         ]);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            return response()->json([
-                'errors' => [
-                    'Authorization' => ['Access not allowed']
-                ]
-            ], 404);
-        }
-
         $employee = DB::table("tblemployee")->find($id);
+
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s details']
@@ -637,25 +583,21 @@ class EmployeeController extends Controller
     {
         $employee = DB::table("tblemployee")->find($id);
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
+        // check if employee is a subordinate to current user
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
-                        'Authorization' => ['Access not allowed']
+                        'Authorization' => ['You cannot dekete other\'s details']
                     ]
                 ], 404);
             }
         }
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employee->id != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot delete other\'s details']
-                    ]
-                ], 404);
-            }
-        }
+
 
         if ($employee == null) {
             return response()->json([
