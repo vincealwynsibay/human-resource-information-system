@@ -23,12 +23,6 @@ class DatabaseSeeder extends Seeder
 
 
         DB::table('tbluserrole')->insert([
-            'id' => RoleEnum::SUPERVISOR->value,
-            'name' => "SUPERVISOR",
-            'description' => "User that supervises employees"
-        ]);
-
-        DB::table('tbluserrole')->insert([
             'id' => RoleEnum::EMPLOYEE->value,
             'name' => "EMPLOYEE",
             'description' => "User with an employee account"

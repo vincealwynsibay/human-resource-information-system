@@ -288,6 +288,20 @@ CREATE TABLE `tblemployeeeducation` (
   CONSTRAINT `tblemployeeeducation_ibfk_2` FOREIGN KEY (`EducationID`) REFERENCES `tbleducation` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tblemployeesupervisor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tblemployeesupervisor` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `SupervisorID` int NOT NULL,
+  `SubordinateID` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `SupervisorID` (`SupervisorID`),
+  KEY `SubordinateID` (`SubordinateID`),
+  CONSTRAINT `tblemployeesupervisor_ibfk_1` FOREIGN KEY (`SupervisorID`) REFERENCES `tblemployee` (`id`),
+  CONSTRAINT `tblemployeesupervisor_ibfk_2` FOREIGN KEY (`SubordinateID`) REFERENCES `tblemployee` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblemployeetraining`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
