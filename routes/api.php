@@ -231,13 +231,9 @@ Route::group(['prefix' => "/admin/attendance", 'middleware' => ['auth:sanctum', 
     Route::delete('/{id}', [AttendanceController::class, 'destroy']);
 });
 
-// Route::group(['prefix' => "/supervisor/attendance", 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
-//     Route::get('/', [AttendanceController::class, 'index']);
-//     Route::get('/{id}', [AttendanceController::class, 'show']);
-// });
 
 Route::group(['prefix' => "/employee/attendance", 'middleware' => ['auth:sanctum', 'role:employee']], function () {
-    Route::get('/', [AttendanceController::class, 'index']);
+    Route::get('/me', [AttendanceController::class, 'getOwnAttendanceRecords']);
     Route::get('/{id}', [AttendanceController::class, 'show']);
     Route::post('/', [AttendanceController::class, 'attendance']);
     Route::post('/timeIn', [AttendanceController::class, 'timeIn']);

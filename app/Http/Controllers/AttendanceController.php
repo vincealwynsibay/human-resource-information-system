@@ -24,20 +24,10 @@ class AttendanceController extends Controller
         ]);
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->user()->EmployeeID)
-                ->when($request->id, function ($query, $id) {
-                    return $query->where('id', $id);
-                })
-                ->when($request->name, function ($query, $name) {
-                    return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
-                })
-                ->whereBetween('date', [Date::format("Y-m-d", $request->fromDate), Date::format("Y-m-d", $request->toDate)])
-                ->get();
-            return response()->json($attendances);
-        } else if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            $assignedEmployees = DB::table('tblemployee')->where('SupervisorID', $request->user()->EmployeeID)->get();
-            $employeeIDs = $assignedEmployees->pluck('id')->toArray();
-            $attendances = DB::table('tblattendancerecord')->whereIn('EmployeeID', $employeeIDs)
+            DB::table('tblattendancerecord')
+                ->join('tblemployee', 'tblattendancerecord.EmployeeID', '=', 'tblemployee.id')
+                ->join('tblemployeesupervisor', 'tblemployeesupervisor.SubordinateID', '=', 'tblemployee.id')
+                ->where('tblemployeesupervisor.SupervisorID', $request->user()->EmployeeID)
                 ->when($request->id, function ($query, $id) {
                     return $query->where('id', $id);
                 })
@@ -61,26 +51,32 @@ class AttendanceController extends Controller
         return response()->json($attendances);
     }
 
+    public function getOwnAttendanceRecords(Request $request)
+    {
+        $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->user()->EmployeeID)
+            ->when($request->id, function ($query, $id) {
+                return $query->where('id', $id);
+            })
+            ->when($request->name, function ($query, $name) {
+                return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
+            })
+            ->whereBetween('date', [Date::format("Y-m-d", $request->fromDate), Date::format("Y-m-d", $request->toDate)])
+            ->get();
+        return response()->json($attendances);
+    }
+
 
     public function getEmployeeAttendanceRecords(Request $request, $employeeId)
     {
         $validated = $request->validate([
             "range" => 'nullable|string|in:TODAY,WEEK,MONTH,HALFYEAR,YEAR,ALL',
         ]);
-        $employee = DB::table('tblemployee')->where('id', $employeeId)->first();
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+        $employee = DB::table('tblemployee')->where('id', $employeeId)->first();
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employeeId != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You view other\'s attendance records']
@@ -88,6 +84,7 @@ class AttendanceController extends Controller
                 ], 404);
             }
         }
+
 
         if ($request->range === "ALL") {
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->orderBy('date', 'DESC')->get();
@@ -114,7 +111,6 @@ class AttendanceController extends Controller
         }
 
 
-        //TODO: CHECK LEAVE RECORDS AND HOLIDAYS
         $absences = $this->getEmployeeAbsencesByDateRange($employeeId, Date::parse($attendances[count($attendances) - 1]->date), Date::parse($attendances[0]->date));
 
         // update each record to have hours worked for each session, total hours worked for the day, overtime hours, undertime hours, and late hours
@@ -376,18 +372,11 @@ class AttendanceController extends Controller
         $attendance = DB::table("tblattendancerecord")->find($id);
         $employee = DB::table('tblemployee')->where('id', $attendance->EmployeeID)->first();
 
-        if ($request->user()->roleID == RoleEnum::SUPERVISOR->value) {
-            if ($employee->SupervisorID != $request->user()->id) {
-                return response()->json([
-                    'errors' => [
-                        'Authorization' => ['Access not allowed']
-                    ]
-                ], 404);
-            }
-        }
+
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($attendance->EmployeeID != $request->user()->id) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
                     'errors' => [
                         'Authorization' => ['You cannot update other\'s attendance records']
@@ -395,7 +384,6 @@ class AttendanceController extends Controller
                 ], 404);
             }
         }
-
 
         if ($attendance == null) {
             return response()->json([
