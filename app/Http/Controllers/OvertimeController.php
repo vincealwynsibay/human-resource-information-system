@@ -20,10 +20,11 @@ class OvertimeController extends Controller
             'status' => 'nullable|string'
         ]);
 
-        if ($request->user()->RoleID == RoleEnum::SUPERVISOR) {
-            $assignedEmployees = DB::table('tblemployee')->where('SupervisorID', $request->user()->EmployeeID)->pluck('id');
-            $overtimeRequests = DB::table('tblovertime')
-                ->whereIn('EmployeeID', $assignedEmployees)
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE) {
+            $assignedEmployees = DB::table('tblovertime')
+                ->join('tblemployee', 'tblovertime.EmployeeID', '=', 'tblemployee.id')
+                ->join('tblemployeesupervisor', 'tblemployeesupervisor.SubordinateID', '=', 'tblemployee.id')
+                ->where('tblemployeesupervisor.SupervisorID', $request->user()->EmployeeID)
                 ->when($request->employeeId, function ($query, $employeeId) {
                     return $query->where('EmployeeID', $employeeId);
                 })
