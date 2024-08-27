@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Enum\DayLengthEnum;
 use App\Enum\PayFrequencyEnum;
 use App\Enum\LeaveRequestEnum;
+use App\Exports\PayrollExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use App\Enum\PayrollItemTypeEnum;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PayrollController extends Controller
 {
@@ -25,6 +27,37 @@ class PayrollController extends Controller
     {
         $payroll = DB::table('tblpayroll')->where('EmployeeID', $employeeId)->get();
         return response()->json($payroll, 200);
+    }
+
+    public function export(Request $request)
+    {
+        // $validated = $request->validate([
+        //     'startDate' => 'required|date',
+        //     'endDate' => 'required|date'
+        // ]);
+        $validated = $request->validate([
+            'startDate' => 'nullable',
+            'endDate' => 'nullable'
+        ]);
+
+
+        $employeeId = DB::table('tblemployee')->insertGetId([
+            "firstname" => fake()->firstName(),
+            "lastname" => fake()->lastName(),
+            "joined_date" => Date::now()
+        ]);
+
+        DB::table('tblpayroll')->insert([
+            'EmployeeID' => $employeeId,
+            'pay_period_start' => Date::today()->subDay(),
+            'pay_period_end' => Date::today(),
+            'gross_salary' => 150,
+            'deductions' => 50,
+            'net_salary' => 100,
+            'created_date' => Date::now()
+        ]);
+
+        return Excel::download(new PayrollExport(Date::createFromFormat('Y-m-d', $validated['startDate']), Date::createFromFormat('Y-m-d', $validated['endDate'])), 'payroll-' . Date::today()->format('Y-m-d') . '.xlsx');
     }
 
     /**
