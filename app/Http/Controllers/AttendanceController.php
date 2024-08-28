@@ -145,11 +145,11 @@ class AttendanceController extends Controller
             }
 
             if ($timeIn1 != null && $timeIn1 > $workShift->start_time) {
-                $lateHours += Date::parse($timeIn1)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
+                $lateHours += Date::parse(Date::parse($workShift->start_time))->diffInMinutes($timeIn1) / 60;
             }
 
             if ($timeIn2 != null && $timeIn2 > $workShift->start_time) {
-                $lateHours += Date::parse($timeIn2)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
+                $lateHours += Date::parse(Date::parse($workShift->end_break_time))->diffInMinutes($timeIn2) / 60;
             }
 
             $attendance->total_hours_worked = $totalHoursWorked;

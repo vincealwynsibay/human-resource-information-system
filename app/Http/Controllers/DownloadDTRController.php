@@ -92,8 +92,6 @@ class DownloadDTRController extends Controller
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
         $left = 0;
 
-
-
         while ($left < count($attendances)) {
             $leftDate = $attendances[$left];
             $lateHours = 0;
@@ -106,19 +104,19 @@ class DownloadDTRController extends Controller
             $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
 
             if ($leftDate->time_in_session1 != null && $leftDate->time_out_session1 != null) {
-                $hoursWorked += Date::parse($leftDate->time_out_session1)->diffInMinutes(Date::parse($leftDate->time_in_session1)) / 60;
+                $hoursWorked += Date::parse($leftDate->time_in_session1)->diffInMinutes(Date::parse($leftDate->time_out_session1)) / 60;
             }
 
             if ($leftDate->time_in_session2 != null && $leftDate->time_out_session2 != null) {
-                $hoursWorked += Date::parse($leftDate->time_out_session2)->diffInMinutes(Date::parse($leftDate->time_in_session2)) / 60;
+                $hoursWorked += Date::parse($leftDate->time_in_session2)->diffInMinutes(Date::parse($leftDate->time_out_session2)) / 60;
             }
 
             if ($leftDate->time_in_session1 != null && $leftDate->time_in_session1 > $workShift->start_time) {
-                $lateHours += Date::parse($leftDate->time_in_session1)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
+                $lateHours += Date::parse(Date::parse($workShift->start_time))->diffInMinutes($leftDate->time_in_session1) / 60;
             }
 
             if ($leftDate->time_in_session2 != null && $leftDate->time_in_session2 > $workShift->start_time) {
-                $lateHours += Date::parse($leftDate->time_in_session2)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
+                $lateHours += Date::parse(Date::parse($workShift->end_break_time))->diffInMinutes($leftDate->time_in_session2) / 60;
             }
 
             $undertimeHours = $workShift->hours_per_day - $hoursWorked;
@@ -135,6 +133,13 @@ class DownloadDTRController extends Controller
                 'late_hours' => $lateHours,
                 'status' => 'PRESENT',
             ];
+
+
+            $dayNo++;
+            $totalHoursWorked += $hoursWorked;
+            $totalOvertimeHours += 0;
+            $totalUndertimeHours += $undertimeHours;
+            $totalLateHours += $lateHours;
 
             if (count($attendances) == 1) {
                 break;
@@ -239,13 +244,10 @@ class DownloadDTRController extends Controller
                 }
             }
 
-            $dayNo++;
-            $totalHoursWorked += $hoursWorked;
-            $totalOvertimeHours += 0;
-            $totalUndertimeHours += $undertimeHours;
-            $totalLateHours += $lateHours;
             $left++;
         }
+
+
 
         while ($dayNo <= Date::today()->format("d")) {
             $parsedAttendance[] = [

@@ -74,13 +74,13 @@
         <tfoot>
             <tr>
                 <td>Total</td>
-                <td>{{ $total_hours_worked }}</td>
+                <td>{{ $total_hours_worked }} hours</td>
             </tr>
         </tfoot>
     </table>
 
-    <h4>Total Undertime: {{ $total_undertime_hours }}</h4>
-    <h4>Total Overtime: {{ $total_overtime_hours }}</h4>
+    <h4>Total Undertime: {{ $total_undertime_hours }} hours</h4>
+    <h4>Total Overtime: {{ $total_overtime_hours }} hours</h4>
 
     <div>
         <p>Prepared by:</p>
