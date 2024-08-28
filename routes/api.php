@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DownloadDTRController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeEducationController;
@@ -26,6 +27,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/dtr', [DownloadDTRController::class, '__invoke']);
 
 
 Route::group(['prefix' => "user", 'middleware' => ['auth:sanctum', 'role:admin']], function () {
