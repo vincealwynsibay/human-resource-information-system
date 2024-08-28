@@ -16,18 +16,12 @@ class DownloadDTRController extends Controller
     public function __invoke(Request $request)
     {
 
-        // $validated = $request->validate([
-        //     'employee_id' => 'required|exists:tblemployee,id',
-        // ]);
-        $firstId = DB::table('tblemployee')->first()->id;
-        $employee = DB::table('tblemployee')->where('id', $firstId)->first();
-        $attendance = $this->generateDTR($employee->id);
-        // $validated = $request->validate([
-        //     'employee_id' => 'required|exists:tblemployee,id',
-        // ]);
-        // $attendance = $this->generateDTR($validated['employee_id']);
-        // dd($attendance['attendances']);
-        // dd($attendance);
+        $validated = $request->validate([
+            'employee_id' => 'required|exists:tblemployee,id',
+        ]);
+        $attendance = $this->generateDTR($validated['employee_id']);
+        $employee = DB::table('tblemployee')->where('id', $validated['employee_id'])->first();
+
         return Pdf::view('pdf.dtr', [
             'employee' => $employee,
             'month' => Date::now()->format('F'),
