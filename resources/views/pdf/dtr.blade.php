@@ -2,7 +2,7 @@
     <h1>Daily Time Record</h1>
     <h2>{{ $employee->firstname . " " . $employee->lastname }}</h2>
 
-    <h3>For the month of {{$month}} {{$year}}</h3>
+    <h3 class="text-red">For the month of {{$month}} {{$year}}</h3>
 
 
     <table>
