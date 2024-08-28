@@ -3,19 +3,18 @@ namespace App\Enum;
 
 enum DayLengthEnum: int
 {
-    case FULL_DAY = 0;
-    case HALF_DAY = 1;
-    case NO_WORK = 2;
+    case FULL_DAY = 1;
+    case NO_WORK = 0;
 
     public function isFullDay(): bool
     {
         return $this->value === self::FULL_DAY->value;
     }
 
-    public function isHalfDay(): bool
-    {
-        return $this->value === self::HALF_DAY->value;
-    }
+    // public function isHalfDay(): bool
+    // {
+    //     return $this->value === self::HALF_DAY->value;
+    // }
 
     public function isNoWork(): bool
     {
