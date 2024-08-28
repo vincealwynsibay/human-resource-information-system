@@ -115,7 +115,9 @@ class AttendanceController extends Controller
 
         // update each record to have hours worked for each session, total hours worked for the day, overtime hours, undertime hours, and late hours
         foreach ($attendances as $attendance) {
-            $workShift = DB::table('tblworkshift')->where('id', $employee->WorkShiftID)->first();
+
+            $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
+            $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
 
             $timeIn1 = $attendance->time_in_session1;
             $timeOut1 = $attendance->time_out_session1;
@@ -270,7 +272,6 @@ class AttendanceController extends Controller
         // check current time
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first('id');
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->id)->first();
-
         $currentTime = Date::now()->format("H:i");
 
         // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
@@ -478,7 +479,7 @@ class AttendanceController extends Controller
                             'overtime_hours' => 0,
                             'undertime_hours' => 0,
                             'late_hours' => 0,
-                            'status' => 'ON LEAVE',
+                            'status' => 'LEAVE',
                             'leave_type' => $leave->leave_type
                         ];
                         $date = $date->addDay();
