@@ -27,6 +27,7 @@ class DownloadDTRController extends Controller
         // ]);
         // $attendance = $this->generateDTR($validated['employee_id']);
         // dd($attendance['attendances']);
+        // dd($attendance);
         return Pdf::view('pdf.dtr', [
             'employee' => $employee,
             'month' => Date::now()->format('F'),
@@ -151,7 +152,6 @@ class DownloadDTRController extends Controller
         $day = strtolower(Date::today()->format('D'));
         $workWeek = DB::table('tblworkweek')->first();
         $dayLength = $workWeek->$day;
-
 
         while ($left < count($attendances)) {
             $leftDate = $attendances[$left];
@@ -434,7 +434,7 @@ class DownloadDTRController extends Controller
     //             $lateHours += Date::parse($leftDate->time_in_session2)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
     //         }
 
-    //         $undertimeHours = $workShift->hours_per_day - $hoursWorked;
+    //         $undertimeHours = ($workShift->hours_per_day / 60) - $hoursWorked;
 
     //         $parsedAttendance[] = [
     //             'date' => $attendances[$left]->date,
