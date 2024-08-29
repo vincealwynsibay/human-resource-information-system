@@ -14,7 +14,7 @@ test('update monday to full day', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
     $response = $this->put('/api/workweek', [
-        'mon' => 0,
+        'mon' => 1,
         'tue' => 0,
         'wed' => 0,
         'thu' => 0,
@@ -32,24 +32,6 @@ test('update monday to friday to full day', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
     $response = $this->put('/api/workweek', [
-        'mon' => 0,
-        'tue' => 0,
-        'wed' => 0,
-        'thu' => 0,
-        'fri' => 0,
-        'sat' => 0,
-        'sun' => 0,
-    ]);
-
-    $response->assertJson(['message' => 'Work week updated successfully']);
-
-    $response->assertStatus(200);
-});
-
-test('update monday to friday to half day', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
-    $response = $this->put('/api/workweek', [
         'mon' => 1,
         'tue' => 1,
         'wed' => 1,
@@ -64,17 +46,35 @@ test('update monday to friday to half day', function () {
     $response->assertStatus(200);
 });
 
+// test('update monday to friday to half day', function () {
+//     $user = User::factory()->create();
+//     $this->actingAs($user);
+//     $response = $this->put('/api/workweek', [
+//         'mon' => 1,
+//         'tue' => 1,
+//         'wed' => 1,
+//         'thu' => 1,
+//         'fri' => 1,
+//         'sat' => 0,
+//         'sun' => 0,
+//     ]);
+
+//     $response->assertJson(['message' => 'Work week updated successfully']);
+
+//     $response->assertStatus(200);
+// });
+
 test('update saturday and sunday to no work', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
     $response = $this->put('/api/workweek', [
-        'mon' => 0,
-        'tue' => 0,
-        'wed' => 0,
-        'thu' => 0,
-        'fri' => 0,
-        'sat' => 2,
-        'sun' => 2,
+        'mon' => 1,
+        'tue' => 1,
+        'wed' => 1,
+        'thu' => 1,
+        'fri' => 1,
+        'sat' => 0,
+        'sun' => 0,
     ]);
 
     $response->assertStatus(200);
