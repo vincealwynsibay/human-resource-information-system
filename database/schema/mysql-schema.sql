@@ -557,10 +557,10 @@ CREATE TABLE `tblworkshift` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   `hours_per_day` decimal(4,2) NOT NULL,
-  `start_time` time NOT NULL,
-  `end_time` time NOT NULL,
-  `start_break_time` time DEFAULT NULL,
-  `end_break_time` time DEFAULT NULL,
+  `start_time1` time NOT NULL,
+  `end_time1` time NOT NULL,
+  `start_time2` time DEFAULT NULL,
+  `end_time2` time DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
