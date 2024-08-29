@@ -42,7 +42,7 @@ test('get user payroll items as admin', function () {
 
 test('get own payroll items', function () {
     $employee = User::factory()->create([
-        'RoleID' => 3
+        'RoleID' => 2
     ]);
     $this->actingAs($employee);
 
