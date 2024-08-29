@@ -429,12 +429,12 @@ class PayrollController extends Controller
             //         $undertimeHours = $workShift->hours_per_day - $totalHoursWorked;
             //     }
 
-            //     if ($timeIn1 != null && $timeIn1 > $workShift->start_time) {
-            //         $lateHours += Date::parse($timeIn1)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
+            //     if ($timeIn1 != null && $timeIn1 > $workShift->start_time1) {
+            //         $lateHours += Date::parse($timeIn1)->diffInMinutes(Date::parse($workShift->start_time1)) / 60;
             //     }
 
-            //     if ($timeIn2 != null && $timeIn2 > $workShift->start_time) {
-            //         $lateHours += Date::parse($timeIn2)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
+            //     if ($timeIn2 != null && $timeIn2 > $workShift->start_time1) {
+            //         $lateHours += Date::parse($timeIn2)->diffInMinutes(Date::parse($workShift->start_time1)) / 60;
             //     }
 
             //     $left = $right;

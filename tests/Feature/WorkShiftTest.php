@@ -14,12 +14,10 @@ test('get all work shifts', function () {
             'id',
             'name',
             'hours_per_day',
-            'start_time',
-            'end_time',
-            'start_break_time',
-            'end_break_time',
-            'created_at',
-            'updated_at'
+            'start_time1',
+            'end_time1',
+            'start_time2',
+            'end_time2',
         ]
     ]);
 });
@@ -31,8 +29,8 @@ test('create a new work shift', function () {
     $response = $this->post('/api/workshift', [
         'name' => 'Morning Shift',
         'hours_per_day' => 8,
-        'start_time' => '08:00',
-        'end_time' => '16:00'
+        'start_time1' => '08:00',
+        'end_time1' => '16:00'
     ]);
 
     $response->assertStatus(201);
@@ -47,10 +45,10 @@ test('create a new work shift with break time', function () {
     $response = $this->post('/api/workshift', [
         'name' => 'Morning Shift',
         'hours_per_day' => 8,
-        'start_time' => '08:00',
-        'end_time' => '16:00',
-        'start_break_time' => '12:00',
-        'end_break_time' => '13:00'
+        'start_time1' => '08:00',
+        'end_time1' => '16:00',
+        'start_time2' => '12:00',
+        'end_time2' => '13:00'
     ]);
 
     $response->assertStatus(201);
@@ -66,19 +64,19 @@ test('update a work shift', function () {
     $id = DB::table('tblworkshift')->insertGetId([
         'name' => 'Morning Shift',
         'hours_per_day' => 8,
-        'start_time' => '08:00',
-        'end_time' => '16:00',
-        'start_break_time' => '12:00',
-        'end_break_time' => '13:00'
+        'start_time1' => '08:00',
+        'end_time1' => '16:00',
+        'start_time2' => '12:00',
+        'end_time2' => '13:00'
     ]);
 
     $response = $this->put("/api/workshift/" . $id, [
         'name' => 'Night Shift',
         'hours_per_day' => 10,
-        'start_time' => '08:00',
-        'end_time' => '17:00',
-        'start_break_time' => '12:00',
-        'end_break_time' => '14:00'
+        'start_time1' => '08:00',
+        'end_time1' => '17:00',
+        'start_time2' => '12:00',
+        'end_time2' => '14:00'
     ]);
 
 
@@ -91,8 +89,8 @@ test('delete a work shift', function () {
     $id = DB::table('tblworkshift')->insertGetId([
         'name' => 'Morning Shift',
         'hours_per_day' => 8,
-        'start_time' => '08:00',
-        'end_time' => '16:00'
+        'start_time1' => '08:00',
+        'end_time1' => '16:00'
     ]);
     $response = $this->delete("/api/workshift/" . $id);
 

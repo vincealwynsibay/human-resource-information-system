@@ -166,12 +166,12 @@ class DownloadDTRController extends Controller
                 $hoursWorked += Date::parse($leftDate->time_in_session2)->diffInMinutes(Date::parse($leftDate->time_out_session2)) / 60;
             }
 
-            if ($leftDate->time_in_session1 != null && $leftDate->time_in_session1 > $workShift->start_time) {
-                $lateHours += Date::parse(Date::parse($workShift->start_time))->diffInMinutes($leftDate->time_in_session1) / 60;
+            if ($leftDate->time_in_session1 != null && $leftDate->time_in_session1 > $workShift->start_time1) {
+                $lateHours += Date::parse(Date::parse($workShift->start_time1))->diffInMinutes($leftDate->time_in_session1) / 60;
             }
 
-            if ($leftDate->time_in_session2 != null && $leftDate->time_in_session2 > $workShift->start_time) {
-                $lateHours += Date::parse(Date::parse($workShift->end_break_time))->diffInMinutes($leftDate->time_in_session2) / 60;
+            if ($leftDate->time_in_session2 != null && $leftDate->time_in_session2 > $workShift->start_time1) {
+                $lateHours += Date::parse(Date::parse($workShift->start_time2))->diffInMinutes($leftDate->time_in_session2) / 60;
             }
 
             $undertimeHours = $workShift->hours_per_day - $hoursWorked;
@@ -420,12 +420,12 @@ class DownloadDTRController extends Controller
     //             $hoursWorked += Date::parse($leftDate->time_out_session2)->diffInMinutes(Date::parse($leftDate->time_in_session2)) / 60;
     //         }
 
-    //         if ($leftDate->time_in_session1 != null && $leftDate->time_in_session1 > $workShift->start_time) {
-    //             $lateHours += Date::parse($leftDate->time_in_session1)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
+    //         if ($leftDate->time_in_session1 != null && $leftDate->time_in_session1 > $workShift->start_time1) {
+    //             $lateHours += Date::parse($leftDate->time_in_session1)->diffInMinutes(Date::parse($workShift->start_time1)) / 60;
     //         }
 
-    //         if ($leftDate->time_in_session2 != null && $leftDate->time_in_session2 > $workShift->start_time) {
-    //             $lateHours += Date::parse($leftDate->time_in_session2)->diffInMinutes(Date::parse($workShift->start_time)) / 60;
+    //         if ($leftDate->time_in_session2 != null && $leftDate->time_in_session2 > $workShift->start_time1) {
+    //             $lateHours += Date::parse($leftDate->time_in_session2)->diffInMinutes(Date::parse($workShift->start_time1)) / 60;
     //         }
 
     //         $undertimeHours = ($workShift->hours_per_day / 60) - $hoursWorked;

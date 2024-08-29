@@ -27,20 +27,19 @@ class WorkShiftController extends Controller
         $validated = $request->validate([
             "name" => "required|string|max:100",
             "hours_per_day" => "required|numeric",
-            "start_time" => "required|date_format:H:i",
-            "end_time" => "required|date_format:H:i|after:start_time",
-            "start_break_time" => "nullable|date_format:H:i",
-            "end_break_time" => "nullable|date_format:H:i|after:start_break_time"
+            "start_time1" => "required|date_format:H:i",
+            "end_time1" => "required|date_format:H:i|after:start_time1",
+            "start_time2" => "nullable|date_format:H:i",
+            "end_time2" => "nullable|date_format:H:i|after:start_time2"
         ]);
 
         DB::table('tblworkshift')->insert([
             'name' => $validated['name'],
             'hours_per_day' => $validated['hours_per_day'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'start_break_time' => $request->start_break_time,
-            'end_break_time' => $request->end_break_time,
-            'date' => Date::today()
+            'start_time1' => $validated['start_time1'],
+            'end_time1' => $validated['end_time1'],
+            'start_time2' => $request->start_time2,
+            'end_time2' => $request->end_time2,
         ]);
 
         return response()->json([
@@ -57,10 +56,10 @@ class WorkShiftController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:45',
             "hours_per_day" => "required|numeric",
-            "start_time" => "required|date_format:H:i",
-            "end_time" => "required|date_format:H:i|after:start_time",
-            "start_break_time" => "nullable|date_format:H:i",
-            "end_break_time" => "nullable|date_format:H:i|after:start_break_time"
+            "start_time1" => "required|date_format:H:i",
+            "end_time1" => "required|date_format:H:i|after:start_time1",
+            "start_time2" => "nullable|date_format:H:i",
+            "end_time2" => "nullable|date_format:H:i|after:start_time2"
         ]);
 
         $workShift = DB::table("tblworkshift")->find($id);
@@ -76,10 +75,10 @@ class WorkShiftController extends Controller
         DB::table('tblworkshift')->where('id', $id)->update([
             'name' => $validated['name'],
             'hours_per_day' => $validated['hours_per_day'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'start_break_time' => $request->start_break_time,
-            'end_break_time' => $request->end_break_time
+            'start_time1' => $validated['start_time1'],
+            'end_time1' => $validated['end_time1'],
+            'start_time2' => $request->start_time2,
+            'end_time2' => $request->end_time2
         ]);
 
         return response()->json([

@@ -56,18 +56,18 @@ class DatabaseSeeder extends Seeder
             'id' => 1,
             'name' => "Full Time",
             'hours_per_day' => 8,
-            'start_time' => "08:00:00",
-            'end_time' => "17:00:00",
-            'start_break_time' => "12:00:00",
-            'end_break_time' => "13:00:00"
+            'start_time1' => "08:00:00",
+            'end_time1' => "17:00:00",
+            'start_time2' => "13:00:00",
+            'end_time2' => "16:00:00"
         ]);
 
         DB::table('tblworkshift')->insert([
             'id' => 2,
             'name' => "Afternoon",
             'hours_per_day' => 8,
-            'start_time' => "13:00:00",
-            'end_time' => "22:00:00"
+            'start_time1' => "13:00:00",
+            'end_time1' => "21:00:00"
         ]);
 
         DB::table('tblemploymentstatus')->insert([

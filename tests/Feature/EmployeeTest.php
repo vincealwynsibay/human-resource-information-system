@@ -218,8 +218,8 @@ test('assign work shift as admin', function () {
     $workShiftId = DB::table('tblworkshift')->insertGetId([
         'name' => 'Morning',
         'hours_per_day' => 8,
-        'start_time' => '08:00:00',
-        'end_time' => '17:00:00'
+        'start_time1' => '08:00:00',
+        'end_time1' => '17:00:00'
     ]);
 
     $response = $this->put('/api/admin/employee/' . $employeeId . '/assignWorkShift', [
@@ -241,8 +241,8 @@ test('remove work shift as admin', function () {
     $workShiftId = DB::table('tblworkshift')->insertGetId([
         'name' => 'Morning',
         'hours_per_day' => 8,
-        'start_time' => '08:00:00',
-        'end_time' => '17:00:00'
+        'start_time1' => '08:00:00',
+        'end_time1' => '17:00:00'
     ]);
 
     $this->put('/api/admin/employee/' . $employeeId . '/assignWorkShift', [

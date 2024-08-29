@@ -144,12 +144,12 @@ class AttendanceController extends Controller
                 $undertimeHours = $workShift->hours_per_day - $totalHoursWorked;
             }
 
-            if ($timeIn1 != null && $timeIn1 > $workShift->start_time) {
-                $lateHours += Date::parse(Date::parse($workShift->start_time))->diffInMinutes($timeIn1) / 60;
+            if ($timeIn1 != null && $timeIn1 > $workShift->start_time1) {
+                $lateHours += Date::parse(Date::parse($workShift->start_time1))->diffInMinutes($timeIn1) / 60;
             }
 
-            if ($timeIn2 != null && $timeIn2 > $workShift->start_time) {
-                $lateHours += Date::parse(Date::parse($workShift->end_break_time))->diffInMinutes($timeIn2) / 60;
+            if ($timeIn2 != null && $timeIn2 > $workShift->start_time1) {
+                $lateHours += Date::parse(Date::parse($workShift->start_time2))->diffInMinutes($timeIn2) / 60;
             }
 
             $attendance->total_hours_worked = $totalHoursWorked;
@@ -187,7 +187,7 @@ class AttendanceController extends Controller
         $currentTime = Date::now()->format("H:i");
 
         // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
-        if ($currentTime <= $workShift->end_break_time) {
+        if ($currentTime <= $workShift->start_time2) {
             if ($today->time_in_session1 == null) {
                 // if not timed in yet
                 DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
@@ -200,7 +200,7 @@ class AttendanceController extends Controller
                 ]);
             }
 
-        } else if ($currentTime > $workShift->end_break_time) {
+        } else if ($currentTime > $workShift->start_time2) {
             // time in/time out for second segment after break time, can time in after end break time and time out after working hours. hours exceeding working hours is considered overtime 
             if ($today->time_in_session2 == null) {
                 // if not timed in yet
@@ -240,12 +240,12 @@ class AttendanceController extends Controller
         $currentTime = Date::now()->format("H:i");
 
         // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
-        if ($currentTime >= $workShift->end_break_time) {
+        if ($currentTime <= $workShift->start_time2) {
             DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
                 'time_in_session1' => $currentTime
             ]);
 
-        } else if ($currentTime > $workShift->end_break_time) {
+        } else if ($currentTime > $workShift->start_time2) {
             DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
                 'time_out_session2' => $currentTime
             ]);
@@ -275,12 +275,12 @@ class AttendanceController extends Controller
         $currentTime = Date::now()->format("H:i");
 
         // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
-        if ($currentTime <= $workShift->end_break_time) {
+        if ($currentTime <= $workShift->start_time2) {
             DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
                 'time_out_session1' => $currentTime
             ]);
 
-        } else if ($currentTime > $workShift->end_break_time) {
+        } else if ($currentTime > $workShift->start_time2) {
             DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
                 'time_out_session2' => $currentTime
             ]);
