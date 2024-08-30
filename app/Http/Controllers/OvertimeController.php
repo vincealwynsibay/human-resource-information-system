@@ -75,6 +75,7 @@ class OvertimeController extends Controller
     {
         $validated = $request->validate([
             'employeeId' => 'required|exists:tblemployee,id',
+            'duration' => 'required|numeric',
             'date' => 'required|date',
             'reason' => 'required|string',
         ]);
@@ -130,6 +131,7 @@ class OvertimeController extends Controller
     {
         $validated = $request->validate([
             'requestedDate' => 'required|date',
+            'duration' => 'required|numeric',
             'reason' => 'required|string',
         ]);
 
