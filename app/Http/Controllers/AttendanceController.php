@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enum\DayLengthEnum;
 use App\Enum\LeaveRequestEnum;
 use App\Enum\RoleEnum;
+use App\Services\AttendanceReportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -66,7 +67,7 @@ class AttendanceController extends Controller
     }
 
 
-    public function getEmployeeAttendanceRecords(Request $request, $employeeId)
+    public function getEmployeeAttendanceRecords(Request $request, AttendanceReportService $attendanceReportService, $employeeId)
     {
         $validated = $request->validate([
             "range" => 'nullable|string|in:TODAY,WEEK,MONTH,HALFYEAR,YEAR,ALL',
@@ -84,7 +85,6 @@ class AttendanceController extends Controller
                 ], 404);
             }
         }
-
 
         if ($request->range === "ALL") {
             $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->orderBy('date', 'DESC')->get();
@@ -110,58 +110,66 @@ class AttendanceController extends Controller
             ], 400);
         }
 
+        $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
+        $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
+        $employeeAttendances = $attendanceReportService->getAllEmployeeAttendance($attendances, $workShift);
 
-        $absences = $this->getEmployeeAbsencesByDateRange($employeeId, Date::parse($attendances[count($attendances) - 1]->date), Date::parse($attendances[0]->date));
-
-        // update each record to have hours worked for each session, total hours worked for the day, overtime hours, undertime hours, and late hours
-        foreach ($attendances as $attendance) {
-
-            $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
-            $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
-
-            $timeIn1 = $attendance->time_in_session1;
-            $timeOut1 = $attendance->time_out_session1;
-            $timeIn2 = $attendance->time_in_session2;
-            $timeOut2 = $attendance->time_out_session2;
-
-            $totalHoursWorked = 0;
-            $overtimeHours = 0;
-            $undertimeHours = 0;
-            $lateHours = 0;
-
-            // calculate total hours worked, if no time out for the session, it is considered as not worked or invalid and not counted
-            if ($timeIn1 != null && $timeOut1 != null) {
-                $totalHoursWorked += Date::parse($timeOut1)->diffInMinutes(Date::parse($timeIn1)) / 60;
-            }
-
-            if ($timeIn2 != null && $timeOut2 != null) {
-                $totalHoursWorked += Date::parse($timeOut2)->diffInMinutes(Date::parse($timeIn2)) / 60;
-            }
-
-            if ($totalHoursWorked > $workShift->hours_per_day) {
-                $overtimeHours = $totalHoursWorked - $workShift->hours_per_day;
-            } else if ($totalHoursWorked < $workShift->hours_per_day) {
-                $undertimeHours = $workShift->hours_per_day - $totalHoursWorked;
-            }
-
-            if ($timeIn1 != null && $timeIn1 > $workShift->start_time1) {
-                $lateHours += Date::parse(Date::parse($workShift->start_time1))->diffInMinutes($timeIn1) / 60;
-            }
-
-            if ($timeIn2 != null && $timeIn2 > $workShift->start_time1) {
-                $lateHours += Date::parse(Date::parse($workShift->start_time2))->diffInMinutes($timeIn2) / 60;
-            }
-
-            $attendance->total_hours_worked = $totalHoursWorked;
-            $attendance->overtime_hours = $overtimeHours;
-            $attendance->undertime_hours = $undertimeHours;
-            $attendance->late_hours = $lateHours;
-        }
 
         return response()->json([
-            'attendances' => $attendances,
-            'absences' => $absences
+            'attendances' => $employeeAttendances
         ]);
+    }
+
+    public function getAttendanceEmployeeSummary(Request $request, AttendanceReportService $attendanceReportService, $employeeId)
+    {
+        $validated = $request->validate([
+            "range" => 'nullable|string|in:TODAY,WEEK,MONTH,HALFYEAR,YEAR,ALL',
+        ]);
+
+        $employee = DB::table('tblemployee')->where('id', $employeeId)->first();
+        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You view other\'s attendance records']
+                    ]
+                ], 404);
+            }
+        }
+
+        if ($request->range === "ALL") {
+            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->orderBy('date', 'DESC')->get();
+        } else if ($request->range === "TODAY") {
+            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->where('date', Date::today())->orderBy('date', 'DESC')->get();
+        } else if ($request->range === "WEEK") {
+            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->where('date', [Date::now()->startOfWeek(), Date::today()])->orderBy('date', 'DESC')->get();
+        } else if ($request->range === "MONTH") {
+            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->where('date', [Date::now()->startOfMonth(), Date::today()])->orderBy('date', 'DESC')->get();
+        } else if ($request->range === "HALFYEAR") {
+            if (Date::month() <= 6) {
+                $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->where('date', [Date::now()->startOfYear(), Date::today()])->orderBy('date', 'DESC')->get();
+            } else {
+                $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->where('date', [Date::now()->subMonths(6), Date::today()])->orderBy('date', 'DESC')->get();
+            }
+        } else if ($request->range === "YEAR") {
+            $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employeeId)->where('date', [Date::now()->startOfYear(), Date::today()])->orderBy('date', 'DESC')->get();
+        } else {
+            return response()->json([
+                'errors' => [
+                    'range' => ['Invalid range']
+                ]
+            ], 400);
+        }
+
+        $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
+        $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
+        $employeeAttendanceSummary = $attendanceReportService->getAttendanceSummary($attendances, $workShift);
+
+
+        return response()->json($employeeAttendanceSummary);
+
     }
 
 
@@ -405,133 +413,6 @@ class AttendanceController extends Controller
         return response()->json([
             'message' => "Attendance Deleted successfully"
         ], 201);
-    }
-
-    public function generateDTR(Request $request)
-    {
-        $validated = $request->validate([
-            'employee_id' => 'required|exists:tblemployee,id',
-        ]);
-        // get all attendance records within the month
-        $employee = DB::table('tblemployee')->where('id', $validated['employee_id'])->first();
-        if ($employee == null) {
-            return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
-            ], 404);
-        }
-
-        $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $validated['employee_id'])->where('date', '>=', Date::now()->startOfMonth())->where('date', '<=', Date::now()->endOfMonth())->get();
-        $employeeID = $validated['employee_id'];
-
-        $parsedAttendance = [];
-
-        $left = 0;
-        $right = 1;
-
-        while ($right < count($attendances)) {
-            $leftDate = $attendances[$left];
-            $rightDate = $attendances[$right];
-
-
-            // compare if there is a gap between attendance records (later date - earlier date > 1), this means that the gap could be an absence.
-            if (Date::format("Y-m-d", $rightDate->date)->diffInDays(Date::format("Y-m-d", $leftDate->date)) > 1) {
-                // start from the day after the earlier attendance record
-                $date = Date::parse($leftDate->date)->addDay();
-
-                // get all dates between the two attendance records gap
-                while ($date->lt(Date::parse($rightDate->date))) {
-                    $currentDate = $date->format('Y-m-d');
-
-                    // check if the day is not a work day, if it is, do not record as absence
-                    $day = strtolower(Date::parse($currentDate)->format('D'));
-                    $workWeek = DB::table('tblworkweek')->first();
-                    $dayLength = $workWeek->$day;
-
-                    if (DayLengthEnum::from($dayLength)->isNoWork()) {
-                        $parsedAttendance[] = [
-                            'date' => $currentDate,
-                            'time_in_session1' => null,
-                            'time_out_session1' => null,
-                            'time_in_session2' => null,
-                            'time_out_session2' => null,
-                            'total_hours_worked' => 0,
-                            'overtime_hours' => 0,
-                            'undertime_hours' => 0,
-                            'late_hours' => 0,
-                            'status' => 'NO WORK DAY',
-                        ];
-
-                        $date = $date->addDay();
-                        continue;
-                    }
-
-                    // check if there is a holiday on the date, if there is, do not record as absence
-                    $holiday = DB::table('tblholiday')->where('date', $currentDate)->first();
-
-                    if ($holiday != null) {
-                        $parsedAttendance[] = [
-                            'date' => $currentDate,
-                            'time_in_session1' => null,
-                            'time_out_session1' => null,
-                            'time_in_session2' => null,
-                            'time_out_session2' => null,
-                            'total_hours_worked' => 0,
-                            'overtime_hours' => 0,
-                            'undertime_hours' => 0,
-                            'late_hours' => 0,
-                            'status' => 'HOLIDAY',
-                        ];
-                        $date = $date->addDay();
-                        continue;
-                    }
-
-                    // check if there is a leave record on the date, if there is, do not record as absence
-                    $leave = DB::table('tblleave')->where('status', LeaveRequestEnum::APPROVED)->where('EmployeeID', $employeeID)->where(function ($query) use ($currentDate) {
-                        $query->where('start_date', "<=", $currentDate);
-                        $query->where('end_date', ">=", $currentDate);
-                    })->first();
-
-                    if ($leave != null) {
-                        $parsedAttendance[] = [
-                            'date' => $currentDate,
-                            'time_in_session1' => null,
-                            'time_out_session1' => null,
-                            'time_in_session2' => null,
-                            'time_out_session2' => null,
-                            'total_hours_worked' => 0,
-                            'overtime_hours' => 0,
-                            'undertime_hours' => 0,
-                            'late_hours' => 0,
-                            'status' => 'LEAVE',
-                            'leave_type' => $leave->leave_type
-                        ];
-                        $date = $date->addDay();
-                        continue;
-                    }
-
-                    // if no work day, holiday, or leave record, record as absence
-                    $parsedAttendance[] = [
-                        'date' => $currentDate,
-                        'time_in_session1' => null,
-                        'time_out_session1' => null,
-                        'time_in_session2' => null,
-                        'time_out_session2' => null,
-                        'total_hours_worked' => 0,
-                        'overtime_hours' => 0,
-                        'undertime_hours' => 0,
-                        'late_hours' => 0,
-                        'status' => 'ABSENT',
-                    ];
-                    $date = $date->addDay();
-                }
-            }
-            $left = $right;
-            $right++;
-        }
-
-
     }
 
     protected function getEmployeeAbsencesByDateRange($employeeID, $startDate, $endDate)
