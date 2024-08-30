@@ -186,6 +186,7 @@ Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'ro
     Route::put('/{id}/jobDetails', [EmployeeController::class, 'updateJobDetails']);
     Route::delete('/{id}', [EmployeeController::class, 'destroy']);
     Route::get('/{employeeId}/attendance', [AttendanceController::class, 'getEmployeeAttendanceRecords']);
+    Route::get('/{employeeId}/attendanceSummary', [AttendanceController::class, 'getAttendanceEmployeeSummary']);
 });
 
 // Route::group(['prefix' => 'supervisor/employee', 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {

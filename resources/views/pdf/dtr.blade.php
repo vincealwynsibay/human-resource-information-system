@@ -190,6 +190,8 @@
                             On Leave
                         @elseif($att['status'] == 'ABSENT')
                             Absent
+                        @elseif($att['status'] == 'FUTURE')
+
                         @elseif($att['status'] == 'PRESENT')
                             {{ $att['time_in_session1'] }}
                         @endif
@@ -203,6 +205,8 @@
                             On Leave
                         @elseif($att['status'] == 'ABSENT')
                             Absent
+                        @elseif($att['status'] == 'FUTURE')
+
                         @else
                             {{ $att['time_out_session1'] }}
                         @endif
@@ -216,6 +220,8 @@
                             On Leave
                         @elseif($att['status'] == 'ABSENT')
                             Absent
+                        @elseif($att['status'] == 'FUTURE')
+
                         @else
                             {{ $att['time_in_session2'] }}
                         @endif
@@ -229,6 +235,8 @@
                             On Leave
                         @elseif($att['status'] == 'ABSENT')
                             Absent
+                        @elseif($att['status'] == 'FUTURE')
+
                         @else
                             {{ $att['time_out_session2'] }}
                         @endif
@@ -237,7 +245,7 @@
                     <td>
                         @if($att['status'] != '')
                             @php 
-                                $hours = (int) $att['undertime_hours'];
+                                $hours = (int) $att['undertime_duration'];
                             @endphp
 
                             @if ($hours == 1)
@@ -255,7 +263,7 @@
                         @if($att['status'] != '')
                             @php 
 
-                                $minutes = round($att['undertime_hours'] - ((int) $att['undertime_hours']) * 60);
+                                $minutes = round($att['undertime_duration'] - ((int) $att['undertime_duration']) * 60);
 
                             @endphp
                             @if ($minutes == 1)
@@ -271,10 +279,10 @@
 
                     <td>
                         @if($att['status'] != '')
-                            @if ($att['hours_worked'] == 1)
-                                {{$att['hours_worked'] }} hour
-                            @elseif($att['hours_worked'] > 2) 
-                                {{ $att['hours_worked'] }} hours
+                            @if ($att['work_duration'] == 1)
+                                {{$att['work_duration'] }} hour
+                            @elseif($att['work_duration'] > 2) 
+                                {{ $att['work_duration'] }} hours
                             @else 
                                 -
                             @endif
@@ -286,7 +294,7 @@
         <tfoot>
             <tr>
                 <td>Total</td>
-                <td colspan="4">{{ $total_hours_worked }} hours</td>
+                <td colspan="4">{{ $total_work_duration }} hours</td>
             </tr>
         </tfoot>
     </table>
