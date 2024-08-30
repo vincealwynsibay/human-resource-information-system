@@ -154,12 +154,12 @@ DROP TABLE IF EXISTS `tblattendancerecord`;
 CREATE TABLE `tblattendancerecord` (
   `id` int NOT NULL AUTO_INCREMENT,
   `EmployeeID` int NOT NULL,
-  `time_in_session1` time DEFAULT NULL,
-  `time_out_session1` time DEFAULT NULL,
-  `time_in_session2` time DEFAULT NULL,
-  `time_out_session2` time DEFAULT NULL,
-  `time_in_overtime` time DEFAULT NULL,
-  `time_out_overtime` time DEFAULT NULL,
+  `time_in_session1` datetime DEFAULT NULL,
+  `time_out_session1` datetime DEFAULT NULL,
+  `time_in_session2` datetime DEFAULT NULL,
+  `time_out_session2` datetime DEFAULT NULL,
+  `time_in_overtime` datetime DEFAULT NULL,
+  `time_out_overtime` datetime DEFAULT NULL,
   `date` date NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -440,6 +440,7 @@ CREATE TABLE `tblovertime` (
   `id` int NOT NULL AUTO_INCREMENT,
   `EmployeeID` int NOT NULL,
   `reason` varchar(255) NOT NULL,
+  `duration` decimal(10,2) DEFAULT NULL COMMENT '1.5 hours, etc.',
   `status` varchar(50) DEFAULT NULL,
   `requested_date` datetime NOT NULL,
   `approval_date` datetime DEFAULT NULL,
