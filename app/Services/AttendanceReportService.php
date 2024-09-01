@@ -118,7 +118,7 @@ class AttendanceReportService
                 $totalLateDuration += Date::parse($timeIn2)->diffInMinutes(Date::parse($workShift->start_time1)) / 60;
             }
 
-            $parsedAttendance[] = [
+            $parsedAttendances[] = [
                 'date' => $attendances[$left]->date,
                 'time_in_session1' => $attendances[$left]->time_in_session1,
                 'time_out_session1' => $attendances[$left]->time_out_session1,
@@ -138,7 +138,7 @@ class AttendanceReportService
             }
 
             $rightDate = $attendances[$left + 1];
-            // get gap between two attendances
+            // get gap between two (2) attendances
             if (Date::parse($leftDate->date)->diffInDays(Date::parse($rightDate->date)) > 1) {
                 $date = Date::parse($leftDate->date)->addDay();
 
@@ -161,7 +161,7 @@ class AttendanceReportService
 
         // days between last attendance and today + 1 should be absent
         while ($dayNo <= Date::today()->format("d")) {
-            $parsedAttendance[] = [
+            $parsedAttendances[] = [
                 'date' => Date::today()->format('Y-m-d'),
                 'time_in_session1' => null,
                 'time_out_session1' => null,
@@ -178,7 +178,7 @@ class AttendanceReportService
 
         // days between today + 1 and end of month should be empty
         while ($dayNo <= $numOfDaysInMonth) {
-            $parsedAttendance[] = [
+            $parsedAttendances[] = [
                 'date' => Date::today()->setDay($dayNo)->format('Y-m-d'),
                 'time_in_session1' => null,
                 'time_out_session1' => null,
@@ -194,7 +194,7 @@ class AttendanceReportService
         }
 
         return [
-            'attendances' => $parsedAttendance,
+            'attendances' => $parsedAttendances,
             "totalWorkDuration" => $totalWorkDuration,
             "totalOvertimeRegularDay" => $totalOvertimeRegularDay,
             "totalOvertimeRestDay" => $totalOvertimeRestDay,
@@ -294,7 +294,7 @@ class AttendanceReportService
                 $totalLateDuration += Date::parse($timeIn2)->diffInMinutes(Date::parse($workShift->start_time1)) / 60;
             }
 
-            $parsedAttendance[] = [
+            $parsedAttendances[] = [
                 'date' => $attendances[$left]->date,
                 'time_in_session1' => $attendances[$left]->time_in_session1,
                 'time_out_session1' => $attendances[$left]->time_out_session1,
