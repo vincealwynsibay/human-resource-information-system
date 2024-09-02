@@ -32,6 +32,11 @@ class UserFactory extends Factory
             "joined_date" => Date::now()
         ]);
 
+        DB::table('tblemployeeworkshift')->insert([
+            'EmployeeID' => $newEmployeeId,
+            'WorkShiftID' => 1,
+        ]);
+
         return [
             'username' => fake()->unique()->userName(),
             'password' => static::$password ??= Hash::make('password'),
