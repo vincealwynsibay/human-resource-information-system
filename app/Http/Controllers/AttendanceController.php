@@ -261,13 +261,20 @@ class AttendanceController extends Controller
         }
 
         // check current time
-        $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first('id');
-        $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->id)->first();
+        $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first();
+        $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
+        if ($workShift == null) {
+            return response()->json([
+                'errors' => [
+                    'WorkShift' => ['Employee does not have a work shift']
+                ]
+            ], 404);
+        }
         $currentDate = Date::now();
+
 
         $overtime = DB::table('tblovertime')->where('date', $currentDate);
 
-        error_log($workShift['start_time2']);
         // $output = new \Symfony\Component\Console\Output\ConsoleOutput();
         // $output->writeln("<info>my message</info>");
         if ($workShift->start_time2 == null) {
@@ -312,20 +319,22 @@ class AttendanceController extends Controller
         $user = $request->user();
         $today = DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->get();
         $currentDate = Date::now();
-        $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first('id');
-        $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->id)->first();
+        $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first();
+        $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
         $overtime = DB::table('tblovertime')->where('date', $currentDate->subDay());
         // check if there is an overtime yesterday and no time out yet, can time out past 12mn of the next day
 
         // if no overtime yesterday, check if there is an attendance record for today
         if ($overtime != null) {
             $yesterdayAttendance = DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::yesterday())->first();
-            if ($yesterdayAttendance->time_out_overtime == null) {
+
+            if ($yesterdayAttendance != null && $yesterdayAttendance->time_out_overtime == null) {
                 // check if after end time and has overtime
                 DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::yesterday())->update([
                     'time_out_overtime' => $currentDate
                 ]);
             }
+
         } else if ($today == null) {
             return response()->json([
                 'errors' => [

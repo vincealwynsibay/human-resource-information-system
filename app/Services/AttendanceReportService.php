@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class AttendanceReportService
 {
 
-    public function getAttendanceSummary($attendances, $workShift)
+    public function getAttendanceSummary($employeeId, $attendances, $workShift)
     {
         $parsedAttendances = [];
         $totalWorkDuration = 0;
@@ -24,7 +24,6 @@ class AttendanceReportService
         $absences = 0;
         $leave = 0;
         $left = 0;
-        $employeeId = $attendances[0]->EmployeeId;
 
         $workWeek = DB::table('tblworkweek')->first();
         $dayNo = count($parsedAttendances);
@@ -38,12 +37,17 @@ class AttendanceReportService
             }
 
             $currentDate = Date::today()->setDay($dayNo);
-            array_push($parsedAttendance, $this->parseAttendance($employeeId, $currentDate));
+            array_push($parsedAttendances, $this->parseAttendance($employeeId, $currentDate));
             $dayNo++;
         }
 
         // first attendance record to last attendance record
+
         do {
+            if (count($attendances) == 0) {
+                break;
+            }
+
             $attendance = $attendances[$left];
             $leftDate = $attendances[$left];
             $lateDuration = 0;
@@ -207,7 +211,7 @@ class AttendanceReportService
         ];
     }
 
-    public function getAllEmployeeAttendance($attendances, $workShift)
+    public function getAllEmployeeAttendance($employeeId, $attendances, $workShift)
     {
         $parsedAttendances = [];
         $totalWorkDuration = 0;
@@ -220,7 +224,11 @@ class AttendanceReportService
         $left = 0;
         $workWeek = DB::table('tblworkweek')->first();
 
+
         do {
+            if (count($attendances) == 0) {
+                break;
+            }
             $attendance = $attendances[$left];
             $lateDuration = 0;
             $overtimeDuration = 0;

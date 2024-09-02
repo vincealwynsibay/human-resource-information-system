@@ -226,6 +226,9 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
     Route::post('/{id}/certificates', [CertificateController::class, 'store']);
     Route::put('/{id}/certificates/{certificateId}', [CertificateController::class, 'update']);
     Route::delete('/{id}/certificates/{certificateId}', [CertificateController::class, 'destroy']);
+    Route::get('/{employeeId}/attendance', [AttendanceController::class, 'getEmployeeAttendanceRecords']);
+    Route::get('/{employeeId}/attendanceSummary', [AttendanceController::class, 'getAttendanceEmployeeSummary']);
+
 });
 
 
