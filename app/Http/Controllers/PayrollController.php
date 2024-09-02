@@ -255,7 +255,7 @@ class PayrollController extends Controller
     protected function getAttendancePayrollItems(AttendanceReportService $attendanceReportService, $employeeId, $attendances, $workShift, $hourlyRate)
     {
 
-        $attendanceSummary = $attendanceReportService->getAttendanceSummary($attendances, $workShift);
+        $attendanceSummary = $attendanceReportService->getAttendanceSummary($employeeId, $attendances, $workShift);
         $totalWorkDuration = $attendanceSummary["totalWorkDuration"];
         $totalOvertimeRestDay = $attendanceSummary["totalOvertimeRestDay"];
         $totalOvertimeHoliday = $attendanceSummary["totalOvertimeHoliday"];

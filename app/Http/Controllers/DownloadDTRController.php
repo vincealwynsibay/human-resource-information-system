@@ -51,7 +51,7 @@ class DownloadDTRController extends Controller
         $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employee_id)->where('date', '>=', Date::now()->startOfMonth())->where('date', '<=', Date::now()->endOfMonth())->orderBy('date', 'asc')->get();
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
-        $attendanceSummary = $attendanceReportService->getAttendanceSummary($attendances, $workShift);
+        $attendanceSummary = $attendanceReportService->getAttendanceSummary($employee->id, $attendances, $workShift);
         return [
             "attendances" => $attendanceSummary['parsedAttendances'],
             "total_work_duration" => $attendanceSummary['totalWorkDuration'],
