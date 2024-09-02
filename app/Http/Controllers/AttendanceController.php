@@ -35,7 +35,7 @@ class AttendanceController extends Controller
                 ->when($request->name, function ($query, $name) {
                     return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
                 })
-                ->whereBetween('date', [Date::format("Y-m-d", $request->fromDate), Date::format("Y-m-d", $request->toDate)])
+                ->whereBetween('date', [Date::createFromFormat("Y-m-d", $request->fromDate), Date::createFromFormat("Y-m-d", $request->toDate)])
                 ->get();
         } else {
             $attendances = DB::table('tblattendancerecord')
@@ -45,7 +45,7 @@ class AttendanceController extends Controller
                 ->when($request->name, function ($query, $name) {
                     return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
                 })
-                ->whereBetween('date', [Date::format("Y-m-d", $request->fromDate), Date::format("Y-m-d", $request->toDate)])
+                ->whereBetween('date', [Date::createFromFormat("Y-m-d", $request->fromDate), Date::createFromFormat("Y-m-d", $request->toDate)])
                 ->get();
         }
 
@@ -61,7 +61,7 @@ class AttendanceController extends Controller
             ->when($request->name, function ($query, $name) {
                 return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
             })
-            ->whereBetween('date', [Date::format("Y-m-d", $request->fromDate), Date::format("Y-m-d", $request->toDate)])
+            ->whereBetween('date', [Date::createFromFormat("Y-m-d", $request->fromDate), Date::createFromFormat("Y-m-d", $request->toDate)])
             ->get();
         return response()->json($attendances);
     }
@@ -112,8 +112,7 @@ class AttendanceController extends Controller
 
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
-        $employeeAttendances = $attendanceReportService->getAllEmployeeAttendance($attendances, $workShift);
-
+        $employeeAttendances = $attendanceReportService->getAllEmployeeAttendance($employee->id, $attendances, $workShift);
 
         return response()->json([
             'attendances' => $employeeAttendances
@@ -165,7 +164,8 @@ class AttendanceController extends Controller
 
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
-        $employeeAttendanceSummary = $attendanceReportService->getAttendanceSummary($attendances, $workShift);
+        $employeeAttendanceSummary = $attendanceReportService->getAttendanceSummary($employee->id, $attendances, $workShift);
+        $employeeAttendanceSummary = [];
 
 
         return response()->json($employeeAttendanceSummary);
@@ -249,7 +249,13 @@ class AttendanceController extends Controller
         if ($today == null) {
             $newAttendance = DB::table('tblattendancerecord')->insertGetId([
                 'EmployeeID' => $user->EmployeeID,
-                'date' => Date::today()
+                'date' => Date::today(),
+                'time_in_session1' => null,
+                'time_out_session1' => null,
+                'time_in_session2' => null,
+                'time_out_session2' => null,
+                'time_in_overtime' => null,
+                'time_out_overtime' => null
             ]);
             $today = DB::table('tblattendancerecord')->where("id", $newAttendance)->get();
         }
@@ -261,22 +267,40 @@ class AttendanceController extends Controller
 
         $overtime = DB::table('tblovertime')->where('date', $currentDate);
 
-        if ($currentDate > $workShift->start_time2 && $overtime != null) {
-            // check if after end time and has overtime
-            DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
-                'time_in_overtime' => $currentDate
-            ]);
-        } else if ($currentDate <= $workShift->start_time2) {
-            // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
-            DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
-                'time_in_session1' => $currentDate
-            ]);
+        error_log($workShift['start_time2']);
+        // $output = new \Symfony\Component\Console\Output\ConsoleOutput();
+        // $output->writeln("<info>my message</info>");
+        if ($workShift->start_time2 == null) {
+            if ($workShift->start_time1 != null && $currentDate >= $workShift->start_time1 && $currentDate <= Date::now()->setHour(23)->setMinute(59)->setSecond(59) && $overtime != null) {
+                // check if after end time and has overtime
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
+                    'time_in_overtime' => $currentDate
+                ]);
+            } else if ($workShift->start_time1 != null && $currentDate <= Date::now()->setHour(23)->setMinute(59)->setSecond(59)) {
+                // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
+                    'time_in_session1' => $currentDate
+                ]);
+            }
+        } else {
+            if ($workShift->start_time2 != null && $currentDate > $workShift->start_time2 && $overtime != null) {
+                // check if after end time and has overtime
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
+                    'time_in_overtime' => $currentDate
+                ]);
+            } else if ($workShift->start_time2 != null && $currentDate <= $workShift->start_time2) {
+                // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
+                    'time_in_session1' => $currentDate
+                ]);
 
-        } else if ($currentDate > $workShift->start_time2) {
-            DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
-                'time_out_session2' => $currentDate
-            ]);
+            } else if ($currentDate >= $workShift->start_time2 && $currentDate <= Date::now()->setHour(23)->setMinute(59)->setSecond(59)) {
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
+                    'time_in_session2' => $currentDate
+                ]);
+            }
         }
+
 
         return response()->json([
             'Message' => "Time in successful"
@@ -287,37 +311,60 @@ class AttendanceController extends Controller
     {
         $user = $request->user();
         $today = DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->get();
-
-        if ($today == null) {
-            $newAttendance = DB::table('tblattendancerecord')->insertGetId([
-                'EmployeeID' => $user->EmployeeID,
-                'date' => Date::today()
-            ]);
-            $today = DB::table('tblattendancerecord')->where("id", $newAttendance)->get();
-        }
-
-        // check current time
+        $currentDate = Date::now();
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first('id');
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->id)->first();
-        $currentDate = Date::now();
-        $overtime = DB::table('tblovertime')->where('date', $currentDate);
+        $overtime = DB::table('tblovertime')->where('date', $currentDate->subDay());
+        // check if there is an overtime yesterday and no time out yet, can time out past 12mn of the next day
 
-        if ($currentDate > $workShift->start_time2 && $overtime != null) {
-            // check if after end time and has overtime
-            DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
-                'time_out_overtime' => $currentDate
-            ]);
-        } elseif ($currentDate <= $workShift->start_time2) {
-            // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
-            DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
-                'time_out_session1' => $currentDate
-            ]);
-
-        } else if ($currentDate > $workShift->start_time2) {
-            DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
-                'time_out_session2' => $currentDate
-            ]);
+        // if no overtime yesterday, check if there is an attendance record for today
+        if ($overtime != null) {
+            $yesterdayAttendance = DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::yesterday())->first();
+            if ($yesterdayAttendance->time_out_overtime == null) {
+                // check if after end time and has overtime
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::yesterday())->update([
+                    'time_out_overtime' => $currentDate
+                ]);
+            }
+        } else if ($today == null) {
+            return response()->json([
+                'errors' => [
+                    'Attendance' => ['No attendance record for today']
+                ]
+            ], 404);
         }
+
+        if ($workShift->start_time2 == null) {
+            if ($currentDate > $workShift->start_time1 && $overtime != null) {
+                // check if after end time and has overtime
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
+                    'time_out_overtime' => $currentDate
+                ]);
+            } elseif ($currentDate <= $workShift->start_time1) {
+                // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
+                    'time_out_session1' => $currentDate
+                ]);
+            }
+        } else {
+            if ($currentDate > $workShift->start_time2 && $overtime != null) {
+                // check if after end time and has overtime
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', $currentDate)->update([
+                    'time_out_overtime' => $currentDate
+                ]);
+            } elseif ($currentDate <= $workShift->start_time2) {
+                // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
+                    'time_out_session1' => $currentDate
+                ]);
+
+            } else if ($currentDate > $workShift->start_time2) {
+                DB::table('tblattendancerecord')->where("EmployeeID", $user->EmployeeID)->where('date', Date::today())->update([
+                    'time_out_session2' => $currentDate
+                ]);
+            }
+        }
+
 
         return response()->json([
             'Message' => "Time out successful"
@@ -432,7 +479,7 @@ class AttendanceController extends Controller
 
 
             // compare if there is a gap between attendance records (later date - earlier date > 1), this means that the gap could be an absence.
-            if (Date::format("Y-m-d", $rightDate->date)->diffInDays(Date::format("Y-m-d", $leftDate->date)) > 1) {
+            if (Date::createFromFormat("Y-m-d", $rightDate->date)->diffInDays(Date::createFromFormat("Y-m-d", $leftDate->date)) > 1) {
                 // start from the day after the earlier attendance record
                 $date = Date::parse($leftDate->date)->addDay();
 
