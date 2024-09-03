@@ -5,6 +5,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 // time in am  as employee
 test('time in am as employee', function () {
@@ -255,4 +256,19 @@ test('delete attendance record as employee', function () {
 
     $response = $this->delete("/api/employee/attendance/{$attendanceRecordId}");
     $response->assertStatus(201);
+});
+
+test('download a dtr', function () {
+
+    $employee = User::factory()->create([
+        'RoleID' => 2
+    ]);
+    $this->actingAs($employee);
+
+    $response = $this->get("/api/employee/{$employee->EmployeeID}/downloadDtr");
+
+    // assert that pdf is downloaded
+    $response->assertStatus(200);
+    $this->assertTrue($response->headers->get('content-type') == 'application/pdf');
+    $this->assertTrue($response->headers->get('content-disposition') == 'attachment; filename="' . 'dtr-' . Date::today()->format('Y-m-d') . '.pdf' . '"');
 });
