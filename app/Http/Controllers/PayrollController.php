@@ -210,7 +210,6 @@ class PayrollController extends Controller
         // get all valid payroll items within the date range (salary, overtime, bonuses, allowance, holiday pay, commissions, leave pay)
         // $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_date', ">=", $dateFrom)->whereDate('created_date', "<=", $dateTo)->get();
         $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->get();
-        dd($payrollItems);
         $grossSalary = 0;
         foreach ($payrollItems as $item) {
             if ($item->item_type != PayrollItemTypeEnum::DEDUCTION) {
@@ -257,11 +256,9 @@ class PayrollController extends Controller
     {
 
         $attendanceSummary = $attendanceReportService->getAttendanceSummary($employeeId, $attendances, $workShift, $startDate, $endDate);
-        $totalWorkDuration = $attendanceSummary["totalWorkDuration"];
         $totalOvertimeRestDay = $attendanceSummary["totalOvertimeRestDay"];
         $totalOvertimeHoliday = $attendanceSummary["totalOvertimeHoliday"];
         $totalUndertimeDuration = $attendanceSummary["totalUndertimeDuration"];
-        dd($totalUndertimeDuration);
         $totalLateDuration = $attendanceSummary["totalLateDuration"];
         $absences = $attendanceSummary["absences"];
         $leave = $attendanceSummary["leave"];
@@ -275,16 +272,6 @@ class PayrollController extends Controller
                 'item_type' => PayrollItemTypeEnum::LEAVE,
                 'amount' => $leave * $workShift->hours_per_day * $hourlyRate,
                 'description' => 'Leave',
-                'created_date' => Date::now()
-            ];
-        }
-
-        if ($totalWorkDuration > 0) {
-            $payrollItems[] = [
-                'EmployeeID' => $employeeId,
-                'item_type' => PayrollItemTypeEnum::OVERTIME,
-                'amount' => $totalWorkDuration * ($hourlyRate * 1.25),
-                'description' => 'Overtime Regular Hours',
                 'created_date' => Date::now()
             ];
         }

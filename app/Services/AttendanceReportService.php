@@ -75,7 +75,6 @@ class AttendanceReportService
             }
 
             $countedWorkDuration = min($workDuration, $workShift->hours_per_day);
-
             $totalWorkDuration += $countedWorkDuration;
 
             if ($countedWorkDuration < $workShift->hours_per_day) {
@@ -91,7 +90,6 @@ class AttendanceReportService
             $overtime = DB::table('tblovertime')->where('requested_date', $attendance->date)->where('status', 'APPROVED')->first();
 
             if ($overtime != null) {
-
                 if (DayLengthEnum::from($dayLength)->isNoWork()) {
                     $overtimeDuration = $countedWorkDuration;
                     $totalOvertimeRestDay += $countedWorkDuration;
@@ -114,7 +112,6 @@ class AttendanceReportService
                 }
             }
 
-            // dd($timeIn1, $workShift->start_time1, Date::parse($workShift->start_time1)->diffInMinutes(Date::parse($timeIn1)) / 60, Date::parse($timeIn1)->setTimeFromTimeString($workShift->start_time1)->diffInMinutes(Date::parse($timeIn1)) / 60);
             if ($timeIn1 != null && $timeIn1 > $workShift->start_time1) {
                 $lateDuration = Date::parse($timeIn1)->setTimeFromTimeString($workShift->start_time1)->diffInMinutes(Date::parse($timeIn1)) / 60;
                 $totalLateDuration += Date::parse($timeIn1)->setTimeFromTimeString($workShift->start_time1)->diffInMinutes(Date::parse($timeIn1)) / 60;
@@ -177,7 +174,6 @@ class AttendanceReportService
         } while ($left < count($attendances));
 
 
-
         // days between last attendance and today + 1 should be absent
         while ($dayNo <= Date::today()->format("d")) {
             $parsedAttendances[] = [
@@ -212,7 +208,7 @@ class AttendanceReportService
             $dayNo++;
         }
 
-        dd($parsedAttendances);
+
 
         return [
             'attendances' => $parsedAttendances,
