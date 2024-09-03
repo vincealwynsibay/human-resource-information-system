@@ -88,6 +88,7 @@ class OvertimeController extends Controller
             'EmployeeID' => $validated['employeeId'],
             'requested_date' => $requestedDate,
             'reason' => $validated['reason'],
+            'duration' => $validated['duration'],
             'status' => OvertimeRequestEnum::PENDING,
         ]);
 
