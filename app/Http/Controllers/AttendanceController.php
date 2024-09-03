@@ -164,7 +164,7 @@ class AttendanceController extends Controller
 
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
-        $employeeAttendanceSummary = $attendanceReportService->getAttendanceSummary($employee->id, $attendances, $workShift);
+        $employeeAttendanceSummary = $attendanceReportService->getAttendanceSummary($employee->id, $attendances, $workShift, Date::now()->startOfMonth(), Date::now());
         $employeeAttendanceSummary = [];
 
 
@@ -195,7 +195,7 @@ class AttendanceController extends Controller
         $currentDate = Date::now();
 
         // time in/time out before start of second segment (ex. needs to time in/time out before end of lunch break)
-        $overtime = DB::table('tblovertime')->where('date', $currentDate);
+        $overtime = DB::table('tblovertime')->where('requested_date', $currentDate)->where('status', 'APPROVED')->first();
 
         if ($currentDate > $workShift->start_time2 && $overtime != null) {
             // check if after end time and has overtime
@@ -273,7 +273,7 @@ class AttendanceController extends Controller
         $currentDate = Date::now();
 
 
-        $overtime = DB::table('tblovertime')->where('date', $currentDate);
+        $overtime = DB::table('tblovertime')->where('requested_date', $currentDate)->where('status', 'APPROVED')->first();
 
         // $output = new \Symfony\Component\Console\Output\ConsoleOutput();
         // $output->writeln("<info>my message</info>");
@@ -321,7 +321,7 @@ class AttendanceController extends Controller
         $currentDate = Date::now();
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
-        $overtime = DB::table('tblovertime')->where('date', $currentDate->subDay());
+        $overtime = DB::table('tblovertime')->where('requested_date', $currentDate)->where('status', 'APPROVED')->subDay();
         // check if there is an overtime yesterday and no time out yet, can time out past 12mn of the next day
 
         // if no overtime yesterday, check if there is an attendance record for today
