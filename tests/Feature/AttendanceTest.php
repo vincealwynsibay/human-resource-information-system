@@ -3,6 +3,8 @@
 
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 
 // time in am  as employee
 test('time in am as employee', function () {
@@ -176,7 +178,81 @@ test('get own attendance summary as employee', function () {
 });
 
 // update time in and time out as admin
-// update time in and time out as employee
+test('update time in and time out as admin', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $employee = User::factory()->create([
+        'RoleID' => 2
+    ]);
+
+    $attendanceRecordId = DB::table('tblattendancerecord')->insertGetId([
+        'EmployeeID' => $employee->EmployeeID,
+        'date' => '2021-01-01',
+        'time_in_session1' => Date::now()->setDateTime(2021, 1, 1, 8, 0, 0),
+        'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0)
+    ]);
+
+    $response = $this->put("/api/admin/attendance/{$attendanceRecordId}", [
+        'time_in_session1' => Date::now()->setDateTime(2021, 1, 1, 8, 0, 0),
+        'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0),
+        'date' => '2021-01-01'
+    ]);
+    $response->assertStatus(201);
+});
+
+// update own time in and time out as employee
+test('update own time in and time out as employee', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $attendanceRecordId = DB::table('tblattendancerecord')->insertGetId([
+        'EmployeeID' => $user->EmployeeID,
+        'date' => '2021-01-01',
+        'time_in_session1' => Date::now()->setDateTime(2021, 1, 1, 8, 0, 0),
+        'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0)
+    ]);
+
+    $response = $this->put("/api/employee/attendance/{$attendanceRecordId}", [
+        'time_in_session1' => Date::now()->setDateTime(2021, 1, 1, 8, 0, 0),
+        'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0),
+        'date' => '2021-01-01'
+    ]);
+    $response->assertStatus(201);
+});
 
 // delete attendance record as admin
+test('delete attendance record as admin', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $employee = User::factory()->create([
+        'RoleID' => 2
+    ]);
+
+    $attendanceRecordId = DB::table('tblattendancerecord')->insertGetId([
+        'EmployeeID' => $employee->EmployeeID,
+        'date' => '2021-01-01',
+        'time_in_session1' => Date::now()->setDateTime(2021, 1, 1, 8, 0, 0),
+        'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0)
+    ]);
+
+    $response = $this->delete("/api/admin/attendance/{$attendanceRecordId}");
+    $response->assertStatus(201);
+});
+
 // delete attendance record as employee
+test('delete attendance record as employee', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $attendanceRecordId = DB::table('tblattendancerecord')->insertGetId([
+        'EmployeeID' => $user->EmployeeID,
+        'date' => '2021-01-01',
+        'time_in_session1' => Date::now()->setDateTime(2021, 1, 1, 8, 0, 0),
+        'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0)
+    ]);
+
+    $response = $this->delete("/api/employee/attendance/{$attendanceRecordId}");
+    $response->assertStatus(201);
+});
