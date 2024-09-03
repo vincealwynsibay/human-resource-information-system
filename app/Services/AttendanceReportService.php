@@ -203,7 +203,7 @@ class AttendanceReportService
             "totalOvertimeRegularDay" => $totalOvertimeRegularDay,
             "totalOvertimeRestDay" => $totalOvertimeRestDay,
             "totalOvertimeHoliday" => $totalOvertimeHoliday,
-            "totalOvertimDuration" => $totalOvertimeDuration,
+            "totalOvertimeDuration" => $totalOvertimeDuration,
             "totalUndertimeDuration" => $totalUndertimeDuration,
             "totalLateDuration" => $totalLateDuration,
             "absences" => $absences,

@@ -229,6 +229,8 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
     Route::get('/{employeeId}/attendance', [AttendanceController::class, 'getEmployeeAttendanceRecords']);
     Route::get('/{employeeId}/attendanceSummary', [AttendanceController::class, 'getAttendanceEmployeeSummary']);
 
+    Route::get('/{employeeId}/downloadDtr', [DownloadDTRController::class, '__invoke']);
+
 });
 
 

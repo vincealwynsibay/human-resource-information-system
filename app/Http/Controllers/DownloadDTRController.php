@@ -14,14 +14,19 @@ use function Spatie\LaravelPdf\Support\pdf;
 
 class DownloadDTRController extends Controller
 {
-    public function __invoke(Request $request, AttendanceReportService $attendanceReportService)
+    public function __invoke(Request $request, AttendanceReportService $attendanceReportService, $employee_id)
     {
+        $employee = DB::table('tblemployee')->where('id', $employee_id)->first();
 
-        $validated = $request->validate([
-            'employee_id' => 'required|exists:tblemployee,id',
-        ]);
-        $attendance = $this->generateDTR($attendanceReportService, $validated['employee_id']);
-        $employee = DB::table('tblemployee')->where('id', $validated['employee_id'])->first();
+        if ($employee == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not exist']
+                ]
+            ], 404);
+        }
+
+        $attendance = $this->generateDTR($attendanceReportService, $employee_id);
 
         return Pdf::view('pdf.dtr', [
             'employee' => $employee,
@@ -33,7 +38,7 @@ class DownloadDTRController extends Controller
             'total_undertime_duration' => $attendance['total_undertime_duration'],
             'total_late_duration' => $attendance['total_late_duration']
         ])
-            ->download('dtr.pdf');
+            ->download('dtr-' . Date::today()->format('Y-m-d'));
     }
 
     public function generateDTR(AttendanceReportService $attendanceReportService, $employee_id)
@@ -53,7 +58,7 @@ class DownloadDTRController extends Controller
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
         $attendanceSummary = $attendanceReportService->getAttendanceSummary($employee->id, $attendances, $workShift);
         return [
-            "attendances" => $attendanceSummary['parsedAttendances'],
+            "attendances" => $attendanceSummary['attendances'],
             "total_work_duration" => $attendanceSummary['totalWorkDuration'],
             "total_overtime_duration" => $attendanceSummary['totalOvertimeDuration'],
             "total_undertime_duration" => $attendanceSummary['totalUndertimeDuration'],
