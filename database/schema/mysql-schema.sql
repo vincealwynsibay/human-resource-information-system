@@ -161,7 +161,8 @@ CREATE TABLE `tblattendancerecord` (
   `time_in_overtime` datetime DEFAULT NULL,
   `time_out_overtime` datetime DEFAULT NULL,
   `date` date NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `date` (`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblbasicsalary`;
@@ -248,6 +249,8 @@ CREATE TABLE `tblemployee` (
   KEY `EmploymentStatusID` (`EmploymentStatusID`),
   KEY `DepartmentID` (`DepartmentID`),
   KEY `SupervisorID` (`SupervisorID`),
+  KEY `lastname` (`lastname`),
+  KEY `Fullname` (`firstname`,`lastname`),
   CONSTRAINT `tblemployee_ibfk_2` FOREIGN KEY (`JobTitleID`) REFERENCES `tbljobtitle` (`id`),
   CONSTRAINT `tblemployee_ibfk_3` FOREIGN KEY (`EmploymentStatusID`) REFERENCES `tblemploymentstatus` (`id`),
   CONSTRAINT `tblemployee_ibfk_4` FOREIGN KEY (`DepartmentID`) REFERENCES `tbldepartment` (`id`),
@@ -391,6 +394,7 @@ CREATE TABLE `tblleave` (
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
   KEY `LeaveTypeID` (`LeaveTypeID`),
+  KEY `LeavePeriodRange` (`start_date`,`end_date`) COMMENT 'start and end query',
   CONSTRAINT `tblleave_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
   CONSTRAINT `tblleave_ibfk_2` FOREIGN KEY (`LeaveTypeID`) REFERENCES `tblleavetype` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -410,6 +414,7 @@ CREATE TABLE `tblleaveentitlement` (
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
   KEY `LeaveTypeID` (`LeaveTypeID`),
+  KEY `ValidPeriodRange` (`valid_from`,`valid_to`),
   CONSTRAINT `tblleaveentitlement_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
   CONSTRAINT `tblleaveentitlement_ibfk_2` FOREIGN KEY (`LeaveTypeID`) REFERENCES `tblleavetype` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -444,7 +449,10 @@ CREATE TABLE `tblovertime` (
   `status` varchar(50) DEFAULT NULL,
   `requested_date` datetime NOT NULL,
   `approval_date` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `requested_date` (`requested_date`),
+  KEY `EmployeeID` (`EmployeeID`),
+  CONSTRAINT `tblovertime_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblpaygrade`;
@@ -480,7 +488,10 @@ CREATE TABLE `tblpayroll` (
   `net_salary` decimal(10,2) DEFAULT NULL,
   `deductions` decimal(10,2) DEFAULT NULL COMMENT 'unpaid leave, absences, allowance, taxes',
   `created_date` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `pay_period_start` (`pay_period_start`,`pay_period_end`),
+  KEY `EmployeeID` (`EmployeeID`),
+  CONSTRAINT `tblpayroll_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblpayrollitem`;
@@ -495,6 +506,7 @@ CREATE TABLE `tblpayrollitem` (
   `created_date` datetime NOT NULL COMMENT 'to check for payroll item validity',
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
+  KEY `created_date` (`created_date`),
   CONSTRAINT `tblpayrollitem_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -528,15 +540,13 @@ CREATE TABLE `tbluser` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(45) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `firstName` varchar(45) NOT NULL,
-  `lastName` varchar(45) NOT NULL,
-  `middleName` varchar(45) DEFAULT NULL,
   `EmployeeID` int NOT NULL,
   `RoleID` int NOT NULL,
   `status` varchar(45) NOT NULL DEFAULT 'ACTIVE',
   PRIMARY KEY (`id`),
   KEY `RoleID` (`RoleID`),
   KEY `EmployeeID` (`EmployeeID`),
+  KEY `username` (`username`),
   CONSTRAINT `tbluser_ibfk_1` FOREIGN KEY (`RoleID`) REFERENCES `tbluserrole` (`id`),
   CONSTRAINT `tbluser_ibfk_2` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
