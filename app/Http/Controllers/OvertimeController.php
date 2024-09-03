@@ -29,7 +29,7 @@ class OvertimeController extends Controller
                     return $query->where('EmployeeID', $employeeId);
                 })
                 ->when($request->date, function ($query, $date) {
-                    return $query->whereDate('start_date', '==', $date);
+                    return $query->whereDate('requested_date', '==', $date);
                 })
                 ->when($request->status, function ($query, $status) {
                     return $query->where('status', $status);
@@ -41,7 +41,7 @@ class OvertimeController extends Controller
                     return $query->where('EmployeeID', $employeeId);
                 })
                 ->when($request->date, function ($query, $date) {
-                    return $query->whereDate('start_date', '==', $date);
+                    return $query->whereDate('requested_date', '==', $date);
                 })
                 ->when($request->status, function ($query, $status) {
                     return $query->where('status', $status);
@@ -62,7 +62,7 @@ class OvertimeController extends Controller
 
         $overtimes = DB::table('tblovertime')->where('EmployeeID', $request->user()->EmployeeID)
             ->when($request->date, function ($query, $date) {
-                return $query->whereDate('start_date', '==', $date);
+                return $query->whereDate('requested_date', '==', $date);
             })
             ->when($request->status, function ($query, $status) {
                 return $query->where('status', $status);
