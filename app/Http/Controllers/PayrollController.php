@@ -67,12 +67,13 @@ class PayrollController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, AttendanceReportService $attendanceReportService)
+    public function store(Request $request, AttendanceReportService $attendanceReportService, $employeeId)
     {
         // this store is called by scheduling and the pay frequency depends on the basic salary frequency
         $validated = $request->validate([
             "employeeId" => "required|exists:tblemployee,id",
         ]);
+
 
         $basicSalary = DB::table('tblbasicsalary')->where("EmployeeID", $validated['employeeId'])->first();
         $employee = DB::table('tblemployee')->where('id', $request->employeeId)->first();
@@ -86,28 +87,26 @@ class PayrollController extends Controller
         $grossSalary = 0;
         $deductions = 0;
         $payrollItems = [];
-        $employee = DB::table('tblemployee')->where('id', $request->user()->EmployeeID)->first();
         $dateFrom = null;
         $dateTo = null;
 
 
         $day = Date::now()->format('d');
         if ($day == 15) {
-            $dateFrom = Date::now()->startOfMonth();
-            $dateTo = Date::today();
+            $dateFrom = Date::now()->startOfMonth()->setTime(0, 0, 0);
+            $dateTo = Date::today()->setTime(23, 59, 59);
         } else {
             // if end of month, schedule SSS, PhilHealth, Pag-Ibig
-            $dateFrom = Date::now()->dayOfMonth(16);
+            $dateFrom = Date::now()->dayOfMonth(16)->setTime(0, 0, 0);
             // $dateTo = Date::today();
-            $dateTo = Date::today();
+            $dateTo = Date::today()->setTime(23, 59, 59);
         }
 
         // determine if date is 15th or end of month for semi-monthly
         // if 15th, schedule income tax
         // attendance payroll items (leave, overtime, late, undertime, absences, holiday)
-        $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->whereBetween('date', [$dateFrom, $dateTo])->orderBy('date', 'DESC')->get();
-        $payrollItems = array_merge($payrollItems, $this->getAttendancePayrollItems($attendanceReportService, $employee->id, $attendances, $workShift, $hourlyRate));
-
+        $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->whereBetween('date', [$dateFrom, $dateTo])->orderBy('date', 'ASC')->get();
+        $payrollItems = array_merge($payrollItems, $this->getAttendancePayrollItems($attendanceReportService, $employee->id, $attendances, $workShift, $hourlyRate, $dateFrom, $dateTo));
         if ($day == 15) {
             $payrollItems[] = [
                 'EmployeeID' => $employee->id,
@@ -209,11 +208,13 @@ class PayrollController extends Controller
     protected function calculateGrossSalary($employeeId, $dateFrom, $dateTo)
     {
         // get all valid payroll items within the date range (salary, overtime, bonuses, allowance, holiday pay, commissions, leave pay)
-        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_date', ">=", $dateFrom)->whereDate('created_date', "<=", $dateTo)->get();
+        // $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_date', ">=", $dateFrom)->whereDate('created_date', "<=", $dateTo)->get();
+        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->get();
+        dd($payrollItems);
         $grossSalary = 0;
         foreach ($payrollItems as $item) {
-            if ($item["item_type"] != PayrollItemTypeEnum::DEDUCTION) {
-                $grossSalary += $item["amount"];
+            if ($item->item_type != PayrollItemTypeEnum::DEDUCTION) {
+                $grossSalary += $item->amount;
             }
         }
         return $grossSalary;
@@ -224,8 +225,8 @@ class PayrollController extends Controller
         $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_date', ">=", $dateFrom)->whereDate('created_date', "<=", $dateTo)->get();
         $grossSalary = 0;
         foreach ($payrollItems as $item) {
-            if ($item["item_type"] == PayrollItemTypeEnum::DEDUCTION) {
-                $grossSalary += $item["amount"];
+            if ($item->item_type == PayrollItemTypeEnum::DEDUCTION) {
+                $grossSalary += $item->amount;
             }
         }
         return $grossSalary;
@@ -252,14 +253,15 @@ class PayrollController extends Controller
         return $taxes;
     }
 
-    protected function getAttendancePayrollItems(AttendanceReportService $attendanceReportService, $employeeId, $attendances, $workShift, $hourlyRate)
+    protected function getAttendancePayrollItems(AttendanceReportService $attendanceReportService, $employeeId, $attendances, $workShift, $hourlyRate, $startDate, $endDate)
     {
 
-        $attendanceSummary = $attendanceReportService->getAttendanceSummary($employeeId, $attendances, $workShift);
+        $attendanceSummary = $attendanceReportService->getAttendanceSummary($employeeId, $attendances, $workShift, $startDate, $endDate);
         $totalWorkDuration = $attendanceSummary["totalWorkDuration"];
         $totalOvertimeRestDay = $attendanceSummary["totalOvertimeRestDay"];
         $totalOvertimeHoliday = $attendanceSummary["totalOvertimeHoliday"];
         $totalUndertimeDuration = $attendanceSummary["totalUndertimeDuration"];
+        dd($totalUndertimeDuration);
         $totalLateDuration = $attendanceSummary["totalLateDuration"];
         $absences = $attendanceSummary["absences"];
         $leave = $attendanceSummary["leave"];
