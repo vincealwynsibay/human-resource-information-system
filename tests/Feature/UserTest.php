@@ -17,9 +17,6 @@ test('add new user as admin', function () {
     $response = $this->post('/api/user', [
         'username' => "New User",
         'password' => "Password",
-        'firstName' => "New",
-        'middleName' => "",
-        'lastName' => "User",
         'role' => 1,
         'employeeId' => $newEmployeeId
     ]);
@@ -46,9 +43,6 @@ test('add new user as not admin', function () {
     $response = $this->post('/api/user', [
         'username' => "New User",
         'password' => "Password",
-        'firstName' => "New",
-        'middleName' => "",
-        'lastName' => "User",
         'role' => 1,
         'employeeId' => $newEmployeeId
     ]);

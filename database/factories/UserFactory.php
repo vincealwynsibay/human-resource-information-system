@@ -40,9 +40,6 @@ class UserFactory extends Factory
         return [
             'username' => fake()->unique()->userName(),
             'password' => static::$password ??= Hash::make('password'),
-            'firstName' => fake()->firstName(),
-            'lastName' => fake()->lastName(),
-            'middleName' => fake()->lastName(),
             'EmployeeID' => $newEmployeeId,
             'RoleID' => 1,
             'status' => "Active",

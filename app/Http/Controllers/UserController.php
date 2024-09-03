@@ -13,7 +13,7 @@ class UserController extends Controller
     {
 
         // TODO: paginate all
-        $users = DB::table('tbluser')->where('status', "ACTIVE")->get(["username", "firstName", "middleName", "lastName", "RoleID"]);
+        $users = DB::table('tbluser')->where('status', "ACTIVE")->get(["username", "RoleID"]);
         // TODO: populate role names
         return response()->json($users, 200);
     }
@@ -23,9 +23,6 @@ class UserController extends Controller
         $validated = $request->validate([
             'username' => "required|string",
             'password' => "required|string",
-            'firstName' => "required|string",
-            'middleName' => "nullable|string",
-            'lastName' => "required|string",
             'role' => "required|exists:tbluserrole,id",
             'employeeId' => "required|exists:tblemployee,id"
         ]);
@@ -33,9 +30,6 @@ class UserController extends Controller
         DB::table('tbluser')->insert([
             'username' => $validated["username"],
             'password' => Hash::make($validated["password"]),
-            'firstName' => $validated["firstName"],
-            'lastName' => $validated["lastName"],
-            'middleName' => $validated["middleName"],
             'EmployeeID' => $validated["employeeId"],
             'RoleID' => $validated["role"],
         ]);
