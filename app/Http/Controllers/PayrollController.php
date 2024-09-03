@@ -35,30 +35,9 @@ class PayrollController extends Controller
 
     public function export(Request $request)
     {
-        // $validated = $request->validate([
-        //     'startDate' => 'required|date',
-        //     'endDate' => 'required|date'
-        // ]);
         $validated = $request->validate([
             'startDate' => 'nullable',
             'endDate' => 'nullable'
-        ]);
-
-
-        $employeeId = DB::table('tblemployee')->insertGetId([
-            "firstname" => fake()->firstName(),
-            "lastname" => fake()->lastName(),
-            "joined_date" => Date::now()
-        ]);
-
-        DB::table('tblpayroll')->insert([
-            'EmployeeID' => $employeeId,
-            'pay_period_start' => Date::today()->subDay(),
-            'pay_period_end' => Date::today(),
-            'gross_salary' => 150,
-            'deductions' => 50,
-            'net_salary' => 100,
-            'created_date' => Date::now()
         ]);
 
         return Excel::download(new PayrollExport(Date::createFromFormat('Y-m-d', $validated['startDate']), Date::createFromFormat('Y-m-d', $validated['endDate'])), 'payroll-' . Date::today()->format('Y-m-d') . '.xlsx');
@@ -95,11 +74,21 @@ class PayrollController extends Controller
         if ($day == 15) {
             $dateFrom = Date::now()->startOfMonth()->setTime(0, 0, 0);
             $dateTo = Date::today()->setTime(23, 59, 59);
-        } else {
+        } else if ($day == Date::now()->endOfMonth()->format('d')) {
             // if end of month, schedule SSS, PhilHealth, Pag-Ibig
             $dateFrom = Date::now()->dayOfMonth(16)->setTime(0, 0, 0);
             // $dateTo = Date::today();
             $dateTo = Date::today()->setTime(23, 59, 59);
+        } else {
+            // TODO: invalid date for payroll or continue
+            return response()->json(['message' => 'Invalid date for payroll'], 400);
+        }
+
+        // check if payroll already exists between $dateFrom and $dateTo
+        $existingPayroll = DB::table('tblpayroll')->where('EmployeeID', $employee->id)->where('pay_period_start', ">=", $dateFrom)->where('pay_period_end', "<=", $dateTo)->first();
+
+        if ($existingPayroll) {
+            return response()->json(['message' => 'Payroll already exists for this time'], 400);
         }
 
         // determine if date is 15th or end of month for semi-monthly
@@ -209,7 +198,7 @@ class PayrollController extends Controller
     {
         // get all valid payroll items within the date range (salary, overtime, bonuses, allowance, holiday pay, commissions, leave pay)
         // $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_date', ">=", $dateFrom)->whereDate('created_date', "<=", $dateTo)->get();
-        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->get();
+        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->where('created_date', ">=", $dateFrom)->where('created_date', "<=", $dateTo)->get();
         $grossSalary = 0;
         foreach ($payrollItems as $item) {
             if ($item->item_type != PayrollItemTypeEnum::DEDUCTION) {
