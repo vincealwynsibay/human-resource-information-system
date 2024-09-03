@@ -23,7 +23,7 @@ class SalaryController extends Controller
             return response()->json(['message' => 'Employee not found'], 404);
         }
 
-        $salary = DB::table('tblbasicsalary')->where("EmployeeID", $employeeId)->get();
+        $salary = DB::table('tblbasicsalary')->where("EmployeeID", $employeeId)->whereNull('is_deleted')->first();
 
         return response()->json($salary, 200);
     }
@@ -60,6 +60,11 @@ class SalaryController extends Controller
                 'amount' => $validated['amount'],
                 'change_reason' => 'Starting Salary'
             ]);
+        } else {
+            // invalidate the old salary
+            DB::table('tblbasicsalary')->where(['EmployeeID', $validated['employeeId']])->update([
+                'is_deleted' => Date::now()
+            ]);
         }
 
         DB::table('tblbasicsalary')->insert([
@@ -94,7 +99,7 @@ class SalaryController extends Controller
             return response()->json(['message' => 'Amount is not within the paygrade range'], 400);
         }
 
-        DB::table('tblbasicsalary')->where('id', $id)->update([
+        DB::table('tblbasicsalary')->where('id', $id)->whereNull('is_deleted')->update([
             'EmployeeID' => $validated['employeeId'],
             'PayGradeID' => $validated['paygradeId'],
             'amount' => $validated['amount'],
@@ -109,7 +114,7 @@ class SalaryController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::table('tblbasicsalary')->where('id', $id)->update([
+        DB::table('tblbasicsalary')->where('id', $id)->whereNull('is_deleted')->update([
             'is_deleted' => Date::now()
         ]);
 
