@@ -54,7 +54,7 @@ class PayrollController extends Controller
         ]);
 
 
-        $basicSalary = DB::table('tblbasicsalary')->where("EmployeeID", $validated['employeeId'])->first();
+        $basicSalary = DB::table('tblbasicsalary')->where("EmployeeID", $validated['employeeId'])->whereNull('is_deleted')->first();
         $employee = DB::table('tblemployee')->where('id', $request->employeeId)->first();
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
