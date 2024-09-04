@@ -86,15 +86,19 @@ class AttendanceReportService
             //     // if also holiday or rest day, it is impossible to overtime because all work hours is an overtime
             $day = strtolower(Date::createFromFormat('Y-m-d', $attendance->date)->format('D'));
             $dayLength = $workWeek->$day;
+            // CHECK IF VALID (IF RECURRING CHECK MONTH AND DAY, IF NOT CHECK VALIDITY DATE)
+
+            $recurringHoliday = DB::table('tblholiday')->where('recurring', true)->whereRaw('MONTH(date) = ?', [Date::parse($attendance->date)->format('m')])->whereRaw('DAY(date) = ?', [Date::parse($attendance->date)->format('d')])->first();
             $holiday = DB::table('tblholiday')->where('date', $attendance->date)->first();
             $overtime = DB::table('tblovertime')->where('requested_date', $attendance->date)->where('status', 'APPROVED')->first();
+
 
             if ($overtime != null) {
                 if (DayLengthEnum::from($dayLength)->isNoWork()) {
                     $overtimeDuration = $countedWorkDuration;
                     $totalOvertimeRestDay += $countedWorkDuration;
                     $totalOvertimeDuration += $countedWorkDuration;
-                } else if ($holiday != null) {
+                } else if ($holiday != null || $recurringHoliday != null) {
                     $overtimeDuration = $countedWorkDuration;
                     $totalOvertimeHoliday += $countedWorkDuration;
                     $totalOvertimeDuration += $countedWorkDuration;
@@ -279,6 +283,7 @@ class AttendanceReportService
             //     // if also holiday or rest day, it is impossible to overtime because all work hours is an overtime
             $day = strtolower(Date::createFromFormat('Y-m-d', $attendance->date)->format('D'));
             $dayLength = $workWeek->$day;
+            $recurringHoliday = DB::table('tblholiday')->where('recurring', true)->whereRaw('MONTH(date) = ?', [Date::parse($attendance->date)->format('m')])->whereRaw('DAY(date) = ?', [Date::parse($attendance->date)->format('d')])->first();
             $holiday = DB::table('tblholiday')->where('date', $attendance->date)->first();
             $overtime = DB::table('tblovertime')->where('requested_date', $attendance->date)->where('status', 'APPROVED')->first();
 
@@ -287,7 +292,7 @@ class AttendanceReportService
                     $totalOvertimeRestDay += $countedWorkDuration;
                     $overtimeDuration += $countedWorkDuration;
                     $totalOvertimeDuration += $countedWorkDuration;
-                } else if ($holiday != null) {
+                } else if ($holiday != null || $recurringHoliday != null) {
                     $totalOvertimeHoliday += $countedWorkDuration;
                     $overtimeDuration += $countedWorkDuration;
                     $totalOvertimeDuration += $countedWorkDuration;
@@ -341,7 +346,9 @@ class AttendanceReportService
         $day = strtolower(Date::parse($formattedDate)->format('D'));
         $workWeek = DB::table('tblworkweek')->first();
         $dayLength = $workWeek->$day;
+        $recurringHoliday = DB::table('tblholiday')->where('recurring', true)->whereRaw('MONTH(date) = ?', [Date::parse($date)->format('m')])->whereRaw('DAY(date) = ?', [Date::parse($date)->format('d')])->first();
         $holiday = DB::table('tblholiday')->where('date', $formattedDate)->first();
+
         $leave = DB::table('tblleave')
             ->where('status', LeaveRequestEnum::APPROVED)
             // if unpaid leave add to absences
@@ -366,7 +373,7 @@ class AttendanceReportService
                 'late_duration' => 0,
                 'status' => AttendanceStatusEnum::NONE->value,
             ];
-        } else if ($holiday != null) {
+        } else if ($holiday != null || $recurringHoliday != null) {
             return [
                 'date' => $formattedDate,
                 'time_in_session1' => null,
