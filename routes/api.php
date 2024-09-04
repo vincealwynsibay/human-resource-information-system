@@ -132,6 +132,8 @@ Route::group(['prefix' => "leaveentitlement", 'middleware' => ['auth:sanctum', '
     Route::get('/', [LeaveEntitlementController::class, 'index']);
     Route::get('/me', [LeaveEntitlementController::class, 'getUserLeaveEntitlements']);
     Route::post('/', [LeaveEntitlementController::class, 'store']);
+    Route::post('/storeMany', [LeaveEntitlementController::class, 'storeMany']);
+    Route::post('/employees', [LeaveEntitlementController::class, 'assignLeaveEntitlements']);
     Route::put('/{id}', [LeaveEntitlementController::class, 'update']);
     Route::put('/{id}/daysUsed', [LeaveEntitlementController::class, 'updateDaysUsed']);
     Route::delete('/{id}', [LeaveEntitlementController::class, 'destroy']);

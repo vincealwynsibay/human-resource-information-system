@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
 class LeaveEntitlementController extends Controller
@@ -71,6 +72,58 @@ class LeaveEntitlementController extends Controller
         ]);
 
         return response()->json(['message' => "Leave entitlement created successfully", 'id' => $id]);
+    }
+
+    public function storeMany(Request $request)
+    {
+        $validated = $request->validate([
+            'employeeId' => 'required|exists:tblemployee,id',
+            'leaveEntitlements' => 'required|array',
+            'leaveEntitlements.*.leaveTypeId' => 'required|exists:tblleavetype,id',
+            'leaveEntitlements.*.entitlement' => 'required|numeric',
+            'leaveEntitlements.*.validFrom' => 'required|date',
+            'leaveEntitlements.*.validTo' => 'nullable|date',
+        ]);
+
+        DB::table('tblleaveentitlement')->insert(array_map(function ($leaveEntitlement) use ($request) {
+            return [
+                'EmployeeID' => $request->employeeId,
+                'LeaveTypeID' => $leaveEntitlement['leaveTypeId'],
+                'entitlement' => $leaveEntitlement['entitlement'],
+                'valid_from' => $leaveEntitlement['validFrom'],
+                'valid_to' => $leaveEntitlement['validTo'],
+                'date_created' => Date::now(),
+            ];
+        }, $request->leaveEntitlements));
+
+        return response()->json(['message' => "Leave entitlements assigned successfully"]);
+    }
+    public function assignLeaveEntitlements(Request $request)
+    {
+        $validated = $request->validate([
+            'employeeIds' => 'required|array',
+            'employeeIds.*' => 'exists:tblemployee,id',
+            'leaveEntitlements' => 'required|array',
+            'leaveEntitlements.*.leaveTypeId' => 'required|exists:tblleavetype,id',
+            'leaveEntitlements.*.entitlement' => 'required|numeric',
+            'leaveEntitlements.*.validFrom' => 'required|date',
+            'leaveEntitlements.*.validTo' => 'nullable|date',
+        ]);
+
+        foreach ($request->employeeIds as $employeeId) {
+            DB::table('tblleaveentitlement')->insert(array_map(function ($leaveEntitlement) use ($employeeId) {
+                return [
+                    'EmployeeID' => $employeeId,
+                    'LeaveTypeID' => $leaveEntitlement['leaveTypeId'],
+                    'entitlement' => $leaveEntitlement['entitlement'],
+                    'valid_from' => $leaveEntitlement['validFrom'],
+                    'valid_to' => $leaveEntitlement['validTo'],
+                    'date_created' => Date::now(),
+                ];
+            }, $request->leaveEntitlements));
+        }
+
+        return response()->json(['message' => "Leave entitlements assigned successfully"]);
     }
 
     /**

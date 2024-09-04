@@ -131,7 +131,8 @@ class LeaveController extends Controller
             return response()->json(['error' => 'Leave Type not found'], 400);
         }
 
-        // check if have leave entitlement
+        // TODO: SETUP FOR DEFAULT LEAVE ENTITLEMENT
+        // check if have leave entitlement for leave type
         $leaveEntitlement = DB::table('tblleaveentitlement')->where('EmployeeID', $validated['employeeId'])->where('LeaveTypeID', $validated['leaveType'])->first();
         if (!$leaveEntitlement) {
             return response()->json(['error' => 'Leave Type not allowed. No leave entitlement'], 400);
