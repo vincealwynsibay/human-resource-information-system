@@ -321,7 +321,7 @@ class AttendanceController extends Controller
         $currentDate = Date::now();
         $employeeWorkShift = DB::table('tblemployeeworkshift')->where("EmployeeID", $user->EmployeeID)->first();
         $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
-        $overtime = DB::table('tblovertime')->where('requested_date', $currentDate)->where('status', 'APPROVED')->subDay();
+        $overtime = DB::table('tblovertime')->where('requested_date', $currentDate->subDay())->where('status', 'APPROVED')->first();
         // check if there is an overtime yesterday and no time out yet, can time out past 12mn of the next day
 
         // if no overtime yesterday, check if there is an attendance record for today
