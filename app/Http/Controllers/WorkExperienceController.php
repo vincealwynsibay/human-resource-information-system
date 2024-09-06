@@ -55,10 +55,10 @@ class WorkExperienceController extends Controller
     public function update(Request $request, string $id, string $workExperienceId)
     {
         $validated = $request->validate([
-            'employer' => 'required|string',
-            'position' => 'required|string',
-            'from' => 'required|date',
-            'to' => 'required|date',
+            'employer' => 'nullable|string',
+            'position' => 'nullable|string',
+            'from' => 'nullable|date',
+            'to' => 'nullable|date',
         ]);
 
         $workExperience = DB::table('tblemployeeworkexperience')->where('id', $workExperienceId)->first();

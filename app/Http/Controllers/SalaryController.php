@@ -84,9 +84,9 @@ class SalaryController extends Controller
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'paygradeId' => 'required',
-            'amount' => 'required|numeric',
-            'change_reason' => 'required'
+            'paygradeId' => 'nullable',
+            'amount' => 'nullable|numeric',
+            'change_reason' => 'nullable'
         ]);
 
         $paygrade = DB::table('tblpaygrade')->where('id', $validated['paygradeId'])->first();

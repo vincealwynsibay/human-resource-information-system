@@ -39,7 +39,7 @@ class EducationController extends Controller
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
+            'name' => 'nullable|string',
         ]);
 
         DB::table('tbleducation')->where('id', $id)->update([

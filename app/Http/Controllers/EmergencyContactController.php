@@ -55,10 +55,10 @@ class EmergencyContactController extends Controller
     public function update(Request $request, string $id, string $emergencyContactId)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
-            'relationship' => 'required|string',
-            'mobile_no' => 'required|string',
-            'email' => 'required|email'
+            'name' => 'nullable|string',
+            'relationship' => 'nullable|string',
+            'mobile_no' => 'nullable|string',
+            'email' => 'nullable|email'
         ]);
 
         $emergencyContact = DB::table('tblemergencycontact')->where('id', $emergencyContactId)->first();

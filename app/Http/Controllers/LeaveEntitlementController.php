@@ -132,8 +132,8 @@ class LeaveEntitlementController extends Controller
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'entitlement' => 'required|numeric',
-            'validFrom' => 'required|date',
+            'entitlement' => 'nullable|numeric',
+            'validFrom' => 'nullable|date',
             'validTo' => 'nullable|date',
         ]);
 

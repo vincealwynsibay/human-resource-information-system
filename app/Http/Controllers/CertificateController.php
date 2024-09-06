@@ -52,9 +52,9 @@ class CertificateController extends Controller
     public function update(Request $request, string $id, string $certificateId)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
-            'issuedBy' => 'required|string',
-            'issuedDate' => 'required|date',
+            'name' => 'nullable|string',
+            'issuedBy' => 'nullable|string',
+            'issuedDate' => 'nullable|date',
         ]);
 
         $certificate = DB::table('tblemployeecertificate')->where('id', $certificateId)->first();
