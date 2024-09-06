@@ -54,13 +54,14 @@ class AttendanceController extends Controller
 
     public function getOwnAttendanceRecords(Request $request)
     {
+
+        $validated = $request->validate([
+            'fromDate' => 'required|date',
+            'toDate' => 'required|date',
+        ]);
+
         $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->user()->EmployeeID)
-            ->when($request->id, function ($query, $id) {
-                return $query->where('id', $id);
-            })
-            ->when($request->name, function ($query, $name) {
-                return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
-            })
+
             ->whereBetween('date', [Date::createFromFormat("Y-m-d", $request->fromDate), Date::createFromFormat("Y-m-d", $request->toDate)])
             ->get();
         return response()->json($attendances);
