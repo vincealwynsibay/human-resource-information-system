@@ -239,6 +239,7 @@ CREATE TABLE `tblemployee` (
   `SupervisorID` int DEFAULT NULL,
   `DepartmentID` int DEFAULT NULL,
   `joined_date` datetime NOT NULL,
+  `termination_date` datetime DEFAULT NULL,
   `status` varchar(45) NOT NULL DEFAULT 'ACTIVE',
   `image` text,
   `sss_contribution` decimal(10,2) DEFAULT '0.00',
@@ -389,14 +390,18 @@ CREATE TABLE `tblleave` (
   `start_date` datetime NOT NULL,
   `end_date` datetime NOT NULL,
   `reason` varchar(255) NOT NULL,
+  `date_created` datetime NOT NULL,
   `status` varchar(50) DEFAULT 'PENDING',
   `approval_date` datetime DEFAULT NULL,
+  `approvedBy` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
   KEY `LeaveTypeID` (`LeaveTypeID`),
   KEY `LeavePeriodRange` (`start_date`,`end_date`) COMMENT 'start and end query',
+  KEY `approvedBy` (`approvedBy`),
   CONSTRAINT `tblleave_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
-  CONSTRAINT `tblleave_ibfk_2` FOREIGN KEY (`LeaveTypeID`) REFERENCES `tblleavetype` (`id`)
+  CONSTRAINT `tblleave_ibfk_2` FOREIGN KEY (`LeaveTypeID`) REFERENCES `tblleavetype` (`id`),
+  CONSTRAINT `tblleave_ibfk_3` FOREIGN KEY (`approvedBy`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblleaveentitlement`;
@@ -447,6 +452,7 @@ CREATE TABLE `tblovertime` (
   `reason` varchar(255) NOT NULL,
   `duration` decimal(10,2) DEFAULT NULL COMMENT '1.5 hours, etc.',
   `status` varchar(50) DEFAULT NULL,
+  `date_created` datetime NOT NULL,
   `requested_date` datetime NOT NULL,
   `approval_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
