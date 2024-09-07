@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EmploymentStatus;
 use App\Http\Requests\StoreEmploymentStatusRequest;
 use App\Http\Requests\UpdateEmploymentStatusRequest;
 use Illuminate\Http\Request;
@@ -15,7 +14,7 @@ class EmploymentStatusController extends Controller
      */
     public function index()
     {
-        $employmentStatuses = DB::table('tblemploymentstatus')->get();
+        $employmentStatuses = DB::select('CALL procGetEmploymentStatuses()');
         return response()->json($employmentStatuses);
     }
 
@@ -28,15 +27,14 @@ class EmploymentStatusController extends Controller
             "name" => "required|string|max:45"
         ]);
 
-        DB::table('tblemploymentstatus')->insert([
-            'name' => $validated['name']
+        DB::select('CALL procInsertEmploymentStatus(?)', [
+            $validated['name']
         ]);
 
         return response()->json([
             'message' => 'New Employment Status created successfully'
         ], 201);
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -47,7 +45,7 @@ class EmploymentStatusController extends Controller
             'name' => 'required|string|max:45'
         ]);
 
-        $employmentStatus = DB::table("tblemploymentstatus")->find($id);
+        $employmentStatus = DB::select('CALL procGetEmploymentStatus(?)', [$id])[0] ?? null;
 
         if ($employmentStatus == null) {
             return response()->json([
@@ -57,8 +55,9 @@ class EmploymentStatusController extends Controller
             ], 404);
         }
 
-        DB::table('tblemploymentstatus')->where('id', $id)->update([
-            'name' => $validated['name']
+        DB::select('CALL procUpdateEmploymentStatusByID(?, ?)', [
+            $id,
+            $validated['name']
         ]);
 
         return response()->json([
@@ -71,7 +70,7 @@ class EmploymentStatusController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $employmentStatus = DB::table("tblemploymentstatus")->find($id);
+        $employmentStatus = DB::select('CALL procGetEmploymentStatus(?)', [$id])[0] ?? null;
 
         if ($employmentStatus == null) {
             return response()->json([
@@ -81,7 +80,7 @@ class EmploymentStatusController extends Controller
             ], 404);
         }
 
-        DB::table('tblemploymentstatus')->where('id', $id)->delete();
+        DB::select('CALL procDeleteEmploymentStatusByID(?)', [$id]);
 
         return response()->json([
             'message' => "Employment Status deleted successfully"
