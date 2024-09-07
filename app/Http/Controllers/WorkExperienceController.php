@@ -12,7 +12,7 @@ class WorkExperienceController extends Controller
      */
     public function index($employeeId)
     {
-        $employee = DB::table('tblemployee')->where('id', $employeeId)->first();
+        $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
 
         if ($employee == null) {
             return response()->json([
@@ -20,9 +20,8 @@ class WorkExperienceController extends Controller
             ], 404);
         }
 
-        $workExperiences = DB::table('tblemployeeworkexperience')->where('employeeId', $employeeId)->get();
+        $workExperiences = DB::select('CALL procGetEmployeeWorkExperiences(?)', [$employeeId]);
         return response()->json($workExperiences);
-
     }
 
     /**
@@ -37,16 +36,15 @@ class WorkExperienceController extends Controller
             'to' => 'required|date',
         ]);
 
-        $workExperienceId = DB::table('tblemployeeworkexperience')->insertGetId([
-            'employeeId' => $employeeId,
-            'employer' => $validated['employer'],
-            'position' => $validated['position'],
-            'from_date' => $validated['from'],
-            'to_date' => $validated['to'],
+        DB::select('CALL procInsertEmployeeWorkExperience(?, ?, ?, ?, ?)', [
+            $employeeId,
+            $validated['employer'],
+            $validated['position'],
+            $validated['from'],
+            $validated['to']
         ]);
 
-        $workExperience = DB::table('tblemployeeworkexperience')->where('id', $workExperienceId)->first();
-        return response()->json($workExperience, 201);
+        return response()->json("New Work Experience has been added to employee", 201);
     }
 
     /**
@@ -61,7 +59,7 @@ class WorkExperienceController extends Controller
             'to' => 'nullable|date',
         ]);
 
-        $workExperience = DB::table('tblemployeeworkexperience')->where('id', $workExperienceId)->first();
+        $workExperience = DB::select('CALL procGetEmployeeWorkExperience(?)', [$workExperienceId])[0] ?? null;
 
         if ($workExperience == null) {
             return response()->json([
@@ -69,11 +67,12 @@ class WorkExperienceController extends Controller
             ], 404);
         }
 
-        DB::table('tblemployeeworkexperience')->where('id', $workExperienceId)->update([
-            'employer' => $validated['employer'],
-            'position' => $validated['position'],
-            'from_date' => $validated['from'],
-            'to_date' => $validated['to'],
+        DB::select('CALL procUpdateEmployeeWorkExperienceByID(?, ?, ?, ?, ?)', [
+            $workExperienceId,
+            $validated['employer'],
+            $validated['position'],
+            $validated['from'],
+            $validated['to']
         ]);
 
         return response()->json([
@@ -86,7 +85,7 @@ class WorkExperienceController extends Controller
      */
     public function destroy(string $id, string $workExperienceId)
     {
-        $workExperience = DB::table('tblemployeeworkexperience')->where('id', $workExperienceId)->first();
+        $workExperience = DB::select('CALL procGetEmployeeWorkExperience(?)', [$workExperienceId])[0] ?? null;
 
         if ($workExperience == null) {
             return response()->json([
@@ -94,7 +93,7 @@ class WorkExperienceController extends Controller
             ], 404);
         }
 
-        DB::table('tblemployeeworkexperience')->where('id', $workExperienceId)->delete();
+        DB::select('CALL procDeleteEmployeeWorkExperienceByID(?)', [$workExperienceId]);
         return response()->json([
             'message' => 'Work experience deleted successfully'
         ]);
