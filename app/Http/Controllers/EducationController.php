@@ -12,7 +12,7 @@ class EducationController extends Controller
      */
     public function index()
     {
-        $educations = DB::table('tbleducation')->get();
+        $educations = DB::select('CALL procGetEducations()');
         return response()->json($educations);
     }
 
@@ -25,12 +25,11 @@ class EducationController extends Controller
             'name' => 'required|string',
         ]);
 
-        $educationId = DB::table('tbleducation')->insertGetId([
-            'name' => $validated['education'],
+        DB::select('CALL procInsertEducation(?)', [
+            $validated['name']
         ]);
 
-        $education = DB::table('tbleducation')->where('id', $educationId)->first();
-        return response()->json($education, 201);
+        return response()->json("New Education Created Successfully", 201);
     }
 
     /**
@@ -42,11 +41,12 @@ class EducationController extends Controller
             'name' => 'nullable|string',
         ]);
 
-        DB::table('tbleducation')->where('id', $id)->update([
-            'name' => $validated['education'],
+        DB::select('CALL procUpdateEducationByID(?, ?)', [
+            $id,
+            $validated['name']
         ]);
 
-        $education = DB::table('tbleducation')->where('id', $id)->first();
+        $education = DB::select('CALL procGetEducation(?)', [$id])[0];
         return response()->json($education);
     }
 
@@ -55,7 +55,7 @@ class EducationController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::table('tbleducation')->where('id', $id)->delete();
+        DB::select('CALL procDeleteEducationByID(?)', [$id]);
         return response()->json([
             'message' => 'Education deleted successfully'
         ]);
