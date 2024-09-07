@@ -12,7 +12,7 @@ class EmployeeEducationController extends Controller
      */
     public function index($employeeId)
     {
-        $employee = DB::table('tblemployee')->where('id', $employeeId)->first();
+        $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
 
         if ($employee == null) {
             return response()->json([
@@ -20,7 +20,7 @@ class EmployeeEducationController extends Controller
             ], 404);
         }
 
-        $educations = DB::table('tblemployeeeducation')->where('employeeId', $employeeId)->get();
+        $educations = DB::select('CALL procGetEmployeeEducations(?)', [$employeeId]);
         return response()->json($educations);
     }
 
@@ -39,20 +39,18 @@ class EmployeeEducationController extends Controller
             'endDate' => 'required|date',
         ]);
 
-        $educationId = DB::table('tblemployeeeducation')->insertGetId([
-            'employeeId' => $employeeId,
-            'educationId' => $validated['education'],
-            'institute' => $validated['institute'],
-            'major' => $validated['major'],
-            'year_graduated' => $validated['yearGraduated'],
-            'gpa' => $validated['gpa'],
-            'start_date' => $validated['startDate'],
-            'end_date' => $validated['endDate'],
+        DB::select('CALL procInsertEmployeeEducation(?, ?, ?, ?, ?, ?, ?, ?)', [
+            $employeeId,
+            $request->education,
+            $request->institute,
+            $request->major,
+            $request->yearGraduated,
+            $request->gpa,
+            $request->startDate,
+            $request->endDate
         ]);
 
-        $education = DB::table('tblemployeeeducation')->where('id', $educationId)->first();
-
-        return response()->json($education, 201);
+        return response()->json("New Education has been added to Employee", 201);
     }
 
     /**
@@ -70,17 +68,18 @@ class EmployeeEducationController extends Controller
             'endDate' => 'nullable|date',
         ]);
 
-        DB::table('tblemployeeeducation')->where('id', $educationId)->update([
-            'educationId' => $validated['education'],
-            'institute' => $validated['institute'],
-            'major' => $validated['major'],
-            'year_graduated' => $validated['yearGraduated'],
-            'gpa' => $validated['gpa'],
-            'start_date' => $validated['startDate'],
-            'end_date' => $validated['endDate'],
+        DB::select('CALL procUpdateEmployeeEducationByID(?, ?, ?, ?, ?, ?, ?, ?)', [
+            $educationId,
+            $request->education,
+            $request->institute,
+            $request->major,
+            $request->yearGraduated,
+            $request->gpa,
+            $request->startDate,
+            $request->endDate
         ]);
 
-        $education = DB::table('tblemployeeeducation')->where('id', $educationId)->first();
+        $education = DB::select('CALL procGetEmployeeEducation(?)', [$educationId])[0];
         return response()->json($education);
     }
 
@@ -89,7 +88,7 @@ class EmployeeEducationController extends Controller
      */
     public function destroy(string $id, string $educationId)
     {
-        $education = DB::table('tblemployeeeducation')->where('id', $educationId)->first();
+        $education = DB::select('CALL procGetEmployeeEducation(?)', [$educationId])[0] ?? null;
 
         if ($education == null) {
             return response()->json([
@@ -97,7 +96,7 @@ class EmployeeEducationController extends Controller
             ], 404);
         }
 
-        DB::table('tblemployeeeducation')->where('id', $educationId)->delete();
+        DB::select('CALL procDeleteEmployeeEducationByID(?)', [$educationId]);
         return response()->json([
             'message' => 'Education deleted successfully'
         ]);

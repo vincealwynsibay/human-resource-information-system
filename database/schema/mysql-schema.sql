@@ -1595,6 +1595,25 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `procGetEmployeeEducation` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb3 */ ;
+/*!50003 SET character_set_results = utf8mb3 */ ;
+/*!50003 SET collation_connection  = utf8mb3_general_ci */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeEducation`(p_id INT)
+BEGIN
+		SELECT * FROm tblemployeeeducation WHERE id=p_id;
+	END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `procGetEmployeeEducations` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -3345,10 +3364,10 @@ BEGIN
                         educationId = IFNULL(p_educationId, educationId),
                         institute = IFNULL(p_institute, institute),
                         major = IFNULL(p_major, major),
-                        yearGraduated = IFNULL(p_yearGraduated, yearGraduated),
+                        year_graduated = IFNULL(p_yearGraduated, year_graduated),
                         gpa = IFNULL(p_gpa, gpa),
-                        startDate = IFNULL(p_startDate, startDate),
-                        endDate = IFNULL(p_endDate, endDate)
+                        start_date = IFNULL(p_startDate, start_date),
+                        end_date = IFNULL(p_endDate, end_date)
                 WHERE id = p_id;
                 END ;;
 DELIMITER ;
