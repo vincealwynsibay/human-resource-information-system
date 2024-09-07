@@ -15,10 +15,9 @@ class JobTitleController extends Controller
      */
     public function index()
     {
-        $jobTitles = DB::table('tbljobtitle')->get();
+        $jobTitles = DB::select('CALL procGetJobTitles()');
         return response()->json($jobTitles);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -30,9 +29,9 @@ class JobTitleController extends Controller
             "description" => "nullable|string|max:100",
         ]);
 
-        DB::table('tbljobtitle')->insert([
-            'name' => $request->name,
-            'description' => $request->description
+        DB::select('CALL procInsertJobTitle(?, ?)', [
+            $request->name,
+            $request->description
         ]);
 
         return response()->json([
@@ -48,11 +47,9 @@ class JobTitleController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:45',
             'description' => 'nullable|string|max:100',
-
         ]);
 
-
-        $jobTitle = DB::table("tbljobtitle")->find($id);
+        $jobTitle = DB::select('CALL procGetJobTitle(?)', [$id])[0] ?? null;
 
         if ($jobTitle == null) {
             return response()->json([
@@ -62,9 +59,10 @@ class JobTitleController extends Controller
             ], 404);
         }
 
-        DB::table('tbljobtitle')->where('id', $id)->update([
-            'name' => $request->name,
-            'description' => $request->description,
+        DB::select('CALL procUpdateJobTitleByID(?, ?, ?)', [
+            $id,
+            $request->name,
+            $request->description
         ]);
 
         return response()->json([
@@ -77,7 +75,7 @@ class JobTitleController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $jobTitle = DB::table("tbljobtitle")->find($id);
+        $jobTitle = DB::select('CALL procGetJobTitle(?)', [$id])[0] ?? null;
 
         if ($jobTitle == null) {
             return response()->json([
@@ -87,7 +85,7 @@ class JobTitleController extends Controller
             ], 404);
         }
 
-        DB::table('tbljobtitle')->where('id', $id)->delete();
+        DB::select('CALL procDeleteJobTitleByID(?)', [$id]);
 
         return response()->json([
             'message' => "Job Title deleted successfully"
