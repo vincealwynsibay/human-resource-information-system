@@ -12,7 +12,7 @@ class CertificateController extends Controller
      */
     public function index($employeeId)
     {
-        $employee = DB::table('tblemployee')->where('id', $employeeId)->first();
+        $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
 
         if ($employee == null) {
             return response()->json([
@@ -20,7 +20,7 @@ class CertificateController extends Controller
             ], 404);
         }
 
-        $certificates = DB::table('tblemployeecertificate')->where('employeeId', $employeeId)->get();
+        $certificates = DB::select('CALL procGetEmployeeCertificates(?)', [$employeeId]);
         return response()->json($certificates);
     }
 
@@ -35,15 +35,14 @@ class CertificateController extends Controller
             'issuedDate' => 'required|date',
         ]);
 
-        $certificateId = DB::table('tblemployeecertificate')->insertGetId([
-            'employeeId' => $employeeId,
-            'name' => $validated['name'],
-            'issued_by' => $validated['issuedBy'],
-            'issued_date' => $validated['issuedDate'],
+        DB::select('CALL procInsertEmployeeCertificate(?, ?, ?, ?)', [
+            $employeeId,
+            $request->name,
+            $request->issuedBy,
+            $request->issuedDate
         ]);
 
-        $certificate = DB::table('tblemployeecertificate')->where('id', $certificateId)->first();
-        return response()->json($certificate, 201);
+        return response()->json("New Certificate Created Successfully", 201);
     }
 
     /**
@@ -57,7 +56,8 @@ class CertificateController extends Controller
             'issuedDate' => 'nullable|date',
         ]);
 
-        $certificate = DB::table('tblemployeecertificate')->where('id', $certificateId)->first();
+        $certificate = DB::select('CALL procGetEmployeeCertificate(?)', [$certificateId]);
+
 
         if ($certificate == null) {
             return response()->json([
@@ -65,10 +65,11 @@ class CertificateController extends Controller
             ], 404);
         }
 
-        DB::table('tblemployeecertificate')->where('id', $certificateId)->update([
-            'name' => $validated['name'],
-            'issued_by' => $validated['issuedBy'],
-            'issued_date' => $validated['issuedDate'],
+        DB::select('CALL procUpdateEmployeeCertificateByID(?, ?, ?, ?)', [
+            $certificateId,
+            $request->name,
+            $request->issuedBy,
+            $request->issuedDate
         ]);
 
         return response()->json([
@@ -81,7 +82,7 @@ class CertificateController extends Controller
      */
     public function destroy(string $id, string $certificateId)
     {
-        $certificate = DB::table('tblemployeecertificate')->where('id', $certificateId)->first();
+        $certificate = DB::select('CALL procGetEmployeeCertificate(?)', [$certificateId])[0] ?? null;
 
         if ($certificate == null) {
             return response()->json([
@@ -89,7 +90,7 @@ class CertificateController extends Controller
             ], 404);
         }
 
-        DB::table('tblemployeecertificate')->where('id', $certificateId)->delete();
+        DB::select('CALL procDeleteEmployeeCertificateByID(?)', [$certificateId]);
         return response()->json([
             'message' => 'Certificate deleted successfully'
         ]);
