@@ -11,9 +11,8 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-
         // TODO: paginate all
-        $users = DB::table('tbluser')->where('status', "ACTIVE")->get(["username", "RoleID"]);
+        $users = DB::select('CALL procGetUsers()');
         // TODO: populate role names
         return response()->json($users, 200);
     }
@@ -27,11 +26,11 @@ class UserController extends Controller
             'employeeId' => "required|exists:tblemployee,id"
         ]);
 
-        DB::table('tbluser')->insert([
-            'username' => $validated["username"],
-            'password' => Hash::make($validated["password"]),
-            'EmployeeID' => $validated["employeeId"],
-            'RoleID' => $validated["role"],
+        DB::select('CALL procInsertUser(?, ?, ?, ?)', [
+            $validated["username"],
+            Hash::make($validated["password"]),
+            $validated["role"],
+            $validated["employeeId"],
         ]);
 
         return response()->json([
@@ -54,10 +53,10 @@ class UserController extends Controller
             ], 401);
         }
 
-        DB::table('tbluser')->where('id', $request->user()->id)->update([
-            'password' => Hash::make($validated['newPassword'])
+        DB::select('CALL procChangePassword(?, ?)', [
+            $request->user()->id,
+            Hash::make($validated['newPassword'])
         ]);
-
 
         return response()->json([
             'message' => 'Password changed successfully',
@@ -71,13 +70,10 @@ class UserController extends Controller
             'user_id' => 'required|exists:tbluser,id'
         ]);
 
-        DB::table('tbluser')->where('id', $validated['user_id'])->update([
-            'status' => "INACTIVE"
-        ]);
+        DB::select('CALL procDeleteUserByID(?)', [$validated['user_id']]);
 
         return response()->json([
             'message' => 'User deleted successfully'
         ]);
     }
-
 }
