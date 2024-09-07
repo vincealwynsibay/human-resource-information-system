@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreWorkShiftRequest;
 use App\Http\Requests\UpdateWorkShiftRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
 class WorkShiftController extends Controller
@@ -15,7 +14,7 @@ class WorkShiftController extends Controller
      */
     public function index()
     {
-        $workShifts = DB::table('tblworkshift')->get();
+        $workShifts = DB::select('CALL procGetWorkShifts()');
         return response()->json($workShifts);
     }
 
@@ -33,20 +32,19 @@ class WorkShiftController extends Controller
             "end_time2" => "nullable|date_format:H:i|after:start_time2"
         ]);
 
-        DB::table('tblworkshift')->insert([
-            'name' => $validated['name'],
-            'hours_per_day' => $validated['hours_per_day'],
-            'start_time1' => $validated['start_time1'],
-            'end_time1' => $validated['end_time1'],
-            'start_time2' => $request->start_time2,
-            'end_time2' => $request->end_time2,
+        DB::select('CALL procInsertWorkShift(?, ?, ?, ?, ?, ?)', [
+            $validated['name'],
+            $validated['hours_per_day'],
+            $validated['start_time1'],
+            $validated['end_time1'],
+            $request->start_time2,
+            $request->end_time2
         ]);
 
         return response()->json([
             'message' => 'New Work Shift created successfully'
         ], 201);
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -62,7 +60,7 @@ class WorkShiftController extends Controller
             "end_time2" => "nullable|date_format:H:i|after:start_time2"
         ]);
 
-        $workShift = DB::table("tblworkshift")->find($id);
+        $workShift = DB::select('CALL procGetWorkShift(?)', [$id])[0] ?? null;
 
         if ($workShift == null) {
             return response()->json([
@@ -72,13 +70,14 @@ class WorkShiftController extends Controller
             ], 404);
         }
 
-        DB::table('tblworkshift')->where('id', $id)->update([
-            'name' => $validated['name'],
-            'hours_per_day' => $validated['hours_per_day'],
-            'start_time1' => $validated['start_time1'],
-            'end_time1' => $validated['end_time1'],
-            'start_time2' => $request->start_time2,
-            'end_time2' => $request->end_time2
+        DB::select('CALL procUpdateWorkShiftByID(?, ?, ?, ?, ?, ?, ?)', [
+            $id,
+            $validated['name'],
+            $validated['hours_per_day'],
+            $validated['start_time1'],
+            $validated['end_time1'],
+            $request->start_time2,
+            $request->end_time2
         ]);
 
         return response()->json([
@@ -91,7 +90,7 @@ class WorkShiftController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $workShift = DB::table("tblworkshift")->find($id);
+        $workShift = DB::select('CALL procGetWorkShift(?)', [$id])[0] ?? null;
 
         if ($workShift == null) {
             return response()->json([
@@ -101,7 +100,7 @@ class WorkShiftController extends Controller
             ], 404);
         }
 
-        DB::table('tblworkshift')->where('id', $id)->delete();
+        DB::select('CALL procDeleteWorkShiftByID(?)', [$id]);
 
         return response()->json([
             'message' => "Work Shift deleted successfully"
