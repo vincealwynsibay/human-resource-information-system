@@ -16,14 +16,13 @@ class SalaryController extends Controller
      */
     public function getSalaryByEmployee(string $employeeId)
     {
-        // $employee = Employee::find($employeeId);
-        $employee = DB::table('tblemployee')->where("id", $employeeId);
+        $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
 
         if (!$employee) {
             return response()->json(['message' => 'Employee not found'], 404);
         }
 
-        $salary = DB::table('tblbasicsalary')->where("EmployeeID", $employeeId)->whereNull('is_deleted')->first();
+        $salary = DB::select('CALL procGetEmployeeSalary(?)', [$employeeId])[0] ?? null;
 
         return response()->json($salary, 200);
     }
@@ -31,57 +30,54 @@ class SalaryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $employeeId)
     {
         $validated = $request->validate([
-            'employeeId' => 'required|exists:tblemployee,id',
             'paygradeId' => 'required',
             'amount' => 'required|numeric',
             'change_reason' => 'nullable'
         ]);
 
-        $paygrade = DB::table('tblpaygrade')->where('id', $validated['paygradeId'])->first();
+        $paygrade = DB::select('CALL procGetPayGrade(?)', [$request->paygradeId])[0] ?? null;
 
         if ($paygrade == null) {
             return response()->json(['message' => 'Paygrade not found'], 404);
         }
 
-        if ($paygrade->min_salary > $validated['amount'] || $paygrade->max_salary < $validated['amount']) {
+        if ($paygrade->min_salary >= $request->amount || $paygrade->max_salary <= $request->amount) {
             return response()->json(['message' => 'Amount is not within the paygrade range'], 400);
         }
 
-
-        $salary = DB::table('tblbasicsalary')->where('EmployeeID', $validated['employeeId'])->first();
+        $salary = DB::select('CALL procGetEmployeeSalary(?)', [$employeeId])[0] ?? null;
 
         if ($salary == null) {
-            DB::table('tblbasicsalary')->insert([
-                'EmployeeID' => $validated['employeeId'],
-                'PayGradeID' => $validated['paygradeId'],
-                'amount' => $validated['amount'],
-                'change_reason' => 'Starting Salary'
+            DB::select('CALL procInsertEmployeeSalary(?, ?, ?, ?)', [
+                $employeeId,
+                $request->paygradeId,
+                $request->amount,
+                'Starting Salary'
             ]);
         } else {
-            // invalidate the old salary
-            DB::table('tblbasicsalary')->where(['EmployeeID', $validated['employeeId']])->update([
-                'is_deleted' => Date::now()
+            DB::select('CALL procUpdateEmployeeSalaryByID(?, ?)', [
+                $employeeId,
+                Date::now()
             ]);
         }
 
-        DB::table('tblbasicsalary')->insert([
-            'EmployeeID' => $validated['employeeId'],
-            'PayGradeID' => $validated['paygradeId'],
-            'amount' => $validated['amount'],
-            'change_reason' => $validated['change_reason']
+        DB::select('CALL procInsertEmployeeSalary(?, ?, ?, ?)', [
+            $employeeId,
+            $request->paygradeId,
+            $request->amount,
+            $request->change_reason
         ]);
 
         return response()->json(['message' => 'Salary created'], 201);
     }
 
-
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $employeeId, string $salaryId)
     {
         $validated = $request->validate([
             'paygradeId' => 'nullable',
@@ -89,21 +85,21 @@ class SalaryController extends Controller
             'change_reason' => 'nullable'
         ]);
 
-        $paygrade = DB::table('tblpaygrade')->where('id', $validated['paygradeId'])->first();
+        $paygrade = DB::select('CALL procGetPayGrade(?)', [$request->paygradeId])[0] ?? null;
 
         if ($paygrade == null) {
             return response()->json(['message' => 'Paygrade not found'], 404);
         }
 
-        if ($paygrade->min_salary > $validated['amount'] || $paygrade->max_salary < $validated['amount']) {
+        if ($paygrade->min_salary >= $request->amount || $paygrade->max_salary <= $request->amount) {
             return response()->json(['message' => 'Amount is not within the paygrade range'], 400);
         }
 
-        DB::table('tblbasicsalary')->where('id', $id)->whereNull('is_deleted')->update([
-            'EmployeeID' => $validated['employeeId'],
-            'PayGradeID' => $validated['paygradeId'],
-            'amount' => $validated['amount'],
-            'change_reason' => $validated['change_reason']
+        DB::select('CALL procUpdateEmployeeSalaryByID(?, ?, ?, ?)', [
+            $salaryId,
+            $request->paygradeId,
+            $request->amount,
+            $request->change_reason
         ]);
 
         return response()->json(['message' => 'Salary updated'], 200);
@@ -114,9 +110,7 @@ class SalaryController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::table('tblbasicsalary')->where('id', $id)->whereNull('is_deleted')->update([
-            'is_deleted' => Date::now()
-        ]);
+        DB::select('CALL procDeleteEmployeeSalaryByID(?)', [$id]);
 
         return response()->json(['message' => 'Salary deleted'], 200);
     }

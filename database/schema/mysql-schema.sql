@@ -1070,7 +1070,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procDeleteEmployeeSalaryByID`(p_id INT)
 BEGIN
-                UPDATE tblsalary
+                UPDATE tblbasicsalary
                     SET is_deleted = 1
                 WHERE id = p_id;
                 END ;;
@@ -1940,7 +1940,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeSalary`(p_employeeId INT)
 BEGIN
-                SELECT * FROM tblsalary WHERE EmployeeID = p_employeeId AND is_deleted = 0;
+                SELECT * FROM tblbasicsalary WHERE EmployeeID = p_employeeId AND is_deleted = 0;
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2844,14 +2844,14 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeSalary`(p_employeeId INT, p_payGradeId INT, p_amount DECIMAL(10,2), p_changeReason VARCHAR(255))
 BEGIN
             DECLARE oldSalaryId INT;
-                SET oldSalaryId = (SELECT id FROM tblsalary WHERE EmployeeID = p_employeeId AND is_deleted = 0);
+                SET oldSalaryId = (SELECT id FROM tblbasicsalary WHERE EmployeeID = p_employeeId AND is_deleted = 0);
                 IF oldSalaryId IS NOT NULL THEN
-                    UPDATE tblsalary
+                    UPDATE tblbasicsalary
                         SET is_deleted = 1
                     WHERE id = oldSalaryId;
                 END IF;
 
-                INSERT INTO tblsalary (EmployeeID, PayGradeID, amount, change_reason)
+                INSERT INTO tblbasicsalary (EmployeeID, PayGradeID, amount, change_reason)
                 VALUES (p_employeeId, p_payGradeId, p_amount, p_changeReason);
                 END ;;
 DELIMITER ;
@@ -3529,11 +3529,11 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateEmployeeSalaryByID`(p_id INT, p_payGradeId INT, p_amount DECIMAL(10,2), p_changeReason VARCHAR(255))
 BEGIN
-            UPDATE tblsalary
+            UPDATE tblbasicsalary
                     SET
                         payGradeId = IFNULL(p_payGradeId, payGradeId),
                         amount = IFNULL(p_amount, amount),
-                        changeReason = IFNULL(p_changeReason, changeReason)
+                        change_reason = IFNULL(p_changeReason, change_reason)
                 WHERE id = p_id;
                 END ;;
 DELIMITER ;

@@ -14,6 +14,7 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\OvertimeController;
+use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayrollItemController;
 use App\Http\Controllers\PayrollController;
@@ -189,6 +190,12 @@ Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'ro
     Route::delete('/{id}', [EmployeeController::class, 'destroy']);
     Route::get('/{employeeId}/attendance', [AttendanceController::class, 'getEmployeeAttendanceRecords']);
     Route::get('/{employeeId}/attendanceSummary', [AttendanceController::class, 'getAttendanceEmployeeSummary']);
+
+    Route::get('/{id}/salary', [SalaryController::class, 'getSalaryByEmployee']);
+    Route::post('/{id}/salary', [SalaryController::class, 'store']);
+    Route::put('/{id}/salary/{salaryId}', [SalaryController::class, 'update']);
+    Route::delete('/{id}/salary/{salaryId}', [SalaryController::class, 'destroy']);
+
 });
 
 // Route::group(['prefix' => 'supervisor/employee', 'middleware' => ['auth:sanctum', 'role:supervisor']], function () {
@@ -233,6 +240,9 @@ Route::group(['prefix' => '/employee', 'middleware' => ['auth:sanctum', 'role:em
 
     Route::get('/{employeeId}/downloadDtr', [DownloadDTRController::class, '__invoke']);
 
+
+    // salary
+    Route::get('/{id}/salary', [SalaryController::class, 'getSalaryByEmployee']);
 });
 
 
