@@ -26,48 +26,37 @@ class EmployeeController extends Controller
         ]);
 
 
-        $sortOrder = $validated['sortOrder'] ?? "desc";
-        $sortField = $validated['sortField'] ?? "id";
+        $sortOrder = $request->sortOrder ?? "desc";
+        $sortField = $request->sortField ?? "id";
 
 
         $employees = [];
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            $employees = DB::table('tblemployee')
-                ->join('tblemployeesupervisor', 'tblemployee.id', '=', 'tblemployeesupervisor.SubordinateID')
-                ->where('tblemployeesupervisor.SupervisorID', $request->user()->EmployeeID)
-                ->when($request->name, function ($query, $name) {
-                    return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
-                })
-                ->when($request->employmentStatus, function ($query, $employmentStatus) {
-                    return $query->where('EmploymentStatusID', $employmentStatus);
-                })
-                ->when($request->jobTitle, function ($query, $jobTitle) {
-                    return $query->where('JobTitleID', $jobTitle);
-                })
-                ->when($request->department, function ($query, $department) {
-                    return $query->where('DepartmentID', $department);
-                })
-                ->orderBy($sortField, $sortOrder)
-                ->get();
+            // call procGetEmployeesAsSuperVisor
+            $employees = DB::select("CALL procGetEmployeesAsSuperVisor(?, ?, ?, ?, ?, ?, ?, ?)", [
+                $request->user()->EmployeeID,
+                $request->id,
+                $request->name,
+                $request->employmentStatus,
+                $request->jobTitle,
+                $request->department,
+                $sortField,
+                $sortOrder,
+                NULL
+            ]);
+
         } else {
-            $employees = DB::table('tblemployee')
-                ->when($request->id, function ($query, $id) {
-                    return $query->where('id', $id);
-                })
-                ->when($request->name, function ($query, $name) {
-                    return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
-                })
-                ->when($request->employmentStatus, function ($query, $employmentStatus) {
-                    return $query->where('EmploymentStatusID', $employmentStatus);
-                })
-                ->when($request->jobTitle, function ($query, $jobTitle) {
-                    return $query->where('JobTitleID', $jobTitle);
-                })
-                ->when($request->department, function ($query, $department) {
-                    return $query->where('DepartmentID', $department);
-                })
-                ->orderBy($sortField, $sortOrder)
-                ->get();
+            // call procGetEmployees
+            $employees = DB::select("CALL procGetEmployees(?, ?, ?, ?, ?, ?, ?, ?)", [
+                $request->id,
+                $request->name,
+                $request->employmentStatus,
+                $request->jobTitle,
+                $request->department,
+                $sortField,
+                $sortOrder,
+                NULL
+            ]);
         }
 
 
@@ -88,12 +77,10 @@ class EmployeeController extends Controller
             'middlename' => "nullable|string|max:100",
         ]);
 
-        DB::table('tblemployee')->insert([
-            'firstname' => $validated['firstname'],
-            'lastname' => $validated['lastname'],
-            'middlename' => $validated['middlename'],
-            'joined_date' => Date::now()
-
+        DB::select('call procInsertEmployee(?,?,?)', [
+            $request->firstname,
+            $request->lastname,
+            $request->middlename
         ]);
 
         return response()->json([
@@ -108,10 +95,10 @@ class EmployeeController extends Controller
     {
 
 
-        $employee = DB::table("tblemployee")->find($id);
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
@@ -149,7 +136,7 @@ class EmployeeController extends Controller
             ], 400);
         }
 
-        $employee = DB::table("tblemployee")->find($id);
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -158,10 +145,7 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table('tblemployeesupervisor')->insert([
-            'SupervisorID' => $validated['supervisor'],
-            'SubordinateID' => $employee->id
-        ]);
+        DB::select('CALL procAssignSupervisor(?,?)', [$request->supervisor, $employee->id]);
 
         return response()->json([
             'message' => "Supervisor assigned successfully"
@@ -175,6 +159,7 @@ class EmployeeController extends Controller
         ]);
 
         $employee = DB::table("tblemployee")->find($id);
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
 
         if ($employee == null) {
             return response()->json([
@@ -184,7 +169,7 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table('tblemployeesupervisor')->where('SupervisorID', $validated['supervisor'])->where('SubordinateID', $employee->id)->delete();
+        DB::select('CALL procRemoveSupervisor(?,?)', [$request->supervisor, $employee->id]);
 
         return response()->json([
             'message' => "Supervisor removed successfully"
@@ -197,11 +182,10 @@ class EmployeeController extends Controller
             'workShift' => "required|exists:tblworkshift,id"
         ]);
 
-        $employee = DB::table("tblemployee")->find($id);
-
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
@@ -222,10 +206,7 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployeeworkshift")->insert([
-            'EmployeeID' => $id,
-            'WorkShiftID' => $validated["workShift"]
-        ]);
+        DB::select('CALL procAssignWorkShift(?,?)', [$employee->id, $request->workShift]);
 
         return response()->json([
             'message' => "Work Shift assigned successfully"

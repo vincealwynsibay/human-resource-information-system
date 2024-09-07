@@ -1839,6 +1839,40 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `procGetEmployees` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb3 */ ;
+/*!50003 SET character_set_results = utf8mb3 */ ;
+/*!50003 SET collation_connection  = utf8mb3_general_ci */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployees`(p_id INT, p_name VARCHAR(200), p_employmentStatus INT, p_jobTitle INT, p_department INT, p_sortField VARCHAR(50), p_sortOrder VARCHAR(5), p_status VARCHAR(50))
+BEGIN
+            DECLARE sortOrder VARCHAR(5);
+            DECLARE sortField VARCHAR(5); 
+            SET sortOrder = COALESCE(p_sortOrder, "desc");
+            SET sortField = COALESCE(p_sortField, "id");
+
+            SELECT * FROM tblemployee
+                WHERE
+                        (p_id IS NOT NULL OR tblemployee.id = p_id)
+                    AND (p_name IS NOT NULL OR CONCAT(tblemployee.firstname, " ", tblemployee.lastname) = p_name)
+                    AND (p_employmentStatus IS NOT NULL OR tblemployee.EmploymentStatusID = p_employmentStatus)
+                    AND (p_jobTitle IS NOT NULL OR tblemployee.JobTitleID = p_jobTitle)
+                    AND (p_department IS NOT NULL OR tblemployee.DepartmentID = p_department)
+                    AND (p_status IS NOT NULL OR tblemployee.status = p_status)
+                ORDER BY 
+                        CASE WHEN sortOrder="ASC" THEN sortField END ASC,
+                        CASE WHEN sortOrder="DESC" THEN sortField END DESC;
+                END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `procGetEmployeeSalary` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -2632,8 +2666,8 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployee`(p_firstname VARCHAR(100), p_lastname VARCHAR(100), p_middlename VARCHAR(100))
 BEGIN
-                INSERT INTO tblemployee (firstname, lastname, middlename)
-                VALUES (p_firstname, p_lastname, p_middlename);
+                INSERT INTO tblemployee (firstname, lastname, middlename, joined_date)
+                VALUES (p_firstname, p_lastname, p_middlename, NOW());
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
