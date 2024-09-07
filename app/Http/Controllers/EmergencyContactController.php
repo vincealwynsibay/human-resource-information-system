@@ -12,7 +12,7 @@ class EmergencyContactController extends Controller
      */
     public function index($employeeId)
     {
-        $employee = DB::table('tblemployee')->where('id', $employeeId)->first();
+        $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
 
         if ($employee == null) {
             return response()->json([
@@ -20,7 +20,7 @@ class EmergencyContactController extends Controller
             ], 404);
         }
 
-        $emergencyContacts = DB::table('tblemergencycontact')->where('employeeId', $employeeId)->get();
+        $emergencyContacts = DB::select('CALL procGetEmployeeEmergencyContacts(?)', [$employeeId]);
         return response()->json($emergencyContacts);
     }
 
@@ -36,18 +36,16 @@ class EmergencyContactController extends Controller
             'email' => 'required|email'
         ]);
 
-        $emergencyContactId = DB::table('tblemergencycontact')->insertGetId([
-            'employeeId' => $employeeId,
-            'name' => $validated['name'],
-            'relationship' => $validated['relationship'],
-            'mobile_no' => $validated['mobile_no'],
-            'email' => $validated['email']
+        DB::select('CALL procInsertEmployeeEmergencyContact(?, ?, ?, ?, ?)', [
+            $employeeId,
+            $validated['name'],
+            $validated['relationship'],
+            $validated['mobile_no'],
+            $validated['email']
         ]);
 
-        $emergencyContact = DB::table('tblemergencycontact')->where('id', $emergencyContactId)->first();
-        return response()->json($emergencyContact, 201);
+        return response()->json("New Emergency Contact has been added to Employee", 201);
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -61,7 +59,7 @@ class EmergencyContactController extends Controller
             'email' => 'nullable|email'
         ]);
 
-        $emergencyContact = DB::table('tblemergencycontact')->where('id', $emergencyContactId)->first();
+        $emergencyContact = DB::select('CALL procGetEmployeeEmergencyContact(?)', [$emergencyContactId])[0] ?? null;
 
         if ($emergencyContact == null) {
             return response()->json([
@@ -69,11 +67,12 @@ class EmergencyContactController extends Controller
             ], 404);
         }
 
-        DB::table('tblemergencycontact')->where('id', $emergencyContactId)->update([
-            'name' => $validated['name'],
-            'relationship' => $validated['relationship'],
-            'mobile_no' => $validated['mobile_no'],
-            'email' => $validated['email']
+        DB::select('CALL procUpdateEmployeeEmergencyContactByID(?, ?, ?, ?, ?)', [
+            $emergencyContactId,
+            $validated['name'],
+            $validated['relationship'],
+            $validated['mobile_no'],
+            $validated['email']
         ]);
 
         return response()->json([
@@ -86,7 +85,7 @@ class EmergencyContactController extends Controller
      */
     public function destroy(string $id, string $emergencyContactId)
     {
-        $emergencyContact = DB::table('tblemergencycontact')->where('id', $emergencyContactId)->first();
+        $emergencyContact = DB::select('CALL procGetEmployeeEmergencyContact(?)', [$emergencyContactId])[0] ?? null;
 
         if ($emergencyContact == null) {
             return response()->json([
@@ -94,7 +93,7 @@ class EmergencyContactController extends Controller
             ], 404);
         }
 
-        DB::table('tblemergencycontact')->where('id', $emergencyContactId)->delete();
+        DB::select('CALL procDeleteEmployeeEmergencyContactByID(?)', [$emergencyContactId]);
         return response()->json([
             'message' => 'Emergency contact deleted'
         ]);
