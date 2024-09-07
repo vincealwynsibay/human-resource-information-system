@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Department;
 use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use Illuminate\Http\Request;
@@ -15,7 +14,7 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        $departments = DB::table('tbldepartment')->get();
+        $departments = DB::select('CALL procGetDepartments()');
         return response()->json($departments);
     }
 
@@ -28,8 +27,8 @@ class DepartmentController extends Controller
             "name" => "required|string|max:45"
         ]);
 
-        DB::table('tbldepartment')->insert([
-            'name' => $validated['name']
+        DB::select('CALL procInsertDepartment(?)', [
+            $validated['name']
         ]);
 
         return response()->json([
@@ -46,7 +45,7 @@ class DepartmentController extends Controller
             'name' => 'required|string|max:45'
         ]);
 
-        $department = DB::table("tbldepartment")->find($id);
+        $department = DB::select('CALL procGetDepartment(?)', [$id])[0] ?? null;
 
         if ($department == null) {
             return response()->json([
@@ -56,8 +55,9 @@ class DepartmentController extends Controller
             ], 404);
         }
 
-        DB::table('tbldepartment')->where('id', $id)->update([
-            'name' => $validated['name']
+        DB::select('CALL procUpdateDepartmentByID(?, ?)', [
+            $id,
+            $validated['name']
         ]);
 
         return response()->json([
@@ -70,7 +70,7 @@ class DepartmentController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        $department = DB::table("tbldepartment")->find($id);
+        $department = DB::select('CALL procGetDepartment(?)', [$id])[0] ?? null;
 
         if ($department == null) {
             return response()->json([
@@ -80,7 +80,7 @@ class DepartmentController extends Controller
             ], 404);
         }
 
-        DB::table('tbldepartment')->where('id', $id)->delete();
+        DB::select('CALL procDeleteDepartmentByID(?)', [$id]);
 
         return response()->json([
             'message' => "Department deleted successfully"
