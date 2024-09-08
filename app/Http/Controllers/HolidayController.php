@@ -12,7 +12,7 @@ class HolidayController extends Controller
      */
     public function index()
     {
-        $holidays = DB::table('tblholiday')->get();
+        $holidays = DB::select('CALL procGetHolidays()');
         return response()->json($holidays);
     }
 
@@ -25,14 +25,14 @@ class HolidayController extends Controller
             'name' => 'required|string|max:100',
             'date' => 'required|date',
             'is_full_day' => 'required|integer|between:0,2',
-            'recurring' => 'required|boolean'
+            'is_recurring' => 'required|boolean'
         ]);
 
-        DB::table('tblholiday')->insert([
-            'name' => $validated['name'],
-            'date' => $validated['date'],
-            'is_full_day' => $validated['is_full_day'],
-            'recurring' => $validated['recurring']
+        DB::select('CALL procInsertHoliday(?, ?, ?, ?)', [
+            $validated['name'],
+            $validated['date'],
+            $validated['is_full_day'],
+            $validated['is_recurring']
         ]);
 
         return response()->json([
@@ -49,10 +49,10 @@ class HolidayController extends Controller
             'name' => 'required|string|max:100',
             'date' => 'required|date',
             'is_full_day' => 'required|boolean',
-            'recurring' => 'required|boolean'
+            'is_recurring' => 'required|boolean'
         ]);
 
-        $holiday = DB::table('tblholiday')->find($id);
+        $holiday = DB::select('CALL procGetHoliday(?)', [$id])[0] ?? null;
 
         if ($holiday == null) {
             return response()->json([
@@ -62,11 +62,12 @@ class HolidayController extends Controller
             ], 404);
         }
 
-        DB::table('tblholiday')->where('id', $id)->update([
-            'name' => $validated['name'],
-            'date' => $validated['date'],
-            'is_full_day' => $validated['is_full_day'],
-            'recurring' => $validated['recurring']
+        DB::select('CALL procUpdateHolidayByID(?, ?, ?, ?, ?)', [
+            $id,
+            $validated['name'],
+            $validated['date'],
+            $validated['is_full_day'],
+            $validated['is_recurring']
         ]);
 
         return response()->json([
@@ -79,7 +80,7 @@ class HolidayController extends Controller
      */
     public function destroy(string $id)
     {
-        $holiday = DB::table('tblholiday')->find($id);
+        $holiday = DB::select('CALL procGetHoliday(?)', [$id])[0] ?? null;
 
         if ($holiday == null) {
             return response()->json([
@@ -89,7 +90,7 @@ class HolidayController extends Controller
             ], 404);
         }
 
-        DB::table('tblholiday')->where('id', $id)->delete();
+        DB::select('CALL procDeleteHolidayByID(?)', [$id]);
 
         return response()->json([
             'message' => 'Holiday deleted successfully'
