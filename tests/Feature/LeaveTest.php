@@ -117,6 +117,7 @@ test('update leave as employee', function () {
         'reason' => 'sick',
         'status' => 'PENDING',
         'no_of_days' => 1,
+        'date_created' => now(),
     ]);
 
     $response = $this->put('/api/leave/' . $leaveId, [
@@ -141,8 +142,80 @@ test('delete leave as employee', function () {
         'reason' => 'sick',
         'status' => 'PENDING',
         'no_of_days' => 1,
+        'date_created' => now(),
     ]);
 
     $response = $this->delete('/api/leave/' . $leaveId);
+    $response->assertStatus(200);
+});
+
+// approve leave
+test('approve leave as admin', function () {
+    $user = User::factory()->create([
+        'RoleID' => 1
+    ]);
+    $this->actingAs($user);
+
+    // insert leave type entitlemtn
+    DB::table('tblleaveentitlement')->insert([
+        'EmployeeID' => 1,
+        'LeaveTypeID' => 1,
+        'entitlement' => 10,
+        'days_used' => 0,
+        'valid_from' => '2021-01-01',
+        'valid_to' => '2021-12-31',
+        'date_created' => now(),
+    ]);
+
+    $leaveId = DB::table('tblleave')->insertGetId([
+        'EmployeeID' => 1,
+        'LeaveTypeID' => 1,
+        'start_date' => '2021-01-01',
+        'end_date' => '2021-01-01',
+        'reason' => 'sick',
+        'status' => 'PENDING',
+        'no_of_days' => 1,
+        'date_created' => now(),
+    ]);
+
+    $response = $this->post('/api/leave/approve', [
+        'leaveId' => $leaveId
+    ]);
+
+    $response->assertStatus(200);
+});
+
+// reject leave
+test('reject leave as admin', function () {
+    $user = User::factory()->create([
+        'RoleID' => 1
+    ]);
+    $this->actingAs($user);
+
+    // insert leave type entitlemtn
+    DB::table('tblleaveentitlement')->insert([
+        'EmployeeID' => 1,
+        'LeaveTypeID' => 1,
+        'entitlement' => 10,
+        'days_used' => 0,
+        'valid_from' => '2021-01-01',
+        'valid_to' => '2021-12-31',
+        'date_created' => now(),
+    ]);
+
+    $leaveId = DB::table('tblleave')->insertGetId([
+        'EmployeeID' => 1,
+        'LeaveTypeID' => 1,
+        'start_date' => '2021-01-01',
+        'end_date' => '2021-01-01',
+        'reason' => 'sick',
+        'status' => 'PENDING',
+        'no_of_days' => 1,
+        'date_created' => now(),
+    ]);
+
+    $response = $this->post('/api/leave/reject', [
+        'leaveId' => $leaveId
+    ]);
     $response->assertStatus(200);
 });
