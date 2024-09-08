@@ -13,7 +13,6 @@ class OvertimeController extends Controller
 
     public function index(Request $request)
     {
-
         $validated = $request->validate([
             'employeeId' => 'nullable|exists:tblemployee,id',
             'date' => 'nullable|date',
@@ -21,37 +20,22 @@ class OvertimeController extends Controller
         ]);
 
         if ($request->user()->RoleID == RoleEnum::EMPLOYEE) {
-            $assignedEmployees = DB::table('tblovertime')
-                ->join('tblemployee', 'tblovertime.EmployeeID', '=', 'tblemployee.id')
-                ->join('tblemployeesupervisor', 'tblemployeesupervisor.SubordinateID', '=', 'tblemployee.id')
-                ->where('tblemployeesupervisor.SupervisorID', $request->user()->EmployeeID)
-                ->when($request->employeeId, function ($query, $employeeId) {
-                    return $query->where('EmployeeID', $employeeId);
-                })
-                ->when($request->date, function ($query, $date) {
-                    return $query->whereDate('requested_date', '==', $date);
-                })
-                ->when($request->status, function ($query, $status) {
-                    return $query->where('status', $status);
-                })
-                ->get();
+            $overtimeRequests = DB::select('CALL procGetEmployeeOvertimesAsSupervisor(?, ?, ?, ?)', [
+                $request->user()->EmployeeID,
+                $request->employeeId,
+                $request->date,
+                $request->status
+            ]);
         } else {
-            $overtimeRequests = DB::table('tblovertime')
-                ->when($request->employeeId, function ($query, $employeeId) {
-                    return $query->where('EmployeeID', $employeeId);
-                })
-                ->when($request->date, function ($query, $date) {
-                    return $query->whereDate('requested_date', '==', $date);
-                })
-                ->when($request->status, function ($query, $status) {
-                    return $query->where('status', $status);
-                })
-                ->get();
+            $overtimeRequests = DB::select('CALL procGetEmployeeOvertimes(?, ?, ?)', [
+                $request->employeeId,
+                $request->date,
+                $request->status
+            ]);
         }
 
         return response()->json($overtimeRequests);
     }
-
 
     public function getOwnOvertime(Request $request)
     {
@@ -60,14 +44,12 @@ class OvertimeController extends Controller
             'status' => 'nullable|string',
         ]);
 
-        $overtimes = DB::table('tblovertime')->where('EmployeeID', $request->user()->EmployeeID)
-            ->when($request->date, function ($query, $date) {
-                return $query->whereDate('requested_date', '==', $date);
-            })
-            ->when($request->status, function ($query, $status) {
-                return $query->where('status', $status);
-            })
-            ->get();
+        $overtimes = DB::select('CALL procGetEmployeeOvertimeByDate(?, ?, ?)', [
+            $request->user()->EmployeeID,
+            $request->date,
+            $request->status
+        ]);
+
         return response()->json($overtimes);
     }
 
@@ -75,60 +57,51 @@ class OvertimeController extends Controller
     {
         $validated = $request->validate([
             'employeeId' => 'required|exists:tblemployee,id',
-            'duration' => 'required|numeric',
-            'date' => 'required|date',
             'reason' => 'required|string',
+            'duration' => 'required|numeric',
+            'requestedDate' => 'required|date',
         ]);
 
+        $requestedDate = Date::createFromFormat('Y-m-d', $request->requestedDate);
 
-        // no of days between start and end date
-        $requestedDate = Date::createFromFormat('Y-m-d', $validated['date']);
-
-        $overtime = DB::table('tblovertime')->insert([
-            'EmployeeID' => $validated['employeeId'],
-            'requested_date' => $requestedDate,
-            'reason' => $validated['reason'],
-            'duration' => $validated['duration'],
-            'status' => OvertimeRequestEnum::PENDING,
+        DB::select('CALL procApplyForOvertime(?, ?, ?, ?)', [
+            $request->employeeId,
+            $request->duration,
+            $requestedDate,
+            $request->reason,
         ]);
 
-        return response()->json($overtime);
+        return response()->json(['message' => 'Overtime request submitted successfully']);
     }
-
 
     public function approveOvertime(Request $request)
     {
-        // TODO: APPROVED BY
         $validated = $request->validate([
             'overtimeId' => 'required|exists:tblovertime,id',
         ]);
 
-        DB::table('tblovertime')->where('id', $validated['overtimeId'])->update([
-            'status' => OvertimeRequestEnum::APPROVED,
+        DB::select('CALL procApproveOvertime(?, ?)', [
+            $request->overtimeId,
+            $request->user()->EmployeeID
         ]);
 
-        $overtime = DB::table('tblovertime')->where('id', $validated['overtimeId'])->first();
 
-        return response()->json($overtime);
+        return response()->json("Overtime request approved");
     }
+
     public function rejectOvertime(Request $request)
     {
         $validated = $request->validate([
             'overtimeId' => 'required|exists:tblovertime,id',
         ]);
 
-        DB::table('tblovertime')->where('id', $validated['overtimeId'])->update([
-            'status' => OvertimeRequestEnum::REJECTED,
+        DB::select('CALL procRejectOvertime(?)', [
+            $request->overtimeId
         ]);
 
-        $overtime = DB::table('tblovertime')->where('id', $validated['overtimeId'])->first();
-
-        return response()->json($overtime);
+        return response()->json("Overtime request rejected");
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
@@ -137,20 +110,20 @@ class OvertimeController extends Controller
             'reason' => 'required|string',
         ]);
 
-        $overtime = DB::table('tblovertime')->where('id', $id)->update([
-            'requested_date' => $validated['requestedDate'],
-            'reason' => $validated['reason'],
+        DB::select('CALL procUpdateOvertimeByID(?, ?, ?, ?)', [
+            $id,
+            $request->duration,
+            $request->requestedDate,
+            $request->reason
         ]);
 
-        return response()->json($overtime);
+        return response()->json(['message' => 'Overtime updated successfully']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        $overtime = DB::table('tblovertime')->where('id', $id)->delete();
-        return response()->json($overtime);
+        DB::select('CALL procDeleteOvertimeByID(?)', [$id]);
+
+        return response()->json(['message' => 'Overtime deleted successfully']);
     }
 }
