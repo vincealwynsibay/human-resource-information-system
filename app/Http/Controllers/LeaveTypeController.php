@@ -12,7 +12,7 @@ class LeaveTypeController extends Controller
      */
     public function index()
     {
-        $leaveTypes = DB::table('tblleavetype')->get();
+        $leaveTypes = DB::select('CALL procGetLeaveTypes()');
         return response()->json($leaveTypes);
     }
 
@@ -25,8 +25,8 @@ class LeaveTypeController extends Controller
             "name" => "required|string|max:50"
         ]);
 
-        DB::table('tblleavetype')->insert([
-            'name' => $validated['name']
+        DB::select('CALL procInsertLeaveType(?)', [
+            $validated['name']
         ]);
 
         return response()->json([
@@ -43,7 +43,7 @@ class LeaveTypeController extends Controller
             'name' => 'required|string|max:50'
         ]);
 
-        $leaveType = DB::table("tblleavetype")->find($id);
+        $leaveType = DB::select('CALL procGetLeaveType(?)', [$id])[0] ?? null;
 
         if ($leaveType == null) {
             return response()->json([
@@ -53,8 +53,9 @@ class LeaveTypeController extends Controller
             ], 404);
         }
 
-        DB::table('tblleavetype')->where('id', $id)->update([
-            'name' => $validated['name']
+        DB::select('CALL procUpdateLeaveTypeByID(?, ?)', [
+            $id,
+            $validated['name']
         ]);
 
         return response()->json([
@@ -67,7 +68,7 @@ class LeaveTypeController extends Controller
      */
     public function destroy(string $id)
     {
-        $leaveType = DB::table("tblleavetype")->find($id);
+        $leaveType = DB::select('CALL procGetLeaveType(?)', [$id])[0] ?? null;
 
         if ($leaveType == null) {
             return response()->json([
@@ -77,7 +78,7 @@ class LeaveTypeController extends Controller
             ], 404);
         }
 
-        DB::table('tblleavetype')->where('id', $id)->delete();
+        DB::select('CALL procDeleteLeaveTypeByID(?)', [$id]);
 
         return response()->json([
             'message' => "Leave Type deleted successfully"
