@@ -76,17 +76,17 @@ class LeaveController extends Controller
         ]);
 
         // no of days between start and end date
-        $startDate = Date::createFromFormat('Y-m-d', $validated['startDate']);
-        $endDate = Date::createFromFormat('Y-m-d', $validated['endDate']);
+        $startDate = Date::createFromFormat('Y-m-d', $request->startDate);
+        $endDate = Date::createFromFormat('Y-m-d', $request->endDate);
 
         // if leave type null means unpaid leave
         if ($request->leaveType == null) {
             DB::select('CALL procApplyForLeave(?, ?, ?, ?, ?, ?, ?)', [
-                $validated['employeeId'],
+                $request->employeeId,
                 null,
-                $validated['startDate'],
-                $validated['endDate'],
-                $validated['reason'],
+                $request->startDate,
+                $request->endDate,
+                $request->reason,
                 LeaveRequestEnum::PENDING,
                 $startDate->diffInDays($endDate)
             ]);
@@ -94,7 +94,7 @@ class LeaveController extends Controller
             return response()->json(['message' => 'Leave applied successfully']);
         }
 
-        $leaveType = DB::select('CALL procGetLeaveType(?)', [$validated['leaveType']])[0] ?? null;
+        $leaveType = DB::select('CALL procGetLeaveType(?)', [$request->leaveType])[0] ?? null;
 
         if ($leaveType == null) {
             return response()->json(['error' => 'Leave Type not found'], 400);
@@ -102,8 +102,8 @@ class LeaveController extends Controller
 
         // check if have leave entitlement for leave type
         $leaveEntitlement = DB::select('CALL procGetEmployeeLeaveEntitlementsByLeaveType(?, ?)', [
-            $validated['employeeId'],
-            $validated['leaveType']
+            $request->employeeId,
+            $request->leaveType
         ])[0] ?? null;
 
         if (!$leaveEntitlement) {
@@ -116,11 +116,11 @@ class LeaveController extends Controller
         }
 
         DB::select('CALL procApplyForLeave(?, ?, ?, ?, ?, ?, ?)', [
-            $validated['employeeId'],
-            $validated['leaveType'],
-            $validated['startDate'],
-            $validated['endDate'],
-            $validated['reason'],
+            $request->employeeId,
+            $request->leaveType,
+            $request->startDate,
+            $request->endDate,
+            $request->reason,
             LeaveRequestEnum::PENDING->value,
             $startDate->diffInDays($endDate)
         ]);
@@ -135,17 +135,21 @@ class LeaveController extends Controller
         ]);
 
         DB::select('CALL procApproveLeave(?, ?)', [
-            $validated['leaveId'],
+            $request->leaveId,
             $request->user()->EmployeeID
         ]);
 
-        $leave = DB::select('CALL procGetLeave(?)', [$validated['leaveId']])[0] ?? null;
+        $leave = DB::select('CALL procGetLeave(?)', [$request->leaveId])[0] ?? null;
 
         // get leave entitlement and update days used
         $leaveEntitlement = DB::select('CALL procGetEmployeeLeaveEntitlementsByLeaveType(?, ?)', [
             $leave->EmployeeID,
             $leave->LeaveTypeID
         ])[0] ?? null;
+
+        if (!$leaveEntitlement) {
+            return response()->json(['error' => 'Leave Type not allowed. No leave entitlement'], 400);
+        }
 
         DB::select('CALL procUpdateLeaveEntitlementDaysUsed(?, ?)', [
             $leaveEntitlement->id,
@@ -161,7 +165,10 @@ class LeaveController extends Controller
             'leaveId' => 'required|exists:tblleave,id',
         ]);
 
-        DB::select('CALL procRejectLeave(?)', [$validated['leaveId']]);
+        DB::select('CALL procRejectLeave(?, ?)', [
+            $request->leaveId,
+            $request->user()->EmployeeID
+        ]);
 
         return response()->json(['message' => 'Leave rejected successfully']);
     }
@@ -179,9 +186,9 @@ class LeaveController extends Controller
 
         DB::select('CALL procUpdateLeaveByID(?, ?, ?, ?)', [
             $id,
-            $validated['startDate'],
-            $validated['endDate'],
-            $validated['reason']
+            $request->startDate,
+            $request->endDate,
+            $request->reason
         ]);
 
         return response()->json(['message' => 'Leave updated successfully']);

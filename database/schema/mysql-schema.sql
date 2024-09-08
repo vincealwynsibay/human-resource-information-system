@@ -392,16 +392,16 @@ CREATE TABLE `tblleave` (
   `reason` varchar(255) NOT NULL,
   `date_created` datetime NOT NULL,
   `status` varchar(50) DEFAULT 'PENDING',
-  `approval_date` datetime DEFAULT NULL,
-  `approvedBy` int DEFAULT NULL,
+  `reviewed_date` datetime DEFAULT NULL,
+  `ReviewerID` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
   KEY `LeaveTypeID` (`LeaveTypeID`),
   KEY `LeavePeriodRange` (`start_date`,`end_date`) COMMENT 'start and end query',
-  KEY `approvedBy` (`approvedBy`),
+  KEY `ReviewerID` (`ReviewerID`),
   CONSTRAINT `tblleave_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
   CONSTRAINT `tblleave_ibfk_2` FOREIGN KEY (`LeaveTypeID`) REFERENCES `tblleavetype` (`id`),
-  CONSTRAINT `tblleave_ibfk_3` FOREIGN KEY (`approvedBy`) REFERENCES `tblemployee` (`id`)
+  CONSTRAINT `tblleave_ibfk_3` FOREIGN KEY (`ReviewerID`) REFERENCES `tblemployee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblleaveentitlement`;
@@ -454,11 +454,15 @@ CREATE TABLE `tblovertime` (
   `status` varchar(50) DEFAULT NULL,
   `date_created` datetime NOT NULL,
   `requested_date` datetime NOT NULL,
-  `approval_date` datetime DEFAULT NULL,
+  `reviewed_date` datetime DEFAULT NULL,
+  `ReviewerID` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `requested_date` (`requested_date`),
   KEY `EmployeeID` (`EmployeeID`),
-  CONSTRAINT `tblovertime_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`)
+  KEY `ReviewerID` (`ReviewerID`),    
+  CONSTRAINT `tblovertime_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
+  CONSTRAINT `tblovertime_ibfk_2` FOREIGN KEY (`ReviewerID`) REFERENCES `tblemployee` (`id`)
+
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblpaygrade`;
@@ -773,12 +777,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procApplyForOvertime`(
                 IN p_employeeId INT, 
                 IN p_duration DECIMAL(5, 2), 
                 IN p_date DATE, 
-                IN p_reason TEXT, 
-                IN p_status VARCHAR(50)
+                IN p_reason TEXT
             )
 BEGIN
                 INSERT INTO tblovertime (EmployeeID, duration, requested_date, reason, status, date_created)
-                VALUES (p_employeeId, p_duration, p_date, p_reason, p_status, NOW());
+                VALUES (p_employeeId, p_duration, p_date, p_reason, "PENDING", NOW());
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -795,12 +798,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procApproveLeave`(IN p_id INT, IN p_approver INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procApproveLeave`(IN p_id INT, IN p_reviewer INT)
 BEGIN
                 UPDATE tblleave
                     SET status = "APPROVED",
-                        date_approved = NOW(),
-                        ApproverID = p_approver
+                        reviewed_date = NOW(),
+                        ReviewerID = p_reviewer
                 WHERE id = p_id;
             END ;;
 DELIMITER ;
@@ -820,13 +823,13 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procApproveOvertime`(
                 IN p_id INT, 
-                IN p_approver INT
+                IN p_reviewer INT
             )
 BEGIN
                 UPDATE tblovertime
                     SET status = "APPROVED",
-                        approved_date = NOW(),
-                        ApproverID = p_approver
+                        reviewed_date = NOW(),
+                        ReviewerID = p_reviewer
                 WHERE id = p_id;
             END ;;
 DELIMITER ;
@@ -1796,14 +1799,15 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeOvertimeByDate`(
                 IN p_employeeId INT, 
-                IN p_date DATE
+                IN p_date DATE,
+                IN p_status VARCHAR(50)
             )
 BEGIN
                 SELECT * FROM tblovertime
                     WHERE
                         tblovertime.EmployeeID = p_employeeId AND
-                        tblovertime.requested_date = p_date AND
-                        tblovertime.status = "APPROVED";
+                        (p_date IS NULL OR tblovertime.requested_date = p_date) AND
+                        (p_status IS NULL OR tblovertime.status = p_status);
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3147,10 +3151,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procRejectLeave`(IN p_id INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procRejectLeave`(IN p_id INT, IN p_reviewer INT)
 BEGIN
                 UPDATE tblleave
-                    SET status = "REJECTED"
+                    SET status = "REJECTED",
+                        reviewed_date = NOW(),
+                        ReviewerID = p_reviewer
                 WHERE id = p_id;
             END ;;
 DELIMITER ;
@@ -3168,11 +3174,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procRejectOvertime`(IN p_id INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procRejectOvertime`(IN p_id INT, IN p_reviewer INT)
 BEGIN
                 UPDATE tblovertime
                     SET status = "REJECTED",
-                        approved_date = NOW()
+                        reviewed_date = NOW(),
+                        ReviewerID = p_reviewer
                 WHERE id = p_id;
             END ;;
 DELIMITER ;

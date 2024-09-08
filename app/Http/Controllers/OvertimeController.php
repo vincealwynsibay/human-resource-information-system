@@ -95,8 +95,9 @@ class OvertimeController extends Controller
             'overtimeId' => 'required|exists:tblovertime,id',
         ]);
 
-        DB::select('CALL procRejectOvertime(?)', [
-            $request->overtimeId
+        DB::select('CALL procRejectOvertime(?, ?)', [
+            $request->overtimeId,
+            $request->user()->EmployeeID
         ]);
 
         return response()->json("Overtime request rejected");
