@@ -14,6 +14,7 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\LeaveEntitlementController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\OvertimeController;
+use App\Http\Controllers\PayGradeController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PayrollItemController;
@@ -52,6 +53,14 @@ Route::group(['prefix' => 'workweek', 'middleware' => ['auth:sanctum', 'role:adm
         ]);
     });
     Route::put('/', [WorkWeekController::class, 'update']);
+});
+
+
+Route::group(['prefix' => 'paygrade', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
+    Route::get('/', [PayGradeController::class, 'index']);
+    Route::post('/', [PayGradeController::class, 'store']);
+    Route::put('/{id}', [PayGradeController::class, 'update']);
+    Route::delete('/{id}', [PayGradeController::class, 'destroy']);
 });
 
 Route::group(['prefix' => 'department', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
