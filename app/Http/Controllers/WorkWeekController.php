@@ -8,10 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 class WorkWeekController extends Controller
 {
-
     public function index(Request $request)
     {
-        $workWeek = DB::table('tblworkweek')->first();
+        $workWeek = DB::select('CALL procGetWorkWeek()')[0] ?? null;
         return response()->json([
             'mon' => DayLengthEnum::from($workWeek->mon)->value,
             'tue' => DayLengthEnum::from($workWeek->tue)->value,
@@ -22,6 +21,7 @@ class WorkWeekController extends Controller
             'sun' => DayLengthEnum::from($workWeek->sun)->value,
         ]);
     }
+
     public function update(Request $request)
     {
         $validated = $request->validate([
@@ -34,19 +34,28 @@ class WorkWeekController extends Controller
             'sun' => 'required|integer|min:0|max:2',
         ]);
 
-        $workWeek = DB::table('tblworkweek')->first();
+        $workWeek = DB::select('CALL procGetWorkWeek()')[0] ?? null;
         if ($workWeek) {
-            DB::table('tblworkweek')->where('id', $workWeek->id)->update([
-                'mon' => DayLengthEnum::from($validated['mon'])->value,
-                'tue' => DayLengthEnum::from($validated['tue'])->value,
-                'wed' => DayLengthEnum::from($validated['wed'])->value,
-                'thu' => DayLengthEnum::from($validated['thu'])->value,
-                'fri' => DayLengthEnum::from($validated['fri'])->value,
-                'sat' => DayLengthEnum::from($validated['sat'])->value,
-                'sun' => DayLengthEnum::from($validated['sun'])->value,
+            DB::select('CALL procUpdateWorkWeek(?, ?, ?, ?, ?, ?, ?, ?)', [
+                $workWeek->id,
+                DayLengthEnum::from($validated['mon'])->value,
+                DayLengthEnum::from($validated['tue'])->value,
+                DayLengthEnum::from($validated['wed'])->value,
+                DayLengthEnum::from($validated['thu'])->value,
+                DayLengthEnum::from($validated['fri'])->value,
+                DayLengthEnum::from($validated['sat'])->value,
+                DayLengthEnum::from($validated['sun'])->value,
             ]);
         } else {
-            DB::table('tblworkweek')->insert($validated);
+            DB::select('CALL procInsertWorkWeek(?, ?, ?, ?, ?, ?, ?)', [
+                DayLengthEnum::from($validated['mon'])->value,
+                DayLengthEnum::from($validated['tue'])->value,
+                DayLengthEnum::from($validated['wed'])->value,
+                DayLengthEnum::from($validated['thu'])->value,
+                DayLengthEnum::from($validated['fri'])->value,
+                DayLengthEnum::from($validated['sat'])->value,
+                DayLengthEnum::from($validated['sun'])->value,
+            ]);
         }
 
         return response()->json(['message' => 'Work week updated successfully']);
