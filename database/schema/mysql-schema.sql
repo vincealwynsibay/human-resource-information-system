@@ -364,7 +364,7 @@ CREATE TABLE `tblholiday` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   `date` date DEFAULT NULL,
-  `recurring` tinyint NOT NULL DEFAULT '0' COMMENT 'every year or not',
+  `is_recurring` tinyint NOT NULL DEFAULT '0' COMMENT 'every year or not',
   `is_full_day` tinyint DEFAULT '0' COMMENT 'full day / half day',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

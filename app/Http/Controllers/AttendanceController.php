@@ -509,7 +509,7 @@ class AttendanceController extends Controller
 
                     // check if there is a holiday on the date, if there is, do not record as absence
                     $holiday = DB::table('tblholiday')->where('date', $currentDate)->first();
-                    $recurringHoliday = DB::table('tblholiday')->where('recurring', true)->whereRaw('MONTH(date) = ?', [Date::parse($currentDate)->format('m')])->whereRaw('DAY(date) = ?', [Date::parse($currentDate)->format('d')])->first();
+                    $recurringHoliday = DB::table('tblholiday')->where('is_recurring', true)->whereRaw('MONTH(date) = ?', [Date::parse($currentDate)->format('m')])->whereRaw('DAY(date) = ?', [Date::parse($currentDate)->format('d')])->first();
 
 
                     if ($holiday != null || $recurringHoliday) {
