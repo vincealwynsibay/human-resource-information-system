@@ -163,12 +163,13 @@ Route::group(['prefix' => 'leave', 'middleware' => ['auth:sanctum', 'role:employ
 
 Route::group(['prefix' => 'leave', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::get('/', [LeaveController::class, 'index']);
-    Route::put('/approve', [LeaveController::class, 'approveLeave']);
-    Route::put('/reject', [LeaveController::class, 'rejectLeave']);
+    Route::post('/approve', [LeaveController::class, 'approveLeave']);
+    Route::post('/reject', [LeaveController::class, 'rejectLeave']);
 });
 
 
 Route::group(['prefix' => 'overtime', 'middleware' => ['auth:sanctum', 'role:employee']], function () {
+    Route::get('/', [OvertimeController::class, 'index']);
     Route::get('/me', [OvertimeController::class, 'getOwnOvertime']);
     Route::post('/', [OvertimeController::class, 'applyForOvertime']);
     Route::put('/{id}', [OvertimeController::class, 'update']);
@@ -176,9 +177,8 @@ Route::group(['prefix' => 'overtime', 'middleware' => ['auth:sanctum', 'role:emp
 });
 
 Route::group(['prefix' => 'overtime', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
-    Route::get('/', [OvertimeController::class, 'index']);
-    Route::put('/approve', [OvertimeController::class, 'approveOvertime']);
-    Route::put('/reject', [OvertimeController::class, 'rejectOvertime']);
+    Route::post('/approve', [OvertimeController::class, 'approveOvertime']);
+    Route::post('/reject', [OvertimeController::class, 'rejectOvertime']);
 });
 
 Route::group(['prefix' => 'admin/employee', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
