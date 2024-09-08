@@ -1687,8 +1687,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeLeaveEntitlements`(
             )
 BEGIN
                 SELECT * FROM tblleaveentitlement
+                    INNER JOIN tblemployee ON tblleaveentitlement.EmployeeID = tblemployee.id
                     WHERE
-                        (p_name IS NULL OR CONCAT(p_firstname, " ", p_lastname) = p_name) AND
+                        (p_name IS NULL OR CONCAT(tblemployee.firstname, " ", tblemployee.lastname) = p_name) AND
                         (p_leaveTypeId IS NULL OR tblleaveentitlement.LeaveTypeID = p_leaveTypeId) AND
                         (p_leaveValidFrom IS NULL OR tblleaveentitlement.valid_from >= p_leaveValidFrom) AND
                         (p_leaveValidTo IS NULL OR tblleaveentitlement.valid_to <= p_leaveValidTo);

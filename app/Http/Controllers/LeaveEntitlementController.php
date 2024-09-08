@@ -20,20 +20,12 @@ class LeaveEntitlementController extends Controller
             "leaveValidTo" => "nullable|date",
         ]);
 
-        $leaveEntitlements = DB::table('tblleaveentitlement')
-            ->when($request->name, function ($query, $name) {
-                return $query->whereLike(DB::raw("CONCAT(`firstname`, ' ', `lastname`)"), $name);
-            })
-            ->when($request->leaveTypeId, function ($query, $leaveTypeId) {
-                return $query->where('LeaveTypeID', $leaveTypeId);
-            })
-            ->when($request->leaveValidFrom, function ($query, $leaveValidFrom) {
-                return $query->whereDate('valid_from', ">=", $leaveValidFrom);
-            })
-            ->when($request->leaveValidTo, function ($query, $leaveValidTo) {
-                return $query->whereDate('valid_to', "<=", $leaveValidTo);
-            })
-            ->get();
+        $leaveEntitlements = DB::select('CALL procGetEmployeeLeaveEntitlements(?, ?, ?, ?)', [
+            $request->name,
+            $request->leaveTypeId,
+            $request->leaveValidFrom,
+            $request->leaveValidTo
+        ]);
 
         return response()->json($leaveEntitlements);
     }
@@ -42,11 +34,10 @@ class LeaveEntitlementController extends Controller
     {
         $user = $request->user();
 
-        $leaveEntitlements = DB::table('tblleaveentitlement')->where('EmployeeID', $user->EmployeeID)->get();
+        $leaveEntitlements = DB::select('CALL procGetUserLeaveEntitlements(?)', [$user->EmployeeID]);
 
         return response()->json($leaveEntitlements);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -61,17 +52,15 @@ class LeaveEntitlementController extends Controller
             'validTo' => 'nullable|date',
         ]);
 
-
-        $id = DB::table('tblleaveentitlement')->insert([
-            'EmployeeID' => $request->employeeId,
-            'LeaveTypeID' => $request->leaveTypeId,
-            'entitlement' => $request->entitlement,
-            'valid_from' => $request->validFrom,
-            'valid_to' => $request->validTo,
-            'date_created' => now(),
+        DB::select('CALL procInsertLeaveEntitlement(?, ?, ?, ?, ?)', [
+            $request->employeeId,
+            $request->leaveTypeId,
+            $request->entitlement,
+            $request->validFrom,
+            $request->validTo
         ]);
 
-        return response()->json(['message' => "Leave entitlement created successfully", 'id' => $id]);
+        return response()->json(['message' => "Leave entitlement created successfully"]);
     }
 
     public function storeMany(Request $request)
@@ -85,19 +74,19 @@ class LeaveEntitlementController extends Controller
             'leaveEntitlements.*.validTo' => 'nullable|date',
         ]);
 
-        DB::table('tblleaveentitlement')->insert(array_map(function ($leaveEntitlement) use ($request) {
-            return [
-                'EmployeeID' => $request->employeeId,
-                'LeaveTypeID' => $leaveEntitlement['leaveTypeId'],
-                'entitlement' => $leaveEntitlement['entitlement'],
-                'valid_from' => $leaveEntitlement['validFrom'],
-                'valid_to' => $leaveEntitlement['validTo'],
-                'date_created' => Date::now(),
-            ];
-        }, $request->leaveEntitlements));
+        foreach ($request->leaveEntitlements as $leaveEntitlement) {
+            DB::select('CALL procInsertLeaveEntitlement(?, ?, ?, ?, ?)', [
+                $request->employeeId,
+                $leaveEntitlement['leaveTypeId'],
+                $leaveEntitlement['entitlement'],
+                $leaveEntitlement['validFrom'],
+                $leaveEntitlement['validTo']
+            ]);
+        }
 
         return response()->json(['message' => "Leave entitlements assigned successfully"]);
     }
+
     public function assignLeaveEntitlements(Request $request)
     {
         $validated = $request->validate([
@@ -111,16 +100,15 @@ class LeaveEntitlementController extends Controller
         ]);
 
         foreach ($request->employeeIds as $employeeId) {
-            DB::table('tblleaveentitlement')->insert(array_map(function ($leaveEntitlement) use ($employeeId) {
-                return [
-                    'EmployeeID' => $employeeId,
-                    'LeaveTypeID' => $leaveEntitlement['leaveTypeId'],
-                    'entitlement' => $leaveEntitlement['entitlement'],
-                    'valid_from' => $leaveEntitlement['validFrom'],
-                    'valid_to' => $leaveEntitlement['validTo'],
-                    'date_created' => Date::now(),
-                ];
-            }, $request->leaveEntitlements));
+            foreach ($request->leaveEntitlements as $leaveEntitlement) {
+                DB::select('CALL procAssignLeaveEntitlement(?, ?, ?, ?, ?)', [
+                    $employeeId,
+                    $leaveEntitlement['leaveTypeId'],
+                    $leaveEntitlement['entitlement'],
+                    $leaveEntitlement['validFrom'],
+                    $leaveEntitlement['validTo']
+                ]);
+            }
         }
 
         return response()->json(['message' => "Leave entitlements assigned successfully"]);
@@ -137,10 +125,12 @@ class LeaveEntitlementController extends Controller
             'validTo' => 'nullable|date',
         ]);
 
-        DB::table('tblleaveentitlement')->where('id', $id)->update([
-            'entitlement' => $request->entitlement,
-            'valid_from' => $request->validFrom,
-            'valid_to' => $request->validTo,
+        DB::select('CALL procUpdateLeaveEntitlementByID(?, ?, ?, ?, ?)', [
+            $id,
+            $request->leaveTypeId,
+            $request->entitlement,
+            $request->validFrom,
+            $request->validTo
         ]);
 
         return response()->json(['message' => "Leave entitlement updated successfully"]);
@@ -152,20 +142,20 @@ class LeaveEntitlementController extends Controller
             'daysUsed' => 'required|numeric',
         ]);
 
-        DB::table('tblleaveentitlement')->where('id', $id)->update([
-            'days_used' => $request->daysUsed,
+        DB::select('CALL procUpdateLeaveEntitlementDaysUsed(?, ?)', [
+            $id,
+            $request->daysUsed
         ]);
 
         return response()->json(['message' => "Leave days used updated successfully"]);
     }
-
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        DB::table('tblleaveentitlement')->where('id', $id)->delete();
+        DB::select('CALL procDeleteLeaveEntitlementByID(?)', [$id]);
 
         return response()->json(['message' => "Leave entitlement deleted successfully"]);
     }
