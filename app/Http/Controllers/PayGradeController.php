@@ -9,8 +9,7 @@ class PayGradeController extends Controller
 {
     public function index(Request $request)
     {
-        $payGrades = DB::table('tblpaygrade')->get();
-
+        $payGrades = DB::select('CALL procGetPayGrades()');
         return response()->json($payGrades, 200);
     }
 
@@ -23,17 +22,17 @@ class PayGradeController extends Controller
             'max_salary' => 'required|numeric|gt:min_salary',
         ]);
 
-        $payGrade = DB::table('tblpaygrade')->where('name', $validated['name'])->first();
+        $payGrade = DB::select('CALL procGetPayGradeByName(?)', [$validated['name']])[0] ?? null;
 
         if ($payGrade) {
             return response()->json(['message' => 'Paygrade already exists'], 400);
         }
 
-        DB::table('tblpaygrade')->insert([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'min_salary' => $validated['min_salary'],
-            'max_salary' => $validated['max_salary'],
+        DB::select('CALL procInsertPayGrade(?, ?, ?, ?)', [
+            $validated['name'],
+            $validated['description'],
+            $validated['min_salary'],
+            $validated['max_salary']
         ]);
 
         return response()->json(['message' => 'Paygrade created'], 201);
@@ -48,26 +47,32 @@ class PayGradeController extends Controller
             'max_salary' => 'nullable|numeric|gt:min_salary',
         ]);
 
-        $payGrade = DB::table('tblpaygrade')->where('id', $id)->first();
+        $payGrade = DB::select('CALL procGetPayGrade(?)', [$id])[0] ?? null;
 
         if (!$payGrade) {
             return response()->json(['message' => 'Paygrade not found'], 404);
         }
 
-        DB::table('tblpaygrade')->where('id', $id)->update($validated);
+        DB::select('CALL procUpdatePayGradeByID(?, ?, ?, ?, ?)', [
+            $id,
+            $validated['name'],
+            $validated['description'],
+            $validated['min_salary'],
+            $validated['max_salary']
+        ]);
 
         return response()->json(['message' => 'Paygrade updated'], 200);
     }
 
     public function destroy(Request $request, string $id)
     {
-        $payGrade = DB::table('tblpaygrade')->where('id', $id)->first();
+        $payGrade = DB::select('CALL procGetPayGrade(?)', [$id])[0] ?? null;
 
         if (!$payGrade) {
             return response()->json(['message' => 'Paygrade not found'], 404);
         }
 
-        DB::table('tblpaygrade')->where('id', $id)->delete();
+        DB::select('CALL procDeletePayGradeByID(?)', [$id]);
 
         return response()->json(['message' => 'Paygrade deleted'], 200);
     }
