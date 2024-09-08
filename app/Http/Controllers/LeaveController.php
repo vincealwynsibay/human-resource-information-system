@@ -24,46 +24,23 @@ class LeaveController extends Controller
         ]);
 
         if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
-            $leaveRequests = DB::table('tblleave')
-                ->join('tblemployee', 'tblleave.EmployeeID', '=', 'tblemployee.id')
-                ->join('tblemployeesupervisor', 'tblemployeesupervisor.SubordinateID', '=', 'tblemployee.id')
-                ->where('tblemployeesupervisor.SupervisorID', $request->user()->EmployeeID)
-                ->when($request->employeeId, function ($query, $employeeId) {
-                    return $query->where('EmployeeID', $employeeId);
-                })
-                ->when($request->fromDate, function ($query, $fromDate) {
-                    return $query->whereDate('start_date', '>=', $fromDate);
-                })
-                ->when($request->toDate, function ($query, $toDate) {
-                    return $query->whereDate('end_date', '<=', $toDate);
-                })
-                ->when($request->status, function ($query, $status) {
-                    return $query->where('status', $status);
-                })
-                ->when($request->leaveType, function ($query, $leaveType) {
-                    return $query->where('LeaveTypeID', $leaveType);
-                })
-                ->get();
+            $leaveRequests = DB::select('CALL procGetEmployeeLeavesAsSupervisor(?, ?, ?, ?, ?, ?)', [
+                $request->user()->EmployeeID,
+                $request->employeeId,
+                $request->leaveType,
+                $request->fromDate,
+                $request->toDate,
+                $request->status
+            ]);
         } else {
-            $leaveRequests = DB::table('tblleave')
-                ->when($request->employeeId, function ($query, $employeeId) {
-                    return $query->where('EmployeeID', $employeeId);
-                })
-                ->when($request->fromDate, function ($query, $fromDate) {
-                    return $query->whereDate('start_date', '>=', $fromDate);
-                })
-                ->when($request->toDate, function ($query, $toDate) {
-                    return $query->whereDate('end_date', '<=', $toDate);
-                })
-                ->when($request->status, function ($query, $status) {
-                    return $query->where('status', $status);
-                })
-                ->when($request->leaveType, function ($query, $leaveType) {
-                    return $query->where('LeaveTypeID', $leaveType);
-                })
-                ->get();
+            $leaveRequests = DB::select('CALL procGetEmployeeLeavesAsAdmin(?, ?, ?, ?, ?)', [
+                $request->employeeId,
+                $request->leaveType,
+                $request->fromDate,
+                $request->toDate,
+                $request->status
+            ]);
         }
-
 
         return response()->json($leaveRequests);
     }
@@ -77,23 +54,16 @@ class LeaveController extends Controller
             'leaveType' => 'nullable|exists:tblleavetype,id',
         ]);
 
-        $leaves = DB::table('tblleave')->where('EmployeeID', $request->user()->EmployeeID)
-            ->when($request->fromDate, function ($query, $fromDate) {
-                return $query->whereDate('start_date', '>=', $fromDate);
-            })
-            ->when($request->toDate, function ($query, $toDate) {
-                return $query->whereDate('end_date', '<=', $toDate);
-            })
-            ->when($request->status, function ($query, $status) {
-                return $query->where('status', $status);
-            })
-            ->when($request->leaveType, function ($query, $leaveType) {
-                return $query->where('LeaveTypeID', $leaveType);
-            })
-            ->get();
+        $leaves = DB::select('CALL procGetOwnEmployeeLeaves(?, ?, ?, ?, ?)', [
+            $request->user()->EmployeeID,
+            $request->leaveType,
+            $request->fromDate,
+            $request->toDate,
+            $request->status
+        ]);
+
         return response()->json($leaves);
     }
-
 
     public function applyForLeave(Request $request)
     {
@@ -105,56 +75,57 @@ class LeaveController extends Controller
             'reason' => 'required|string',
         ]);
 
-
         // no of days between start and end date
         $startDate = Date::createFromFormat('Y-m-d', $validated['startDate']);
         $endDate = Date::createFromFormat('Y-m-d', $validated['endDate']);
 
         // if leave type null means unpaid leave
         if ($request->leaveType == null) {
-            $leave = DB::table('tblleave')->insert([
-                'EmployeeID' => $validated['employeeId'],
-                'LeaveTypeID' => null,
-                'start_date' => $validated['startDate'],
-                'end_date' => $validated['endDate'],
-                'reason' => $validated['reason'],
-                'status' => LeaveRequestEnum::PENDING,
-                'no_of_days' => $startDate->diffInDays($endDate),
+            DB::select('CALL procApplyForLeave(?, ?, ?, ?, ?, ?, ?)', [
+                $validated['employeeId'],
+                null,
+                $validated['startDate'],
+                $validated['endDate'],
+                $validated['reason'],
+                LeaveRequestEnum::PENDING,
+                $startDate->diffInDays($endDate)
             ]);
 
-            return response()->json($leave);
+            return response()->json(['message' => 'Leave applied successfully']);
         }
 
-        $leaveType = DB::table('tblleavetype')->where('id', $validated['leaveType'])->first();
+        $leaveType = DB::select('CALL procGetLeaveType(?)', [$validated['leaveType']])[0] ?? null;
 
         if ($leaveType == null) {
             return response()->json(['error' => 'Leave Type not found'], 400);
         }
 
-        // TODO: SETUP FOR DEFAULT LEAVE ENTITLEMENT
         // check if have leave entitlement for leave type
-        $leaveEntitlement = DB::table('tblleaveentitlement')->where('EmployeeID', $validated['employeeId'])->where('LeaveTypeID', $validated['leaveType'])->first();
+        $leaveEntitlement = DB::select('CALL procGetEmployeeLeaveEntitlementsByLeaveType(?, ?)', [
+            $validated['employeeId'],
+            $validated['leaveType']
+        ])[0] ?? null;
+
         if (!$leaveEntitlement) {
             return response()->json(['error' => 'Leave Type not allowed. No leave entitlement'], 400);
         }
 
         // check if leave is valid, based on entitlement
-        $leaveEntitlement = DB::table('tblleaveentitlement')->where('EmployeeID', $validated['employeeId'])->where('LeaveTypeID', $validated['leaveType'])->first();
         if (($leaveEntitlement->entitlement - $leaveEntitlement->days_used) < $startDate->diffInDays($endDate)) {
             return response()->json(['error' => 'Not enough leave days left'], 400);
         }
 
-        $leave = DB::table('tblleave')->insert([
-            'EmployeeID' => $validated['employeeId'],
-            'LeaveTypeID' => $validated['leaveType'],
-            'start_date' => $validated['startDate'],
-            'end_date' => $validated['endDate'],
-            'reason' => $validated['reason'],
-            'status' => LeaveRequestEnum::PENDING,
-            'no_of_days' => $startDate->diffInDays($endDate),
+        DB::select('CALL procApplyForLeave(?, ?, ?, ?, ?, ?, ?)', [
+            $validated['employeeId'],
+            $validated['leaveType'],
+            $validated['startDate'],
+            $validated['endDate'],
+            $validated['reason'],
+            LeaveRequestEnum::PENDING->value,
+            $startDate->diffInDays($endDate)
         ]);
 
-        return response()->json($leave);
+        return response()->json(['message' => 'Leave applied successfully']);
     }
 
     public function approveLeave(Request $request)
@@ -163,16 +134,23 @@ class LeaveController extends Controller
             'leaveId' => 'required|exists:tblleave,id',
         ]);
 
-        DB::table('tblleave')->where('id', $validated['leaveId'])->update([
-            'status' => LeaveRequestEnum::APPROVED,
+        DB::select('CALL procApproveLeave(?, ?)', [
+            $validated['leaveId'],
+            $request->user()->EmployeeID
         ]);
 
-        $leave = DB::table('tblleave')->where('id', $validated['leaveId'])->first();
+        $leave = DB::select('CALL procGetLeave(?)', [$validated['leaveId']])[0] ?? null;
 
         // get leave entitlement and update days used
-        $leaveEntitlement = DB::table('tblleaveentitlement')->where('EmployeeID', $leave->EmployeeID)->where('LeaveTypeID', $leave->LeaveTypeID)->first();
-        $leaveEntitlement->days_used += $leave->no_of_days;
-        $leaveEntitlement->save();
+        $leaveEntitlement = DB::select('CALL procGetEmployeeLeaveEntitlementsByLeaveType(?, ?)', [
+            $leave->EmployeeID,
+            $leave->LeaveTypeID
+        ])[0] ?? null;
+
+        DB::select('CALL procUpdateLeaveEntitlementDaysUsed(?, ?)', [
+            $leaveEntitlement->id,
+            $leaveEntitlement->days_used + $leave->no_of_days
+        ]);
 
         return response()->json($leave);
     }
@@ -183,11 +161,9 @@ class LeaveController extends Controller
             'leaveId' => 'required|exists:tblleave,id',
         ]);
 
-        $leave = DB::table('tblleave')->where('id', $validated['leaveId'])->update([
-            'status' => LeaveRequestEnum::REJECTED,
-        ]);
+        DB::select('CALL procRejectLeave(?)', [$validated['leaveId']]);
 
-        return response()->json($leave);
+        return response()->json(['message' => 'Leave rejected successfully']);
     }
 
     /**
@@ -196,18 +172,19 @@ class LeaveController extends Controller
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'startDate' => 'required|date',
-            'endDate' => 'required|date',
-            'reason' => 'required|string',
+            'startDate' => 'nullable|date',
+            'endDate' => 'nullable|date',
+            'reason' => 'nullable|string',
         ]);
 
-        $leave = DB::table('tblleave')->where('id', $id)->update([
-            'start_date' => $validated['startDate'],
-            'end_date' => $validated['endDate'],
-            'reason' => $validated['reason'],
+        DB::select('CALL procUpdateLeaveByID(?, ?, ?, ?)', [
+            $id,
+            $validated['startDate'],
+            $validated['endDate'],
+            $validated['reason']
         ]);
 
-        return response()->json($leave);
+        return response()->json(['message' => 'Leave updated successfully']);
     }
 
     /**
@@ -215,7 +192,7 @@ class LeaveController extends Controller
      */
     public function destroy(string $id)
     {
-        $leave = DB::table('tblleave')->where('id', $id)->delete();
-        return response()->json($leave);
+        DB::select('CALL procDeleteLeaveByID(?)', [$id]);
+        return response()->json(['message' => 'Leave deleted successfully']);
     }
 }
