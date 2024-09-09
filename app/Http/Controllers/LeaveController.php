@@ -81,14 +81,15 @@ class LeaveController extends Controller
 
         // if leave type null means unpaid leave
         if ($request->leaveType == null) {
-            DB::select('CALL procApplyForLeave(?, ?, ?, ?, ?, ?, ?)', [
+            DB::select('CALL procApplyForLeave(?, ?, ?, ?, ?, ?, ?, ?)', [
                 $request->employeeId,
                 null,
                 $request->startDate,
                 $request->endDate,
                 $request->reason,
                 LeaveRequestEnum::PENDING,
-                $startDate->diffInDays($endDate)
+                $startDate->diffInDays($endDate),
+                Date::now()
             ]);
 
             return response()->json(['message' => 'Leave applied successfully']);
@@ -115,14 +116,15 @@ class LeaveController extends Controller
             return response()->json(['error' => 'Not enough leave days left'], 400);
         }
 
-        DB::select('CALL procApplyForLeave(?, ?, ?, ?, ?, ?, ?)', [
+        DB::select('CALL procApplyForLeave(?, ?, ?, ?, ?, ?, ?, ?)', [
             $request->employeeId,
             $request->leaveType,
             $request->startDate,
             $request->endDate,
             $request->reason,
             LeaveRequestEnum::PENDING->value,
-            $startDate->diffInDays($endDate)
+            $startDate->diffInDays($endDate),
+            Date::now()
         ]);
 
         return response()->json(['message' => 'Leave applied successfully']);
@@ -134,9 +136,10 @@ class LeaveController extends Controller
             'leaveId' => 'required|exists:tblleave,id',
         ]);
 
-        DB::select('CALL procApproveLeave(?, ?)', [
+        DB::select('CALL procApproveLeave(?, ?, ?)', [
             $request->leaveId,
-            $request->user()->EmployeeID
+            $request->user()->EmployeeID,
+            Date::now()
         ]);
 
         $leave = DB::select('CALL procGetLeave(?)', [$request->leaveId])[0] ?? null;
@@ -165,9 +168,10 @@ class LeaveController extends Controller
             'leaveId' => 'required|exists:tblleave,id',
         ]);
 
-        DB::select('CALL procRejectLeave(?, ?)', [
+        DB::select('CALL procRejectLeave(?, ?, ?)', [
             $request->leaveId,
-            $request->user()->EmployeeID
+            $request->user()->EmployeeID,
+            Date::now()
         ]);
 
         return response()->json(['message' => 'Leave rejected successfully']);

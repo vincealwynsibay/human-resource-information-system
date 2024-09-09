@@ -64,11 +64,12 @@ class OvertimeController extends Controller
 
         $requestedDate = Date::createFromFormat('Y-m-d', $request->requestedDate);
 
-        DB::select('CALL procApplyForOvertime(?, ?, ?, ?)', [
+        DB::select('CALL procApplyForOvertime(?, ?, ?, ?, ?)', [
             $request->employeeId,
             $request->duration,
             $requestedDate,
             $request->reason,
+            Date::now()
         ]);
 
         return response()->json(['message' => 'Overtime request submitted successfully']);
@@ -80,9 +81,10 @@ class OvertimeController extends Controller
             'overtimeId' => 'required|exists:tblovertime,id',
         ]);
 
-        DB::select('CALL procApproveOvertime(?, ?)', [
+        DB::select('CALL procApproveOvertime(?, ?, ?)', [
             $request->overtimeId,
-            $request->user()->EmployeeID
+            $request->user()->EmployeeID,
+            Date::now()
         ]);
 
 
@@ -95,9 +97,10 @@ class OvertimeController extends Controller
             'overtimeId' => 'required|exists:tblovertime,id',
         ]);
 
-        DB::select('CALL procRejectOvertime(?, ?)', [
+        DB::select('CALL procRejectOvertime(?, ?, ?)', [
             $request->overtimeId,
-            $request->user()->EmployeeID
+            $request->user()->EmployeeID,
+            Date::now()
         ]);
 
         return response()->json("Overtime request rejected");

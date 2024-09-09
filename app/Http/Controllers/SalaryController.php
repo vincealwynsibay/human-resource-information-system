@@ -51,11 +51,12 @@ class SalaryController extends Controller
         $salary = DB::select('CALL procGetEmployeeSalary(?)', [$employeeId])[0] ?? null;
 
         if ($salary == null) {
-            DB::select('CALL procInsertEmployeeSalary(?, ?, ?, ?)', [
+            DB::select('CALL procInsertEmployeeSalary(?, ?, ?, ?, ?)', [
                 $employeeId,
                 $request->paygradeId,
                 $request->amount,
-                'Starting Salary'
+                'Starting Salary',
+                Date::now()
             ]);
         } else {
             DB::select('CALL procUpdateEmployeeSalaryByID(?, ?)', [
@@ -64,11 +65,12 @@ class SalaryController extends Controller
             ]);
         }
 
-        DB::select('CALL procInsertEmployeeSalary(?, ?, ?, ?)', [
+        DB::select('CALL procInsertEmployeeSalary(?, ?, ?, ?, ?)', [
             $employeeId,
             $request->paygradeId,
             $request->amount,
-            $request->change_reason
+            $request->change_reason,
+            Date::now()
         ]);
 
         return response()->json(['message' => 'Salary created'], 201);
@@ -110,7 +112,7 @@ class SalaryController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::select('CALL procDeleteEmployeeSalaryByID(?)', [$id]);
+        DB::select('CALL procDeleteEmployeeSalaryByID(?, ?)', [$id, Date::now()]);
 
         return response()->json(['message' => 'Salary deleted'], 200);
     }

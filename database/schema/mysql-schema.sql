@@ -664,10 +664,12 @@ CREATE TABLE `users` (
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procAddAllowance`(p_employeeId INT, p_amount DECIMAL(10,2), p_description VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procAddAllowance`(p_employeeId INT, p_amount DECIMAL(10,2), p_description VARCHAR(255), p_date DATETIME)
 BEGIN
                 INSERT INTO tblpayrollitem (EmployeeID, item_type, amount, description, created_date)
-                VALUES (p_employeeId, "ALLOWANCE", p_amount, p_description, NOW());
+                VALUES (p_employeeId, "ALLOWANCE", p_amount, p_description,p_date);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -684,10 +686,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procAddBonus`(p_employeeId INT, p_amount DECIMAL(10,2), p_description VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procAddBonus`(p_employeeId INT, p_amount DECIMAL(10,2), p_description VARCHAR(255), p_date DATETIME)
 BEGIN
                 INSERT INTO tblpayrollitem (EmployeeID, item_type, amount, description, created_date)
-                VALUES (p_employeeId, "BONUS", p_amount, p_description, NOW());
+                VALUES (p_employeeId, "BONUS", p_amount, p_description,p_date);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -704,10 +708,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procAddCommission`(p_employeeId INT, p_amount DECIMAL(10,2), p_description VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procAddCommission`(p_employeeId INT, p_amount DECIMAL(10,2), p_description VARCHAR(255), p_date DATETIME)
 BEGIN
                 INSERT INTO tblpayrollitem (EmployeeID, item_type, amount, description, created_date)
-                VALUES (p_employeeId, "COMMISSION", p_amount, p_description, NOW());
+                VALUES (p_employeeId, "COMMISSION", p_amount, p_description,p_date);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -724,10 +730,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procAddDeduction`(p_employeeId INT, p_amount DECIMAL(10,2), p_description VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procAddDeduction`(p_employeeId INT, p_amount DECIMAL(10,2), p_description VARCHAR(255), p_date DATETIME)
 BEGIN
                 INSERT INTO tblpayrollitem (EmployeeID, item_type, amount, description, created_date)
-                VALUES (p_employeeId, "DEDUCTION", p_amount, p_description, NOW());
+                VALUES (p_employeeId, "DEDUCTION", p_amount, p_description,p_date);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -751,11 +759,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procApplyForLeave`(
                 IN p_endDate DATE, 
                 IN p_reason TEXT, 
                 IN p_status VARCHAR(50), 
-                IN p_noOfDays INT
+                IN p_noOfDays INT,
+                IN p_createddate DATETIME
             )
 BEGIN
                 INSERT INTO tblleave (EmployeeID, LeaveTypeID, start_date, end_date, reason, status, no_of_days, date_created)
-                VALUES (p_employeeId, p_leaveTypeId, p_startDate, p_endDate, p_reason, p_status, p_noOfDays, NOW());
+                VALUES (p_employeeId, p_leaveTypeId, p_startDate, p_endDate, p_reason, p_status, p_noOfDays, p_createddate);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -776,11 +787,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procApplyForOvertime`(
                 IN p_employeeId INT, 
                 IN p_duration DECIMAL(5, 2), 
                 IN p_date DATE, 
-                IN p_reason TEXT
+                IN p_reason TEXT,
+                IN p_createddate DATETIME
             )
 BEGIN
                 INSERT INTO tblovertime (EmployeeID, duration, requested_date, reason, status, date_created)
-                VALUES (p_employeeId, p_duration, p_date, p_reason, "PENDING", NOW());
+                VALUES (p_employeeId, p_duration, p_date, p_reason, "PENDING", p_createddate);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -797,11 +811,11 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procApproveLeave`(IN p_id INT, IN p_reviewer INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procApproveLeave`(IN p_id INT, IN p_reviewer INT, IN p_revieweddate DATETIME)
 BEGIN
                 UPDATE tblleave
                     SET status = "APPROVED",
-                        reviewed_date = NOW(),
+                        reviewed_date = p_revieweddate,
                         ReviewerID = p_reviewer
                 WHERE id = p_id;
             END ;;
@@ -822,12 +836,13 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procApproveOvertime`(
                 IN p_id INT, 
-                IN p_reviewer INT
+                IN p_reviewer INT,
+                IN p_revieweddate DATETIME
             )
 BEGIN
                 UPDATE tblovertime
                     SET status = "APPROVED",
-                        reviewed_date = NOW(),
+                        reviewed_date = p_revieweddate,
                         ReviewerID = p_reviewer
                 WHERE id = p_id;
             END ;;
@@ -851,11 +866,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procAssignLeaveEntitlement`(
                 IN p_leaveTypeId INT, 
                 IN p_entitlement INT, 
                 IN p_validFrom DATE, 
-                IN p_validTo DATE
+                IN p_validTo DATE,
+                IN p_createddate DATETIME
             )
 BEGIN
                 INSERT INTO tblleaveentitlement (EmployeeID, LeaveTypeID, entitlement, valid_from, valid_to, date_created)
-                VALUES (p_employeeId, p_leaveTypeId, p_entitlement, p_validFrom, p_validTo, NOW());
+                VALUES (p_employeeId, p_leaveTypeId, p_entitlement, p_validFrom, p_validTo, p_createddate);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -876,6 +894,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procAssignSupervisor`(p_supervisorI
 BEGIN
             INSERT INTO tblemployeesupervisor (SupervisorID, SubordinateID)
             VALUES (p_supervisorId, p_employeeId);
+                            SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -896,6 +916,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procAssignWorkShift`(p_employeeId I
 BEGIN
                     INSERT INTO tblemployeeworkshift (EmployeeID, WorkShiftID)
                         VALUES (p_employeeId, p_workShiftId);
+                                        SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -990,12 +1012,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procDeleteEmployeeByID`(p_id INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procDeleteEmployeeByID`(p_id INT, p_deleted_at DATETIME)
 BEGIN
                 UPDATE tblemployee 
                     SET
-                        tblemployee.status = "INACTIVE" AND
-                        tblemployee.termination_date = NOW()
+                        tblemployee.status = "INACTIVE",
+                        tblemployee.termination_date = p_deleted_at
                 WHERE id = p_id;
             END ;;
 DELIMITER ;
@@ -1070,10 +1092,10 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procDeleteEmployeeSalaryByID`(p_id INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procDeleteEmployeeSalaryByID`(p_id INT, p_deleted_at DATETIME)
 BEGIN
                 UPDATE tblbasicsalary
-                    SET deleted_at = NOW()
+                    SET deleted_at = p_deleted_at
                 WHERE id = p_id;
                 END ;;
 DELIMITER ;
@@ -2534,6 +2556,26 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `procGetPayrollForExcel` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb3 */ ;
+/*!50003 SET character_set_results = utf8mb3 */ ;
+/*!50003 SET collation_connection  = utf8mb3_general_ci */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetPayrollForExcel`(p_payPeriodStart DATETIME, p_payPeriodEnd DATETIME)
+BEGIN
+                SELECT EmployeeID as employee_id, pay_period_start, pay_period_end, gross_salary, deductions, net_salary FROM tblpayroll WHERE pay_period_start = p_payPeriodStart AND pay_period_end = p_payPeriodEnd;
+                
+	END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `procGetPayrollItem` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -2777,6 +2819,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertDepartment`(p_name VARCHA
 BEGIN
                 INSERT INTO tbldepartment (name)
                 VALUES (p_name);
+                                SELECT LAST_INSERT_ID() as id;
+
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2797,6 +2842,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEducation`(p_name VARCHAR
 BEGIN
                 INSERT INTO tbleducation (name)
                 VALUES (p_name);
+                                SELECT LAST_INSERT_ID() as id;
+
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2813,10 +2861,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployee`(p_firstname VARCHAR(100), p_lastname VARCHAR(100), p_middlename VARCHAR(100))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployee`(p_firstname VARCHAR(100), p_lastname VARCHAR(100), p_middlename VARCHAR(100), p_createddate DATETIME)
 BEGIN
                 INSERT INTO tblemployee (firstname, lastname, middlename, joined_date)
-                VALUES (p_firstname, p_lastname, p_middlename, NOW());
+                VALUES (p_firstname, p_lastname, p_middlename, p_createddate);
+
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2837,7 +2887,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeAttendance`(IN p_
 BEGIN
                 INSERT INTO tblattendancerecord (EmployeeID, date, time_in_session1, time_out_session1, time_in_session2, time_out_session2, time_in_overtime, time_out_overtime)
                 VALUES (p_employeeId, p_date, NULL, NULL, NULL, NULL, NULL, NULL);
-                SELECT LAST_INSERT_ID() as id;
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2858,6 +2909,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeCertificate`(p_em
 BEGIN
                 INSERT INTO tblemployeecertificate (employeeId, name, issued_by, issued_date)
                 VALUES (p_employeeId, p_name, p_issuedBy, p_issuedDate);
+                                SELECT LAST_INSERT_ID() as id;
+
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2878,6 +2932,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeEducation`(p_empl
 BEGIN
                 INSERT INTO tblemployeeeducation (employeeId, educationId, institute, major, year_graduated, gpa, start_date, end_date)
                 VALUES (p_employeeId, p_educationId, p_institute, p_major, p_yearGraduated, p_gpa, p_startDate, p_endDate);
+                                SELECT LAST_INSERT_ID() as id;
+
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2898,6 +2955,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeEmergencyContact`
 BEGIN
                 INSERT INTO tblemergencycontact (employeeId, name, relationship, mobile_no, email)
                 VALUES (p_employeeId, p_name, p_relationship, p_mobile_no, p_email);
+                                SELECT LAST_INSERT_ID() as id;
+
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2914,18 +2974,20 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeSalary`(p_employeeId INT, p_payGradeId INT, p_amount DECIMAL(10,2), p_changeReason VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeSalary`(p_employeeId INT, p_payGradeId INT, p_amount DECIMAL(10,2), p_changeReason VARCHAR(255), p_createddate DATETIME)
 BEGIN
             DECLARE oldSalaryId INT;
                 SET oldSalaryId = (SELECT id FROM tblbasicsalary WHERE EmployeeID = p_employeeId AND deleted_at = null);
                 IF oldSalaryId IS NOT NULL THEN
                     UPDATE tblbasicsalary
-                        SET deleted_at = NOW()
+                        SET deleted_at = p_createddate
                     WHERE id = oldSalaryId;
                 END IF;
 
                 INSERT INTO tblbasicsalary (EmployeeID, PayGradeID, amount, change_reason)
                 VALUES (p_employeeId, p_payGradeId, p_amount, p_changeReason);
+                                SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2946,6 +3008,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeWorkExperience`(p
 BEGIN
                 INSERT INTO tblemployeeworkexperience (employeeId, employer, position, from_date, to_date)
                 VALUES (p_employeeId, p_employer, p_position, p_from, p_to);
+                                SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2966,6 +3030,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmploymentStatus`(p_name 
 BEGIN
                 INSERT INTO tblemploymentstatus (name)
                 VALUES (p_name);
+                                SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2991,6 +3057,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertHoliday`(
 BEGIN
                 INSERT INTO tblholiday (name, date, is_full_day, is_recurring)
                 VALUES (p_name, p_date, p_isFullDay, p_isRecurring);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3011,6 +3079,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertJobTitle`(p_name VARCHAR(
 BEGIN
                 INSERT INTO tbljobtitle (name, description)
                 VALUES (p_name, p_description);
+                                SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3033,11 +3103,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertLeave`(
                 IN p_startDate DATE, 
                 IN p_endDate DATE, 
                 IN p_reason TEXT, 
-                IN p_status VARCHAR(50)
+                IN p_status VARCHAR(50),
+                IN p_createddate DATETIME
             )
 BEGIN
                 INSERT INTO tblleave (EmployeeID, LeaveTypeID, start_date, end_date, reason, status, date_created)
-                VALUES (p_employeeId, p_leaveTypeId, p_startDate, p_endDate, p_reason, p_status, NOW());
+                VALUES (p_employeeId, p_leaveTypeId, p_startDate, p_endDate, p_reason, p_status, p_createddate);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3059,11 +3132,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertLeaveEntitlement`(
                 IN p_leaveTypeId INT, 
                 IN p_entitlement INT, 
                 IN p_validFrom DATE, 
-                IN p_validTo DATE
+                IN p_validTo DATE,
+                IN p_createddate DATETIME
             )
 BEGIN
                 INSERT INTO tblleaveentitlement (EmployeeID, LeaveTypeID, entitlement, valid_from, valid_to, date_created)
-                VALUES (p_employeeId, p_leaveTypeId, p_entitlement, p_validFrom, p_validTo, NOW());
+                VALUES (p_employeeId, p_leaveTypeId, p_entitlement, p_validFrom, p_validTo, p_createddate);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3084,6 +3160,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertLeaveType`(IN p_name VARC
 BEGIN
                 INSERT INTO tblleavetype (name)
                 VALUES (p_name);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3104,6 +3182,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertPayGrade`(p_name VARCHAR(
 BEGIN
                 INSERT INTO tblpaygrade (name, description, min_salary, max_salary)
                 VALUES (p_name, p_description, p_minSalary, p_maxSalary);
+                                SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3120,10 +3200,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertPayroll`(p_employeeId INT, p_payPeriodStart DATETIME, p_payPeriodEnd DATETIME, p_grossSalary DECIMAL(10,2), p_deductions DECIMAL(10,2), p_netSalary DECIMAL(10,2))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertPayroll`(p_employeeId INT, p_payPeriodStart DATETIME, p_payPeriodEnd DATETIME, p_grossSalary DECIMAL(10,2), p_deductions DECIMAL(10,2), p_netSalary DECIMAL(10,2), p_createddate DATETIME)
 BEGIN
                 INSERT INTO tblpayroll (EmployeeID, pay_period_start, pay_period_end, gross_salary, deductions, net_salary, created_date)
-                VALUES (p_employeeId, p_payPeriodStart, p_payPeriodEnd, p_grossSalary, p_deductions, p_netSalary, NOW());
+                VALUES (p_employeeId, p_payPeriodStart, p_payPeriodEnd, p_grossSalary, p_deductions, p_netSalary, p_createddate);
+                                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3140,10 +3222,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertPayrollItem`(p_employeeId INT, p_itemType varchar(100), p_amount DECIMAL(10,2), p_description varchar(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertPayrollItem`(p_employeeId INT, p_itemType varchar(100), p_amount DECIMAL(10,2), p_description varchar(255), p_date DATETIME)
 BEGIN
                 INSERT INTO tblpayrollitem (EmployeeID, item_type, amount, description, created_date)
-                VALUES (p_employeeId, p_itemType, p_amount, p_description, NOW());
+                VALUES (p_employeeId, p_itemType, p_amount, p_description, p_date);
+                SELECT LAST_INSERT_ID() as id;
+
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3164,6 +3248,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertUser`(p_username VARCHAR(
 BEGIN
                 INSERT INTO tbluser (username, password, RoleID, EmployeeID)
                 VALUES (p_username, p_password, p_role, p_employeeId);
+                                SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3184,6 +3270,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertWorkShift`(p_name VARCHAR
 BEGIN
                 INSERT INTO tblworkshift (name, hours_per_day, start_time1, end_time1, start_time2, end_time2)
                 VALUES (p_name, p_hoursPerDay, p_startTime1, p_endTime1, p_startTime2, p_endTime2);                
+                                SELECT LAST_INSERT_ID() as id;
+
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -3200,11 +3288,11 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procRejectLeave`(IN p_id INT, IN p_reviewer INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procRejectLeave`(IN p_id INT, IN p_reviewer INT, IN p_revieweddate DATETIME)
 BEGIN
                 UPDATE tblleave
                     SET status = "REJECTED",
-                        reviewed_date = NOW(),
+                        reviewed_date = p_revieweddate,
                         ReviewerID = p_reviewer
                 WHERE id = p_id;
             END ;;
@@ -3223,11 +3311,11 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procRejectOvertime`(IN p_id INT, IN p_reviewer INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procRejectOvertime`(IN p_id INT, IN p_reviewer INT, IN p_revieweddate DATETIME)
 BEGIN
                 UPDATE tblovertime
                     SET status = "REJECTED",
-                        reviewed_date = NOW(),
+                        reviewed_date = p_revieweddate,
                         ReviewerID = p_reviewer
                 WHERE id = p_id;
             END ;;
@@ -3363,7 +3451,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateEmployeeByID`(p_id INT, p_firstname VARCHAR(100), p_lastname VARCHAR(100), p_middlename VARCHAR(100), p_birth_date DATE)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateEmployeeByID`(p_id INT, p_firstname VARCHAR(100), p_lastname VARCHAR(100), p_middlename VARCHAR(100), p_birth_date DATE, p_gender VARCHAR(10), p_marital_status VARCHAR(20), p_mobile_no VARCHAR(50), p_email VARCHAR(50), p_address VARCHAR(100), p_city VARCHAR(100), p_province VARCHAR(100), p_zip_code VARCHAR(20))
 BEGIN
             UPDATE tblemployee
                 SET
@@ -3550,9 +3638,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateEmployeeJobDetailsByID`(p
 BEGIN
             UPDATE tblemployee
                 SET
-                    job_title = IFNULL(p_job_title, job_title),
-                    department = IFNULL(p_department, department),
-                    employment_status = IFNULL(p_employment_status, employment_status)
+                    JobTitleID = IFNULL(p_job_title, JobTitleID),
+                    DepartmentID = IFNULL(p_department, DepartmentID),
+                    EmploymentStatusID = IFNULL(p_employment_status, EmploymentStatusID)
             WHERE id = p_id;
             END ;;
 DELIMITER ;
@@ -4122,6 +4210,7 @@ DELIMITER ;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+    
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (1,'0001_01_01_000000_create_users_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (2,'0001_01_01_000001_create_cache_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (3,'0001_01_01_000002_create_jobs_table',1);

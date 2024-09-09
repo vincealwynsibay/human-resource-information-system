@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Enum\PayrollItemTypeEnum;
+use Illuminate\Support\Facades\Date;
 
 class PayrollItemController extends Controller
 {
@@ -41,11 +42,12 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?, ?)', [
             $request->employeeId,
             $request->itemType,
             $request->amount,
-            $request->description
+            $request->description,
+            Date::now()
         ]);
 
         return response()->json(['message' => 'Payroll item created successfully'], 201);
@@ -60,11 +62,12 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?, ?)', [
             $request->employeeId,
             PayrollItemTypeEnum::BONUS->value,
             $request->amount,
-            $request->description
+            $request->description,
+            Date::now()
         ]);
 
         return response()->json(['message' => 'Bonus added successfully'], 201);
@@ -78,11 +81,12 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?, ?)', [
             $request->employeeId,
             PayrollItemTypeEnum::DEDUCTION->value,
             $request->amount,
-            $request->description
+            $request->description,
+            Date::now(),
         ]);
 
 
@@ -97,11 +101,12 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?, ?)', [
             $request->employeeId,
             PayrollItemTypeEnum::ALLOWANCE->value,
             $request->amount,
-            $request->description
+            $request->description,
+            Date::now()
         ]);
 
 
@@ -116,11 +121,12 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?, ?)', [
             $request->employeeId,
             PayrollItemTypeEnum::COMMISSION->value,
             $request->amount,
-            $request->description
+            $request->description,
+            Date::now()
         ]);
 
 

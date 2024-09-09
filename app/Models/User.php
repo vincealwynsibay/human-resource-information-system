@@ -53,7 +53,6 @@ class User extends Authenticatable
     {
         // get id of role
         $roleId = RoleEnum::fromName(strtoupper($role))->value;
-        // $roleId = DB::table('tbluserrole')->where('name', $role)->first(['id'])->id;
         return $roleId >= $this->RoleID;
     }
 

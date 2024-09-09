@@ -66,6 +66,8 @@ class AttendanceController extends Controller
             "range" => 'nullable|string|in:TODAY,WEEK,MONTH,HALFYEAR,YEAR,ALL',
         ]);
 
+        $currentDate = Date::now();
+
         $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
         $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
             $request->user()->EmployeeID,
@@ -90,25 +92,25 @@ class AttendanceController extends Controller
         } else if ($request->range === "WEEK") {
             $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
                 $employeeId,
-                Date::now()->startOfWeek(),
+                $currentDate->startOfWeek(),
                 Date::today()
             ]);
         } else if ($request->range === "MONTH") {
             $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
                 $employeeId,
-                Date::now()->startOfMonth(),
+                $currentDate->startOfMonth(),
                 Date::today()
             ]);
         } else if ($request->range === "HALFYEAR") {
             $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
                 $employeeId,
-                Date::now()->subMonths(6),
+                $currentDate->subMonths(6),
                 Date::today()
             ]);
         } else if ($request->range === "YEAR") {
             $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
                 $employeeId,
-                Date::now()->startOfYear(),
+                $currentDate->startOfYear(),
                 Date::today()
             ]);
         } else {
@@ -130,6 +132,7 @@ class AttendanceController extends Controller
             "range" => 'nullable|string|in:TODAY,WEEK,MONTH,HALFYEAR,YEAR,ALL',
         ]);
 
+        $currentDate = Date::now();
         $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
         $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
             $request->user()->EmployeeID,
@@ -154,25 +157,25 @@ class AttendanceController extends Controller
         } else if ($request->range === "WEEK") {
             $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
                 $employeeId,
-                Date::now()->startOfWeek(),
+                $currentDate->startOfWeek(),
                 Date::today()
             ]);
         } else if ($request->range === "MONTH") {
             $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
                 $employeeId,
-                Date::now()->startOfMonth(),
+                $currentDate->startOfMonth(),
                 Date::today()
             ]);
         } else if ($request->range === "HALFYEAR") {
             $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
                 $employeeId,
-                Date::now()->subMonths(6),
+                $currentDate->subMonths(6),
                 Date::today()
             ]);
         } else if ($request->range === "YEAR") {
             $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
                 $employeeId,
-                Date::now()->startOfYear(),
+                $currentDate->startOfYear(),
                 Date::today()
             ]);
         } else {
@@ -553,10 +556,13 @@ class AttendanceController extends Controller
                     }
 
                     // check if there is a leave record on the date, if there is, do not record as absence
-                    $leave = DB::table('tblleave')->where('status', LeaveRequestEnum::APPROVED->value)->where('EmployeeID', $employeeID)->where(function ($query) use ($currentDate) {
-                        $query->where('start_date', "<=", $currentDate);
-                        $query->where('end_date', ">=", $currentDate);
-                    })->first();
+                    $leave = DB::select('CALL procGetEmployeeLeaves(?, ?, ?, ?, ?)', [
+                        $employeeID,
+                        null,
+                        $currentDate,
+                        $currentDate,
+                        LeaveRequestEnum::APPROVED->value
+                    ]);
 
                     if ($leave != null) {
                         $date = $date->addDay();

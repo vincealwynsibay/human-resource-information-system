@@ -52,12 +52,13 @@ class LeaveEntitlementController extends Controller
             'validTo' => 'nullable|date',
         ]);
 
-        DB::select('CALL procInsertLeaveEntitlement(?, ?, ?, ?, ?)', [
+        DB::select('CALL procInsertLeaveEntitlement(?, ?, ?, ?, ?, ?)', [
             $request->employeeId,
             $request->leaveTypeId,
             $request->entitlement,
             $request->validFrom,
-            $request->validTo
+            $request->validTo,
+            Date::now()
         ]);
 
         return response()->json(['message' => "Leave entitlement created successfully"]);
@@ -75,12 +76,13 @@ class LeaveEntitlementController extends Controller
         ]);
 
         foreach ($request->leaveEntitlements as $leaveEntitlement) {
-            DB::select('CALL procInsertLeaveEntitlement(?, ?, ?, ?, ?)', [
+            DB::select('CALL procInsertLeaveEntitlement(?, ?, ?, ?, ?, ?)', [
                 $request->employeeId,
                 $leaveEntitlement['leaveTypeId'],
                 $leaveEntitlement['entitlement'],
                 $leaveEntitlement['validFrom'],
-                $leaveEntitlement['validTo']
+                $leaveEntitlement['validTo'],
+                Date::now()
             ]);
         }
 
@@ -101,12 +103,13 @@ class LeaveEntitlementController extends Controller
 
         foreach ($request->employeeIds as $employeeId) {
             foreach ($request->leaveEntitlements as $leaveEntitlement) {
-                DB::select('CALL procAssignLeaveEntitlement(?, ?, ?, ?, ?)', [
+                DB::select('CALL procAssignLeaveEntitlement(?, ?, ?, ?, ?, ?)', [
                     $employeeId,
                     $leaveEntitlement['leaveTypeId'],
                     $leaveEntitlement['entitlement'],
                     $leaveEntitlement['validFrom'],
-                    $leaveEntitlement['validTo']
+                    $leaveEntitlement['validTo'],
+                    Date::now()
                 ]);
             }
         }

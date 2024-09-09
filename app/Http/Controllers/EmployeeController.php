@@ -77,10 +77,11 @@ class EmployeeController extends Controller
             'middlename' => "nullable|string|max:100",
         ]);
 
-        DB::select('call procInsertEmployee(?,?,?)', [
+        DB::select('CALL procInsertEmployee(?,?,?, ?)', [
             $request->firstname,
             $request->lastname,
-            $request->middlename
+            $request->middlename ?? "",
+            Date::now()
         ]);
 
         return response()->json([
@@ -128,7 +129,7 @@ class EmployeeController extends Controller
             'supervisor' => "required|exists:tblemployee,id"
         ]);
 
-        if ($validated["supervisor"] == $id) {
+        if ($request->supervisor == $id) {
             return response()->json([
                 'errors' => [
                     'Supervisor' => ['Employee cannot be their own supervisor']
@@ -158,7 +159,6 @@ class EmployeeController extends Controller
             'supervisor' => "required|exists:tblemployee,id"
         ]);
 
-        $employee = DB::table("tblemployee")->find($id);
         $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
 
         if ($employee == null) {
@@ -219,12 +219,11 @@ class EmployeeController extends Controller
             'workShift' => "required|exists:tblworkshift,id"
         ]);
 
-        $employee = DB::table("tblemployee")->find($id);
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
 
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
-
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
@@ -245,7 +244,7 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployeeworkshift")->where('EmployeeID', $id)->where('WorkShiftID', $validated["workShift"])->delete();
+        DB::select('CALL procRemoveWorkShift(?,?)', [$employee->id, $request->workShift]);
 
         return response()->json([
             'message' => "Work Shift removed successfully"
@@ -272,10 +271,12 @@ class EmployeeController extends Controller
             'zip_code' => "nullable|string|max:20",
         ]);
 
-        $employee = DB::table("tblemployee")->find($id);
+
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
+
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
@@ -297,21 +298,21 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployee")->where('id', $id)->update([
-            'firstname' => $validated["firstname"] ?? "",
-            'lastname' => $validated["lastname"] ?? "",
-            'middlename' => $validated["middlename"] ?? "",
-            'birth_date' => $validated["birth_date"] ?? null,
-            'gender' => $validated["gender"] ?? "",
-            'marital_status' => $validated["marital_status"] ?? "",
-            'mobile_no' => $validated["mobile_no"] ?? "",
-            'email' => $validated["email"] ?? "",
-            'address' => $validated["address"] ?? "",
-            'city' => $validated["city"] ?? "",
-            'province' => $validated["province"] ?? "",
-            'zip_code' => $validated["zip_code"] ?? "",
+        DB::select('CALL procUpdateEmployeeByID(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+            $id,
+            $request->firstname ?? "",
+            $request->lastname ?? "",
+            $request->middlename ?? "",
+            $request->birth_date ?? null,
+            $request->gender ?? "",
+            $request->marital_status ?? "",
+            $request->mobile_no ?? "",
+            $request->email ?? "",
+            $request->address ?? "",
+            $request->city ?? "",
+            $request->province ?? "",
+            $request->zip_code ?? "",
         ]);
-
 
         return response()->json([
             'message' => "Employee Updated Successfully"
@@ -326,10 +327,12 @@ class EmployeeController extends Controller
             'philhealth' => "nullable|string|max:50",
         ]);
 
-        $employee = DB::table("tblemployee")->find($id);
+
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
+
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
@@ -352,10 +355,12 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployee")->where('id', $id)->update([
-            'sss' => $request->sss ?? "",
-            'pagibig' => $request->pagibig ?? "",
-            'philhealth' => $request->philhealth ?? "",
+
+        DB::select('CALL procUpdateEmployeeContribution(?, ?, ?, ?)', [
+            $id,
+            $request->sss ?? "",
+            $request->pagibig ?? "",
+            $request->philhealth ?? "",
         ]);
 
         return response()->json([
@@ -370,16 +375,23 @@ class EmployeeController extends Controller
             'firstname' => "required|string|max:100",
             'lastname' => "required|string|max:100",
             'middlename' => "nullable|string|max:100",
-            'birth_date' => "nullable|date|",
+            'birth_date' => "nullable|date",
             'gender' => "nullable|string|max:6",
             'marital_status' => "nullable|string|max:20",
+            'mobile_no' => "nullable|string|max:50",
+            'email' => "nullable|string|max:50",
+            'address' => "nullable|string|max:100",
+            'city' => "nullable|string|max:100",
+            'province' => "nullable|string|max:100",
+            'zip_code' => "nullable|string|max:20",
         ]);
 
 
-        $employee = DB::table("tblemployee")->find($id);
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
+
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
@@ -393,7 +405,6 @@ class EmployeeController extends Controller
         }
 
 
-
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -402,17 +413,24 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployee")->where('id', $id)->update([
-            'firstname' => $validated["firstname"] ?? "",
-            'lastname' => $validated["lastname"] ?? "",
-            'middlename' => $validated["middlename"] ?? "",
-            'birth_date' => $validated["birth_date"] ?? null,
-            'gender' => $validated["gender"] ?? "",
-            'marital_status' => $validated["marital_status"] ?? "",
+        DB::select('CALL procUpdateEmployeePersonalDetailsByID(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+            $id,
+            $request->firstname ?? "",
+            $request->lastname ?? "",
+            $request->middlename ?? "",
+            $request->birth_date ?? null,
+            $request->gender ?? "",
+            $request->marital_status ?? "",
+            $request->mobile_no ?? "",
+            $request->email ?? "",
+            $request->address ?? "",
+            $request->city ?? "",
+            $request->province ?? "",
+            $request->zip_code ?? "",
         ]);
 
         return response()->json([
-            'message' => "Employee Personal Details Updated Successfully"
+            'message' => "Employee Updated Successfully"
         ], 200);
     }
 
@@ -427,10 +445,12 @@ class EmployeeController extends Controller
             'province' => "nullable|string|max:100",
             'zip_code' => "nullable|string|max:20",
         ]);
-        $employee = DB::table("tblemployee")->find($id);
+
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
+
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
@@ -453,13 +473,23 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployee")->where('id', $id)->update([
-            'mobile_no' => $validated["mobile_no"] ?? "",
-            'email' => $validated["email"] ?? "",
-            'address' => $validated["address"] ?? "",
-            'city' => $validated["city"] ?? "",
-            'province' => $validated["province"] ?? "",
-            'zip_code' => $validated["zip_code"] ?? "",
+        // DB::table("tblemployee")->where('id', $id)->update([
+        //     'mobile_no' => $request->mobile_no ?? "",
+        //     'email' => $request->email ?? "",
+        //     'address' => $request->address ?? "",
+        //     'city' => $request->city ?? "",
+        //     'province' => $request->province ?? "",
+        //     'zip_code' => $request->zip_code ?? "",
+        // ]);
+
+        DB::select('CALL procUpdateEmployeeContactDetailsByID(?, ?, ?, ?, ?, ?, ?)', [
+            $id,
+            $request->mobile_no ?? "",
+            $request->email ?? "",
+            $request->address ?? "",
+            $request->city ?? "",
+            $request->province ?? "",
+            $request->zip_code ?? "",
         ]);
 
         return response()->json([
@@ -474,10 +504,12 @@ class EmployeeController extends Controller
             'department' => "nullable|exists:tbldepartment,id",
         ]);
 
-        $employee = DB::table("tblemployee")->find($id);
+
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
+
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
@@ -500,10 +532,17 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployee")->where('id', $id)->update([
-            'JobTitleID' => $validated["jobTitle"],
-            'EmploymentStatusID' => $validated["employmentStatus"],
-            'DepartmentID' => $validated["department"],
+        // DB::table("tblemployee")->where('id', $id)->update([
+        //     'JobTitleID' => $request->jobTitle,
+        //     'EmploymentStatusID' => $request->employmentStatus,
+        //     'DepartmentID' => $request->department,
+        // ]);
+
+        DB::select('CALL procUpdateEmployeeJobDetailsByID(?, ?, ?, ?)', [
+            $id,
+            $request->jobTitle ?? "",
+            $request->employmentStatus ?? "",
+            $request->department ?? "",
         ]);
 
         return response()->json([
@@ -518,10 +557,12 @@ class EmployeeController extends Controller
             "image" => ["required", File::image()->max("1mb")]
         ]);
 
-        $employee = DB::table("tblemployee")->find($id);
+
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
+
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
@@ -547,8 +588,12 @@ class EmployeeController extends Controller
         $data_uri = 'data:' . finfo_file($finfo, $file) . ';base64,' . $data;
 
 
-        DB::table("tblemployee")->where('id', $id)->update([
-            'image' => $data_uri
+        // DB::table("tblemployee")->where('id', $id)->update([
+        //     'image' => $data_uri
+        // ]);
+        DB::select('CALL procUpdateEmployeeImageByID(?, ?)', [
+            $id,
+            $data_uri
         ]);
 
 
@@ -562,10 +607,12 @@ class EmployeeController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        $employee = DB::table("tblemployee")->find($id);
+
+        $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
+
 
         // check if employee is a subordinate to current user
-        $subordinate = DB::table('tblemployeesupervisor')->where('SupervisorID', $request->user()->EmployeeID)->where('SubordinateID', $employee->id)->first();
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
@@ -588,7 +635,8 @@ class EmployeeController extends Controller
             ], 404);
         }
 
-        DB::table("tblemployee")->where('id', $id)->delete();
+        // DB::table("tblemployee")->where('id', $id)->delete();
+        DB::select('CALL procDeleteEmployeeByID(?, ?)', [$id, Date::now()]);
         return response()->json([
             'message' => "Employee Deleted Successfully"
         ], 200);
