@@ -22,6 +22,16 @@ test('create a payroll on day 15', function () {
         'pagibig_contribution' => 100,
     ]);
 
+    DB::table('tblworkweek')->insert([
+        'mon' => 1,
+        'tue' => 1,
+        'wed' => 1,
+        'thu' => 1,
+        'fri' => 1,
+        'sat' => 0,
+        'sun' => 0
+    ]);
+
     DB::table("tblemployeeworkshift")->insert([
         'EmployeeID' => $employeeId,
         'WorkShiftID' => 1,
@@ -73,6 +83,7 @@ test('create a payroll on day 15', function () {
         'reason' => 'Overtime on day 31',
         'status' => 'APPROVED',
         'duration' => 1,
+        'date_created' => now(),
     ]);
 
     // create overtime attendance from day 14 to day 15
@@ -112,6 +123,8 @@ test('create a payroll on day 31', function () {
 
     $user = User::factory()->create();
     $this->actingAs($user);
+
+
     // set date to day 15
     // create employee
     $employeeId = DB::table("tblemployee")->insertGetId([
@@ -182,6 +195,7 @@ test('create a payroll on day 31', function () {
         'reason' => 'Overtime on day 31',
         'status' => 'APPROVED',
         'duration' => 1,
+        'date_created' => now(),
     ]);
 
     // overtime rate =   * 1.5 = 17.31
