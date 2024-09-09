@@ -26,15 +26,19 @@ class UserFactory extends Factory
     public function definition(): array
     {
 
-        $newEmployeeId = DB::table('tblemployee')->insertGetId([
-            "firstname" => fake()->firstName(),
-            "lastname" => fake()->lastName(),
-            "joined_date" => Date::now()
+
+        $newEmployeeId = DB::select('CALL procInsertEmployee(?, ?, ?, ?)', [
+            $this->faker->firstName(),
+            $this->faker->lastName(),
+            "",
+            Date::now()
         ]);
 
-        DB::table('tblemployeeworkshift')->insert([
-            'EmployeeID' => $newEmployeeId,
-            'WorkShiftID' => 1,
+        $newEmployeeId = 1;
+
+        DB::select('CALL procAssignWorkShift(?,?)', [
+            $newEmployeeId,
+            1
         ]);
 
         return [
