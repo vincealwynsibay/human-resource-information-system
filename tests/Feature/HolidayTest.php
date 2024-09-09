@@ -27,7 +27,7 @@ test('create a new holiday', function () {
         'name' => fake()->company,
         'date' => fake()->date,
         'is_full_day' => 0,
-        'recurring' => false
+        'is_recurring' => false
     ]);
     $response->assertStatus(201);
 });
@@ -40,13 +40,13 @@ test('update a holiday', function () {
         'name' => 'Holiday 1',
         'date' => '2022-01-01',
         'is_full_day' => 1,
-        'recurring' => false
+        'is_recurring' => false
     ]);
     $response = $this->put('/api/holiday/' . $id, [
         'name' => fake()->company,
         'date' => fake()->date,
         'is_full_day' => 1,
-        'recurring' => false
+        'is_recurring' => false
     ]);
     $response->assertStatus(200);
 });
@@ -60,7 +60,7 @@ test('delete a holiday', function () {
         'name' => 'Holiday 1',
         'date' => '2022-01-01',
         'is_full_day' => 1,
-        'recurring' => false
+        'is_recurring' => false
     ]);
     $response = $this->delete('/api/holiday/' . $id);
     $response->assertStatus(200);
