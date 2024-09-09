@@ -33,7 +33,7 @@ class LeaveController extends Controller
                 $request->status
             ]);
         } else {
-            $leaveRequests = DB::select('CALL procGetEmployeeLeavesAsAdmin(?, ?, ?, ?, ?)', [
+            $leaveRequests = DB::select('CALL procGetEmployeeLeaves(?, ?, ?, ?, ?)', [
                 $request->employeeId,
                 $request->leaveType,
                 $request->fromDate,
