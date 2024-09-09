@@ -18,18 +18,13 @@ class PayrollItemController extends Controller
             'employeeId' => "numeric"
         ]);
 
-        $payrollItems = [];
-        if ($request->employeeId == null) {
-            $payrollItems = DB::table('tblpayrollitem')->get();
-        } else {
-            $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $request->employeeId)->get();
-        }
+        $payrollItems = DB::select('CALL procGetPayrollItems(?)', [$request->employeeId]);
         return response()->json($payrollItems);
     }
 
     public function getUserPayrollItems(Request $request)
     {
-        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $request->user()->EmployeeID)->get();
+        $payrollItems = DB::select('CALL procGetPayrollItems(?)', [$request->employeeId]);
         return response()->json($payrollItems);
     }
 
@@ -46,13 +41,11 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::table('tblpayrollitem')->insert([
-            'EmployeeID' => $validated['employeeId'],
-            'item_type' => "test",
-            // 'item_type' => $validated['itemType'],
-            'amount' => $validated['amount'],
-            'description' => $validated['description'],
-            'created_date' => now(),
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+            $request->employeeId,
+            $request->itemType,
+            $request->amount,
+            $request->description
         ]);
 
         return response()->json(['message' => 'Payroll item created successfully'], 201);
@@ -67,12 +60,11 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::table('tblpayrollitem')->insert([
-            'EmployeeID' => $validated['employeeId'],
-            'item_type' => PayrollItemTypeEnum::BONUS,
-            'amount' => $validated['amount'],
-            'description' => $validated['description'],
-            'created_date' => now(),
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+            $request->employeeId,
+            PayrollItemTypeEnum::BONUS->value,
+            $request->amount,
+            $request->description
         ]);
 
         return response()->json(['message' => 'Bonus added successfully'], 201);
@@ -86,13 +78,13 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::table('tblpayrollitem')->insert([
-            'EmployeeID' => $validated['employeeId'],
-            'item_type' => PayrollItemTypeEnum::DEDUCTION,
-            'amount' => $validated['amount'],
-            'description' => $validated['description'],
-            'created_date' => now(),
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+            $request->employeeId,
+            PayrollItemTypeEnum::DEDUCTION->value,
+            $request->amount,
+            $request->description
         ]);
+
 
         return response()->json(['message' => 'Deduction added successfully'], 201);
     }
@@ -105,13 +97,13 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::table('tblpayrollitem')->insert([
-            'EmployeeID' => $validated['employeeId'],
-            'item_type' => PayrollItemTypeEnum::ALLOWANCE,
-            'amount' => $validated['amount'],
-            'description' => $validated['description'],
-            'created_date' => now(),
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+            $request->employeeId,
+            PayrollItemTypeEnum::ALLOWANCE->value,
+            $request->amount,
+            $request->description
         ]);
+
 
         return response()->json(['message' => 'Allowance added successfully'], 201);
     }
@@ -124,13 +116,13 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::table('tblpayrollitem')->insert([
-            'EmployeeID' => $validated['employeeId'],
-            'item_type' => PayrollItemTypeEnum::COMMISSION,
-            'amount' => $validated['amount'],
-            'description' => $validated['description'],
-            'created_date' => now(),
+        DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+            $request->employeeId,
+            PayrollItemTypeEnum::COMMISSION->value,
+            $request->amount,
+            $request->description
         ]);
+
 
         return response()->json(['message' => 'Commission added successfully'], 201);
     }
@@ -141,7 +133,7 @@ class PayrollItemController extends Controller
      */
     public function show(string $id)
     {
-        $payrollItem = DB::table('tblpayrollitem')->where('id', $id)->first();
+        $payrollItem = DB::select('CALL procGetPayrollItem(?)', [$id])[0] ?? null;
         return response()->json($payrollItem);
     }
 
@@ -156,10 +148,11 @@ class PayrollItemController extends Controller
             'description' => 'required|string',
         ]);
 
-        DB::table('tblpayrollitem')->where('id', $id)->update([
-            'item_type' => $validated['itemType'],
-            'amount' => $validated['amount'],
-            'description' => $validated['description'],
+        DB::select("CALL procUpdatePayrollItemByID(?, ?, ?, ?)", [
+            $id,
+            $request->itemType,
+            $request->amount,
+            $request->description
         ]);
 
         return response()->json(['message' => 'Payroll item updated successfully'], 200);
@@ -170,7 +163,7 @@ class PayrollItemController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::table('tblpayrollitem')->where('id', $id)->delete();
+        DB::select('CALL procDeletePayrollItemByID(?)', [$id]);
         return response()->json(['message' => 'Payroll item deleted successfully'], 200);
     }
 }
