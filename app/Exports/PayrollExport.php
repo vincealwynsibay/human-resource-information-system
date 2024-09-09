@@ -20,18 +20,9 @@ class PayrollExport implements FromCollection, WithHeadings
     public function collection()
     {
         // month-day-year to date object
-        return DB::table('tblpayroll')
-            ->whereDate('created_date', ">=", $this->startDate)
-            ->whereDate('created_date', "<=", $this->endDate)
-            ->select(['EmployeeID as employee_id', 'pay_period_start', 'pay_period_end', 'gross_salary', 'deductions', 'net_salary'])
-            ->get();
-    }
+        return DB::select('CALL procGetPayrollForExcel(?, ?)', [$this->startDate, $this->endDate]);
 
-    // public function collection()
-    // {
-    //     return DB::table('tblpayroll')
-    //         ->get(['EmployeeID as employee_id', 'pay_period_start', 'pay_period_end', 'gross_salary', 'deductions', 'net_salary']);
-    // }
+    }
 
     public function headings(): array
     {
