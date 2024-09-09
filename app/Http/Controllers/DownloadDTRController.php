@@ -16,8 +16,7 @@ class DownloadDTRController extends Controller
 {
     public function __invoke(Request $request, AttendanceReportService $attendanceReportService, $employee_id)
     {
-        $employee = DB::table('tblemployee')->where('id', $employee_id)->first();
-
+        $employee = DB::select('CALL procGetEmployee(?)', [$employee_id])[0] ?? null;
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -44,7 +43,7 @@ class DownloadDTRController extends Controller
     public function generateDTR(AttendanceReportService $attendanceReportService, $employee_id)
     {
         // get all attendance records within the month
-        $employee = DB::table('tblemployee')->where('id', $employee_id)->first();
+        $employee = DB::select('CALL procGetEmployee(?)', [$employee_id])[0] ?? null;
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -53,9 +52,22 @@ class DownloadDTRController extends Controller
             ], 404);
         }
 
-        $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $employee_id)->where('date', '>=', Date::now()->startOfMonth())->where('date', '<=', Date::now()->endOfMonth())->orderBy('date', 'asc')->get();
-        $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
-        $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
+        $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
+            $employee_id,
+            Date::now()->startOfMonth(),
+            Date::now()->endOfMonth()
+        ]);
+        $employeeWorkShift = DB::select('CALL procGetEmployeeWorkShifts(?)', [$employee->id])[0] ?? null;
+        $workShift = DB::select('CALL procGetWorkShift(?)', [$employeeWorkShift->WorkShiftID])[0] ?? null;
+
+        if ($workShift == null) {
+            return response()->json([
+                'errors' => [
+                    'WorkShift' => ['Employee does not have a work shift']
+                ]
+            ], 404);
+        }
+
         $attendanceSummary = $attendanceReportService->getAttendanceSummary($employee->id, $attendances, $workShift, Date::now()->startOfMonth(), Date::now()->endOfMonth());
         return [
             "attendances" => $attendanceSummary['attendances'],

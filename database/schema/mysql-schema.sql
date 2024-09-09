@@ -974,7 +974,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procDeleteEmployeeAttendanceByID`(IN p_id INT)
 BEGIN
-                DELETE FROM tblattendance WHERE id = p_id;
+                DELETE FROM tblattendancerecord WHERE id = p_id;
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1441,10 +1441,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeAttendanceByDate`(
                 IN p_date DATE
             )
 BEGIN
-                SELECT * FROM tblattendance
+                SELECT * FROM tblattendancerecord
                     WHERE
-                        tblattendance.EmployeeID = p_employeeId AND
-                        tblattendance.date = p_date;
+                        tblattendancerecord.EmployeeID = p_employeeId AND
+                        tblattendancerecord.date = p_date;
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1467,12 +1467,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeAttendanceByDateRang
                 IN p_toDate DATE
             )
 BEGIN
-                SELECT * FROM tblattendance
+                SELECT * FROM tblattendancerecord
                     WHERE
-                        tblattendance.EmployeeID = p_employeeId AND
-                        tblattendance.date >= p_fromDate AND
-                        tblattendance.date <= p_toDate
-                    ORDER BY tblattendance.date DESC;
+                        tblattendancerecord.EmployeeID = p_employeeId AND
+                        tblattendancerecord.date >= p_fromDate AND
+                        tblattendancerecord.date <= p_toDate
+                    ORDER BY tblattendancerecord.date DESC;
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1491,7 +1491,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeAttendanceByID`(IN p_id INT)
 BEGIN
-                SELECT * FROM tblattendance WHERE id = p_id;
+                SELECT * FROM tblattendancerecord WHERE id = p_id;
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1514,11 +1514,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeAttendancesAsAdmin`(
                 IN p_toDate DATE
             )
 BEGIN
-                SELECT * FROM tblattendance
+                SELECT * FROM tblattendancerecord
                     WHERE
-                        (p_employeeId IS NULL OR tblattendance.EmployeeID = p_employeeId) AND
-                        (p_fromDate IS NULL OR tblattendance.date >= p_fromDate) AND
-                        (p_toDate IS NULL OR tblattendance.date <= p_toDate);
+                        (p_employeeId IS NULL OR tblattendancerecord.EmployeeID = p_employeeId) AND
+                        (p_fromDate IS NULL OR tblattendancerecord.date >= p_fromDate) AND
+                        (p_toDate IS NULL OR tblattendancerecord.date <= p_toDate);
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1543,15 +1543,15 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeAttendancesAsSupervi
                 IN p_toDate DATE
             )
 BEGIN
-                SELECT * FROM tblattendance
-                    INNER JOIN tblemployee ON tblattendance.EmployeeID = tblemployee.id
+                SELECT * FROM tblattendancerecord
+                    INNER JOIN tblemployee ON tblattendancerecord.EmployeeID = tblemployee.id
                     INNER JOIN tblemployeesupervisor ON tblemployeesupervisor.SubordinateID = tblemployee.id
                     WHERE
                         tblemployeesupervisor.SupervisorID = p_supervisorId AND
-                        (p_employeeId IS NULL OR tblattendance.EmployeeID = p_employeeId) AND
+                        (p_employeeId IS NULL OR tblattendancerecord.EmployeeID = p_employeeId) AND
                         (p_name IS NULL OR CONCAT(tblemployee.firstname, " ", tblemployee.lastname) = p_name) AND
-                        (p_fromDate IS NULL OR tblattendance.date >= p_fromDate) AND
-                        (p_toDate IS NULL OR tblattendance.date <= p_toDate);
+                        (p_fromDate IS NULL OR tblattendancerecord.date >= p_fromDate) AND
+                        (p_toDate IS NULL OR tblattendancerecord.date <= p_toDate);
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1723,7 +1723,7 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `procGetEmployeeLeavesAsAdmin` */;
+/*!50003 DROP PROCEDURE IF EXISTS `procGetEmployeeLeaves` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -1731,7 +1731,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeLeavesAsAdmin`(
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeLeaves`(
                 IN p_employeeId INT, 
                 IN p_leaveTypeId INT, 
                 IN p_startDate DATE, 
@@ -2550,7 +2550,6 @@ DELIMITER ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetRecurringHolidays`(
-                IN p_date DATE, 
                 IN p_month INT, 
                 IN p_day INT
             )
@@ -2786,7 +2785,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeAttendance`(IN p_employeeId INT, IN p_date DATE)
 BEGIN
-                INSERT INTO tblattendance (EmployeeID, date, time_in_session1, time_out_session1, time_in_session2, time_out_session2, time_in_overtime, time_out_overtime)
+                INSERT INTO tblattendancerecord (EmployeeID, date, time_in_session1, time_out_session1, time_in_session2, time_out_session2, time_in_overtime, time_out_overtime)
                 VALUES (p_employeeId, p_date, NULL, NULL, NULL, NULL, NULL, NULL);
                 SELECT LAST_INSERT_ID() as id;
             END ;;
@@ -3289,7 +3288,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateEmployeeAttendanceByID`(
                 IN p_timeOutOvertime TIME
             )
 BEGIN
-                UPDATE tblattendance
+                UPDATE tblattendancerecord
                     SET
                         time_in_session1 = IFNULL(p_timeInSession1, time_in_session1),
                         time_out_session1 = IFNULL(p_timeOutSession1, time_out_session1),
@@ -3863,7 +3862,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateTimeInOvertime`(IN p_employeeId INT, IN p_date DATE, IN p_timeIn TIME)
 BEGIN
-                UPDATE tblattendance
+                UPDATE tblattendancerecord
                     SET time_in_overtime = p_timeIn
                 WHERE EmployeeID = p_employeeId AND date = p_date;
             END ;;
@@ -3884,7 +3883,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateTimeInSession1`(IN p_employeeId INT, IN p_date DATE, IN p_timeIn TIME)
 BEGIN
-                UPDATE tblattendance
+                UPDATE tblattendancerecord
                     SET time_in_session1 = p_timeIn
                 WHERE EmployeeID = p_employeeId AND date = p_date;
             END ;;
@@ -3905,7 +3904,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateTimeInSession2`(IN p_employeeId INT, IN p_date DATE, IN p_timeIn TIME)
 BEGIN
-                UPDATE tblattendance
+                UPDATE tblattendancerecord
                     SET time_in_session2 = p_timeIn
                 WHERE EmployeeID = p_employeeId AND date = p_date;
             END ;;
@@ -3926,7 +3925,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateTimeOutOvertime`(IN p_employeeId INT, IN p_date DATE, IN p_timeOut TIME)
 BEGIN
-                UPDATE tblattendance
+                UPDATE tblattendancerecord
                     SET time_out_overtime = p_timeOut
                 WHERE EmployeeID = p_employeeId AND date = p_date;
             END ;;
@@ -3947,7 +3946,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateTimeOutSession1`(IN p_employeeId INT, IN p_date DATE, IN p_timeOut TIME)
 BEGIN
-                UPDATE tblattendance
+                UPDATE tblattendancerecord
                     SET time_out_session1 = p_timeOut
                 WHERE EmployeeID = p_employeeId AND date = p_date;
             END ;;
@@ -3968,7 +3967,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procUpdateTimeOutSession2`(IN p_employeeId INT, IN p_date DATE, IN p_timeOut TIME)
 BEGIN
-                UPDATE tblattendance
+                UPDATE tblattendancerecord
                     SET time_out_session2 = p_timeOut
                 WHERE EmployeeID = p_employeeId AND date = p_date;
             END ;;

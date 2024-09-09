@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enum\AttendanceStatusEnum;
 use App\Enum\DayLengthEnum;
 use App\Enum\LeaveRequestEnum;
+use App\Enum\OvertimeRequestEnum;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -25,7 +26,7 @@ class AttendanceReportService
         $leave = 0;
         $left = 0;
 
-        $workWeek = DB::table('tblworkweek')->first();
+        $workWeek = DB::select('CALL procGetWorkWeek()')[0];
         $dayNo = $dateFrom->day;
         $endDay = $dateTo->day;
 
@@ -88,10 +89,13 @@ class AttendanceReportService
             $dayLength = $workWeek->$day;
             // CHECK IF VALID (IF is_recurring CHECK MONTH AND DAY, IF NOT CHECK VALIDITY DATE)
 
-            $recurringHoliday = DB::table('tblholiday')->where('is_recurring', true)->whereRaw('MONTH(date) = ?', [Date::parse($attendance->date)->format('m')])->whereRaw('DAY(date) = ?', [Date::parse($attendance->date)->format('d')])->first();
-            $holiday = DB::table('tblholiday')->where('date', $attendance->date)->first();
-            $overtime = DB::table('tblovertime')->where('requested_date', $attendance->date)->where('status', 'APPROVED')->first();
-
+            $holiday = DB::select('CALL procGetHolidayByDate(?)', [$attendance->date])[0] ?? null;
+            $recurringHoliday = DB::select('CALL procGetRecurringHolidays(?, ?)', [Date::parse($attendance->date)->format('m'), Date::parse($attendance->date)->format('d')])[0] ?? null;
+            $overtime = DB::select('CALL procGetEmployeeOvertimeByDate(?, ?, ?)', [
+                $employeeId,
+                $attendance->date,
+                OvertimeRequestEnum::APPROVED->value
+            ])[0] ?? null;
 
             if ($overtime != null) {
                 if (DayLengthEnum::from($dayLength)->isNoWork()) {
@@ -239,7 +243,7 @@ class AttendanceReportService
         $totalOvertimeDuration = 0;
         $totalLateDuration = 0;
         $left = 0;
-        $workWeek = DB::table('tblworkweek')->first();
+        $workWeek = DB::select('CALL procGetWorkWeek()')[0];
 
 
         do {
@@ -283,9 +287,14 @@ class AttendanceReportService
             //     // if also holiday or rest day, it is impossible to overtime because all work hours is an overtime
             $day = strtolower(Date::createFromFormat('Y-m-d', $attendance->date)->format('D'));
             $dayLength = $workWeek->$day;
-            $recurringHoliday = DB::table('tblholiday')->where('is_recurring', true)->whereRaw('MONTH(date) = ?', [Date::parse($attendance->date)->format('m')])->whereRaw('DAY(date) = ?', [Date::parse($attendance->date)->format('d')])->first();
-            $holiday = DB::table('tblholiday')->where('date', $attendance->date)->first();
-            $overtime = DB::table('tblovertime')->where('requested_date', $attendance->date)->where('status', 'APPROVED')->first();
+
+            $holiday = DB::select('CALL procGetHolidayByDate(?)', [$attendance->date])[0] ?? null;
+            $recurringHoliday = DB::select('CALL procGetRecurringHolidays(?, ?)', [Date::parse($attendance->date)->format('m'), Date::parse($attendance->date)->format('d')])[0] ?? null;
+            $overtime = DB::select('CALL procGetEmployeeOvertimeByDate(?, ?, ?)', [
+                $employeeId,
+                $attendance->date,
+                OvertimeRequestEnum::APPROVED->value
+            ])[0] ?? null;
 
             if ($overtime != null) {
                 if (DayLengthEnum::from($dayLength)->isNoWork()) {
@@ -343,22 +352,20 @@ class AttendanceReportService
     protected function parseAttendance($employeeId, $date)
     {
         $formattedDate = $date->format('Y-m-d');
+        $workWeek = DB::select('CALL procGetWorkWeek()')[0];
         $day = strtolower(Date::parse($formattedDate)->format('D'));
-        $workWeek = DB::table('tblworkweek')->first();
         $dayLength = $workWeek->$day;
-        $recurringHoliday = DB::table('tblholiday')->where('is_recurring', true)->whereRaw('MONTH(date) = ?', [Date::parse($date)->format('m')])->whereRaw('DAY(date) = ?', [Date::parse($date)->format('d')])->first();
-        $holiday = DB::table('tblholiday')->where('date', $formattedDate)->first();
 
-        $leave = DB::table('tblleave')
-            ->where('status', LeaveRequestEnum::APPROVED)
-            // if unpaid leave add to absences
-            ->whereNot('leaveTypeID', null)
-            ->where('EmployeeID', $employeeId)
-            ->where(function ($query) use ($formattedDate) {
-                $query->where('start_date', "<=", $formattedDate);
-                $query->where('end_date', ">=", $formattedDate);
-            })
-            ->first();
+        $holiday = DB::select('CALL procGetHolidayByDate(?)', [$formattedDate])[0] ?? null;
+        $recurringHoliday = DB::select('CALL procGetRecurringHolidays(?, ?)', [Date::parse($date)->format('m'), Date::parse($date)->format('d')])[0] ?? null;
+
+        $leave = DB::select('CALL procGetEmployeeLeaves(?, ?, ?, ?, ?)', [
+            $employeeId,
+            null,
+            $formattedDate,
+            $formattedDate,
+            LeaveRequestEnum::APPROVED->value
+        ])[0] ?? null;
 
         if (DayLengthEnum::from($dayLength)->isNoWork()) {
             return [
