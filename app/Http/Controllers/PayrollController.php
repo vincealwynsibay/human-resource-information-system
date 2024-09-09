@@ -23,13 +23,14 @@ class PayrollController extends Controller
      */
     public function index()
     {
-        $payroll = DB::table('tblpayroll')->get();
+        $payroll = DB::select('CALL procGetPayroll(?)', [null]);
         return response()->json($payroll, 200);
     }
 
     public function getEmployeePayroll($employeeId)
     {
-        $payroll = DB::table('tblpayroll')->where('EmployeeID', $employeeId)->get();
+        $payroll = DB::select('CALL procGetPayroll(?)', [$employeeId]);
+
         return response()->json($payroll, 200);
     }
 
@@ -40,7 +41,7 @@ class PayrollController extends Controller
             'endDate' => 'nullable'
         ]);
 
-        return Excel::download(new PayrollExport(Date::createFromFormat('Y-m-d', $validated['startDate']), Date::createFromFormat('Y-m-d', $validated['endDate'])), 'payroll-' . Date::today()->format('Y-m-d') . '.xlsx');
+        return Excel::download(new PayrollExport(Date::createFromFormat('Y-m-d', $request->startDate), Date::createFromFormat('Y-m-d', $request->endDate)), 'payroll-' . Date::today()->format('Y-m-d') . '.xlsx');
     }
 
     /**
@@ -54,11 +55,37 @@ class PayrollController extends Controller
         ]);
 
 
-        $basicSalary = DB::table('tblbasicsalary')->where("EmployeeID", $validated['employeeId'])->whereNull('is_deleted')->first();
-        $employee = DB::table('tblemployee')->where('id', $request->employeeId)->first();
-        $employeeWorkShift = DB::table('tblemployeeworkshift')->where('EmployeeID', $employee->id)->first();
-        $workShift = DB::table('tblworkshift')->where('id', $employeeWorkShift->WorkShiftID)->first();
-        $workDaysAmount = DB::table('tblworkweek')->select(DB::raw('(mon + tue + wed + thu + fri + sat + sun) AS total_sum'))->first()->total_sum;
+        $basicSalary = DB::select('CALL procGetEmployeeSalary(?)', [$request->employeeId])[0] ?? null;
+        if ($basicSalary == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not have a salary']
+                ]
+            ], 404);
+        }
+
+        $employee = DB::select('CALL procGetEmployee(?)', [$request->employeeId])[0] ?? null;
+        $employeeWorkShift = DB::select('CALL procGetEmployeeWorkShifts(?)', [$employee->id])[0] ?? null;
+        $workShift = DB::select('CALL procGetWorkShift(?)', [$employeeWorkShift->WorkShiftID])[0] ?? null;
+
+        if ($workShift == null) {
+            return response()->json([
+                'errors' => [
+                    'Employee' => ['Employee does not have a work shift']
+                ]
+            ], 404);
+        }
+
+        $workDaysAmount = DB::select('CALL procGetNumberOfWorkDays()')[0];
+
+        if ($workDaysAmount == 0) {
+            return response()->json([
+                'errors' => [
+                    'WorkDays' => ['No work days found']
+                ]
+            ], 404);
+        }
+
         $annualWorkHours = $workDaysAmount * $workShift->hours_per_day * 52;
         $monthlyWorkHours = $annualWorkHours / 12;
         $hourlyRate = $basicSalary->amount / ($monthlyWorkHours / 2);
@@ -85,7 +112,8 @@ class PayrollController extends Controller
         }
 
         // check if payroll already exists between $dateFrom and $dateTo
-        $existingPayroll = DB::table('tblpayroll')->where('EmployeeID', $employee->id)->where('pay_period_start', ">=", $dateFrom)->where('pay_period_end', "<=", $dateTo)->first();
+        $existingPayroll = DB::select('CALL PayrollByPayPeriod(?, ?, ?)', [$employeeId, $dateFrom, $dateTo]);
+
 
         if ($existingPayroll) {
             return response()->json(['message' => 'Payroll already exists for this time'], 400);
@@ -94,7 +122,11 @@ class PayrollController extends Controller
         // determine if date is 15th or end of month for semi-monthly
         // if 15th, schedule income tax
         // attendance payroll items (leave, overtime, late, undertime, absences, holiday)
-        $attendances = DB::table('tblattendancerecord')->where('EmployeeID', $request->employeeId)->whereBetween('date', [$dateFrom, $dateTo])->orderBy('date', 'ASC')->get();
+        $attendances = DB::select('CALL procGetEmployeeAttendanceByDateRange(?, ?, ?)', [
+            $employee->id,
+            $dateFrom,
+            $dateTo
+        ]);
         $payrollItems = array_merge($payrollItems, $this->getAttendancePayrollItems($attendanceReportService, $employee->id, $attendances, $workShift, $hourlyRate, $dateFrom, $dateTo));
         if ($day == 15) {
             $payrollItems[] = [
@@ -147,7 +179,14 @@ class PayrollController extends Controller
 
 
         // insert all payroll items (basic salary, deductions, attendance)
-        DB::table('tblpayrollitem')->insert($payrollItems);
+        foreach ($payrollItems as $item) {
+            DB::select('CALL procInsertPayrollItem(?, ?, ?, ?)', [
+                $item['EmployeeID'],
+                $item['item_type'],
+                $item['amount'],
+                $item['description']
+            ]);
+        }
 
         // calculate gross salary
         $grossSalary = $this->calculateGrossSalary($employee->id, $dateFrom, $dateTo);
@@ -162,6 +201,15 @@ class PayrollController extends Controller
             'deductions' => $deductions,
             'net_salary' => $netSalary,
             'created_date' => Date::now()
+        ]);
+
+        DB::select('CALL procInsertPayroll(?, ?, ?, ?, ?, ?)', [
+            $employee->id,
+            $dateFrom,
+            $dateTo,
+            $grossSalary,
+            $deductions,
+            $netSalary
         ]);
 
         return response()->json([
@@ -180,7 +228,7 @@ class PayrollController extends Controller
      */
     public function show(string $id)
     {
-        $payroll = DB::table('tblpayroll')->where('id', $id)->first();
+        $payroll = DB::select('CALL procGetPayrollByID(?)', [$id]);
         return response()->json($payroll, 200);
     }
 
@@ -189,7 +237,9 @@ class PayrollController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::table('tblpayroll')->where('id', $id)->delete();
+        DB::select('CALL procDeletePayrollByID(?)', [
+            $id
+        ]);
         return response()->json(['message' => 'Payroll deleted'], 200);
     }
 
@@ -198,7 +248,9 @@ class PayrollController extends Controller
     {
         // get all valid payroll items within the date range (salary, overtime, bonuses, allowance, holiday pay, commissions, leave pay)
         // $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_date', ">=", $dateFrom)->whereDate('created_date', "<=", $dateTo)->get();
-        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->where('created_date', ">=", $dateFrom)->where('created_date', "<=", $dateTo)->get();
+        $payrollItems = DB::select('CALL procGetPayrollItems(?)', [
+            $employeeId
+        ]);
         $grossSalary = 0;
         foreach ($payrollItems as $item) {
             if ($item->item_type != PayrollItemTypeEnum::DEDUCTION) {
@@ -210,7 +262,9 @@ class PayrollController extends Controller
 
     protected function calculateDeductions($employeeId, $dateFrom, $dateTo)
     {
-        $payrollItems = DB::table('tblpayrollitem')->where('EmployeeID', $employeeId)->whereDate('created_date', ">=", $dateFrom)->whereDate('created_date', "<=", $dateTo)->get();
+        $payrollItems = DB::select('CALL procGetPayrollItems(?)', [
+            $employeeId
+        ]);
         $grossSalary = 0;
         foreach ($payrollItems as $item) {
             if ($item->item_type == PayrollItemTypeEnum::DEDUCTION) {

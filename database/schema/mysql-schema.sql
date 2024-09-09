@@ -175,7 +175,7 @@ CREATE TABLE `tblbasicsalary` (
   `amount` decimal(10,0) NOT NULL,
   `change_reason` varchar(255) NOT NULL COMMENT 'starting salary to promotions',
   `comments` text,
-  `is_deleted` datetime DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `EmployeeID` (`EmployeeID`),
   KEY `PayGradeID` (`PayGradeID`),
@@ -459,10 +459,9 @@ CREATE TABLE `tblovertime` (
   PRIMARY KEY (`id`),
   KEY `requested_date` (`requested_date`),
   KEY `EmployeeID` (`EmployeeID`),
-  KEY `ReviewerID` (`ReviewerID`),    
+  KEY `ReviewerID` (`ReviewerID`),
   CONSTRAINT `tblovertime_ibfk_1` FOREIGN KEY (`EmployeeID`) REFERENCES `tblemployee` (`id`),
   CONSTRAINT `tblovertime_ibfk_2` FOREIGN KEY (`ReviewerID`) REFERENCES `tblemployee` (`id`)
-
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tblpaygrade`;
@@ -1074,7 +1073,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procDeleteEmployeeSalaryByID`(p_id INT)
 BEGIN
                 UPDATE tblbasicsalary
-                    SET is_deleted = 1
+                    SET deleted_at = NOW()
                 WHERE id = p_id;
                 END ;;
 DELIMITER ;
@@ -1754,6 +1753,37 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `procGetEmployeeLeavesAsAdmin` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeLeavesAsAdmin`(
+                IN p_employeeId INT, 
+                IN p_leaveTypeId INT, 
+                IN p_startDate DATE, 
+                IN p_endDate DATE, 
+                IN p_status VARCHAR(50)
+            )
+BEGIN
+                SELECT * FROM tblleave
+                    WHERE
+                        (p_employeeId IS NULL OR tblleave.EmployeeID = p_employeeId) AND
+                        (p_leaveTypeId IS NULL OR tblleave.LeaveTypeID = p_leaveTypeId) AND
+                        (p_startDate IS NULL OR tblleave.start_date >= p_startDate) AND
+                        (p_endDate IS NULL OR tblleave.end_date <= p_endDate) AND
+                        (p_status IS NULL OR tblleave.status = p_status);
+            END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `procGetEmployeeLeavesAsSupervisor` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1945,7 +1975,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetEmployeeSalary`(p_employeeId INT)
 BEGIN
-                SELECT * FROM tblbasicsalary WHERE EmployeeID = p_employeeId AND is_deleted = 0;
+                SELECT * FROM tblbasicsalary WHERE EmployeeID = p_employeeId AND deleted_at IS NULL;
                 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2349,7 +2379,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetNumberOfWorkDays`()
 BEGIN
                 SELECT
                     SUM(mon) + SUM(tue) + SUM(wed) + SUM(thu) + SUM(fri) + SUM(sat) + SUM(sun) as total
-                FROM tblworkweek;
+                FROM tblworkweek ORDER BY id DESC LIMIT 1 ;
             END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2458,6 +2488,26 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetPayroll`(p_id INT)
 BEGIN
                 SELECT * FROM tblpayroll WHERE id = p_id;
             END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `procGetPayrollByID` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb3 */ ;
+/*!50003 SET character_set_results = utf8mb3 */ ;
+/*!50003 SET collation_connection  = utf8mb3_general_ci */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `procGetPayrollByID`(p_id INT)
+BEGIN
+                SELECT * FROM tblpayroll WHERE id = p_id;
+           
+	END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -2867,10 +2917,10 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `procInsertEmployeeSalary`(p_employeeId INT, p_payGradeId INT, p_amount DECIMAL(10,2), p_changeReason VARCHAR(255))
 BEGIN
             DECLARE oldSalaryId INT;
-                SET oldSalaryId = (SELECT id FROM tblbasicsalary WHERE EmployeeID = p_employeeId AND is_deleted = 0);
+                SET oldSalaryId = (SELECT id FROM tblbasicsalary WHERE EmployeeID = p_employeeId AND deleted_at = null);
                 IF oldSalaryId IS NOT NULL THEN
                     UPDATE tblbasicsalary
-                        SET is_deleted = 1
+                        SET deleted_at = NOW()
                     WHERE id = oldSalaryId;
                 END IF;
 
