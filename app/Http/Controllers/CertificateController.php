@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\RoleEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -10,9 +11,18 @@ class CertificateController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($employeeId)
+    public function index(Request $request, $employeeId)
     {
         $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
+
+        $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
+            $request->user()->EmployeeID,
+            $employee->id
+        ])[0] ?? null;
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         if ($employee == null) {
             return response()->json([
@@ -34,6 +44,14 @@ class CertificateController extends Controller
             'issuedBy' => 'required|string',
             'issuedDate' => 'required|date',
         ]);
+        $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
+            $request->user()->EmployeeID,
+            $employeeId
+        ])[0] ?? null;
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         DB::select('CALL procInsertEmployeeCertificate(?, ?, ?, ?)', [
             $employeeId,
@@ -48,13 +66,22 @@ class CertificateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id, string $certificateId)
+    public function update(Request $request, string $employeeId, string $certificateId)
     {
         $validated = $request->validate([
             'name' => 'nullable|string',
             'issuedBy' => 'nullable|string',
             'issuedDate' => 'nullable|date',
         ]);
+
+        $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
+            $request->user()->EmployeeID,
+            $employeeId
+        ])[0] ?? null;
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $certificate = DB::select('CALL procGetEmployeeCertificate(?)', [$certificateId]);
 
@@ -80,8 +107,17 @@ class CertificateController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id, string $certificateId)
+    public function destroy(Request $request, string $employeeId, string $certificateId)
     {
+        $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
+            $request->user()->EmployeeID,
+            $employeeId
+        ])[0] ?? null;
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $certificate = DB::select('CALL procGetEmployeeCertificate(?)', [$certificateId])[0] ?? null;
 
         if ($certificate == null) {
