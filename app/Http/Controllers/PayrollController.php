@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enum\DayLengthEnum;
-use App\Enum\PayFrequencyEnum;
-use App\Enum\LeaveRequestEnum;
+use App\Enum\RoleEnum;
 use App\Exports\PayrollExport;
 use App\Services\AttendanceReportService;
 use Illuminate\Http\Request;
@@ -21,15 +19,35 @@ class PayrollController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $payroll = DB::select('CALL procGetPayroll(?)', [null]);
+        $validated = $request->validate([
+            'fromDate' => 'nullable|date',
+            'toDate' => 'nullable|date',
+        ]);
+
+        $payroll = DB::select('CALL procGetPayrolls(?, ?)', [$request->fromDate, $request->toDate]);
         return response()->json($payroll, 200);
     }
 
-    public function getEmployeePayroll($employeeId)
+    public function getEmployeePayroll(Request $request, $employeeId)
     {
-        $payroll = DB::select('CALL procGetPayroll(?)', [$employeeId]);
+        $validated = $request->validate([
+            'fromDate' => 'nullable|date',
+            'toDate' => 'nullable|date',
+        ]);
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+            if ($employeeId != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
+
+        $payroll = DB::select('CALL procGetEmployeePayrolls(?, ?, ?)', [$employeeId, $request->fromDate, $request->toDate]);
 
         return response()->json($payroll, 200);
     }
@@ -220,9 +238,27 @@ class PayrollController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        $payroll = DB::select('CALL procGetPayrollByID(?)', [$id]);
+        $payroll = DB::select('CALL procGetPayrollByID(?)', [$id])[0];
+
+        if ($payroll == null) {
+            return response()->json([
+                'errors' => [
+                    'Payroll' => ['Payroll not found']
+                ]
+            ], 404);
+        }
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+            if ($payroll->EmployeeID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
         return response()->json($payroll, 200);
     }
 
