@@ -14,7 +14,7 @@ test('time in am as employee', function () {
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 8, 0, 0));
 
-    $response = $this->post('/api/employee/attendance/timeIn');
+    $response = $this->post('/api/attendance/timeIn');
     $response->assertStatus(200);
 });
 
@@ -25,7 +25,7 @@ test('time out am as employee', function () {
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 12, 0, 0));
 
-    $response = $this->post('/api/employee/attendance/timeOut');
+    $response = $this->post('/api/attendance/timeOut');
     $response->assertStatus(200);
 });
 
@@ -36,7 +36,7 @@ test('time in pm as employee', function () {
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 13, 0, 0));
 
-    $response = $this->post('/api/employee/attendance/timeIn');
+    $response = $this->post('/api/attendance/timeIn');
     $response->assertStatus(200);
 });
 
@@ -47,7 +47,7 @@ test('time out pm as employee', function () {
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 17, 0, 0));
 
-    $response = $this->post('/api/employee/attendance/timeOut');
+    $response = $this->post('/api/attendance/timeOut');
     $response->assertStatus(200);
 });
 
@@ -58,12 +58,12 @@ test('late attendance am as employee', function () {
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 8, 30, 0));
 
-    $response = $this->post('/api/employee/attendance/timeIn');
+    $response = $this->post('/api/attendance/timeIn');
     $response->assertStatus(200);
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 12, 0, 0));
 
-    $response = $this->post('/api/employee/attendance/timeOut');
+    $response = $this->post('/api/attendance/timeOut');
     $response->assertStatus(200);
 });
 
@@ -74,12 +74,12 @@ test('undertime attendance am as employee', function () {
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 8, 0, 0));
 
-    $response = $this->post('/api/employee/attendance/timeIn');
+    $response = $this->post('/api/attendance/timeIn');
     $response->assertStatus(200);
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 11, 30, 0));
 
-    $response = $this->post('/api/employee/attendance/timeOut');
+    $response = $this->post('/api/attendance/timeOut');
     $response->assertStatus(200);
 });
 
@@ -90,12 +90,12 @@ test('late attendance pm as employee', function () {
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 13, 30, 0));
 
-    $response = $this->post('/api/employee/attendance/timeIn');
+    $response = $this->post('/api/attendance/timeIn');
     $response->assertStatus(200);
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 17, 0, 0));
 
-    $response = $this->post('/api/employee/attendance/timeOut');
+    $response = $this->post('/api/attendance/timeOut');
     $response->assertStatus(200);
 });
 
@@ -106,12 +106,12 @@ test('undertime attendance pm as employee', function () {
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 13, 0, 0));
 
-    $response = $this->post('/api/employee/attendance/timeIn');
+    $response = $this->post('/api/attendance/timeIn');
     $response->assertStatus(200);
 
     Carbon::setTestNow(Carbon::create(2021, 1, 1, 16, 30, 0));
 
-    $response = $this->post('/api/employee/attendance/timeOut');
+    $response = $this->post('/api/attendance/timeOut');
     $response->assertStatus(200);
 });
 
@@ -122,7 +122,7 @@ test('get all attendance records as admin', function () {
     $this->actingAs($user);
 
     // with params as date (from and to)
-    $response = $this->get('/api/admin/attendance?fromDate=2021-01-01&toDate=2021-12-31');
+    $response = $this->get('/api/attendance?fromDate=2021-01-01&toDate=2021-12-31');
     $response->assertStatus(200);
 });
 
@@ -194,7 +194,7 @@ test('update time in and time out as admin', function () {
         'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0)
     ]);
 
-    $response = $this->put("/api/admin/attendance/{$attendanceRecordId}", [
+    $response = $this->put("/api/attendance/{$attendanceRecordId}", [
         'time_in_session1' => Date::now()->setDateTime(2021, 1, 1, 8, 0, 0),
         'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0),
         'date' => '2021-01-01'
@@ -214,7 +214,7 @@ test('update own time in and time out as employee', function () {
         'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0)
     ]);
 
-    $response = $this->put("/api/employee/attendance/{$attendanceRecordId}", [
+    $response = $this->put("/api/attendance/{$attendanceRecordId}", [
         'time_in_session1' => Date::now()->setDateTime(2021, 1, 1, 8, 0, 0),
         'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0),
         'date' => '2021-01-01'
@@ -238,7 +238,7 @@ test('delete attendance record as admin', function () {
         'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0)
     ]);
 
-    $response = $this->delete("/api/admin/attendance/{$attendanceRecordId}");
+    $response = $this->delete("/api/attendance/{$attendanceRecordId}");
     $response->assertStatus(201);
 });
 
@@ -254,7 +254,7 @@ test('delete attendance record as employee', function () {
         'time_out_session2' => Date::now()->setDateTime(2021, 1, 1, 17, 0, 0)
     ]);
 
-    $response = $this->delete("/api/employee/attendance/{$attendanceRecordId}");
+    $response = $this->delete("/api/attendance/{$attendanceRecordId}");
     $response->assertStatus(201);
 });
 

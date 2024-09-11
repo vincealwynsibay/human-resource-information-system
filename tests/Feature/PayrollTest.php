@@ -252,6 +252,34 @@ test('get employee payroll', function () {
         'created_date' => Date::now()
     ]);
 
+    $response = $this->get('/api/employee/' . $user->EmployeeID . '/payroll');
+    $response->assertStatus(200);
+});
+test('get payroll by id', function () {
+
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $employeeId = DB::table('tblemployee')->insert([
+        'firstname' => 'John',
+        'lastname' => 'Doe',
+        'middlename' => fake()->email,
+        'joined_date' => now(),
+        'sss_contribution' => 100,
+        'philhealth_contribution' => 100,
+        'pagibig_contribution' => 100,
+    ]);
+
+    $payrollId = DB::table('tblpayroll')->insertGetId([
+        'EmployeeID' => $employeeId,
+        'pay_period_start' => Date::now()->startOfMonth(),
+        'pay_period_end' => Date::now()->setDay(31),
+        'gross_salary' => 1000,
+        'deductions' => 100,
+        'net_salary' => 900,
+        'created_date' => Date::now()
+    ]);
+
     $response = $this->get('/api/payroll/' . $payrollId);
     $response->assertStatus(200);
 });

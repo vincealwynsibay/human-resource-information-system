@@ -33,7 +33,7 @@ test('get user payroll items as admin', function () {
     ]);
 
     // get the payroll items of the employee
-    $response = $this->get('api/admin/payrollitem?employeeId=' . $employeeId);
+    $response = $this->get('api/payrollitem?employeeId=' . $employeeId);
     // assert the response
     $response->assertStatus(200);
 
@@ -90,7 +90,7 @@ test('add a payroll item to an employee as admin', function () {
         'joined_date' => now()
     ]);
 
-    $response = $this->post('/api/admin/payrollitem/', [
+    $response = $this->post('/api/payrollitem/', [
         'employeeId' => $employeeId,
         'itemType' => 'BONUS',
         'amount' => 1000,
@@ -119,7 +119,7 @@ test('add a bonus payroll item to an employee as admin', function () {
         'joined_date' => now()
     ]);
 
-    $response = $this->post('/api/admin/payrollitem/bonus', [
+    $response = $this->post('/api/payrollitem/bonus', [
         'employeeId' => $employeeId,
         'amount' => 1000,
         'description' => 'Christmas bonus',
@@ -140,7 +140,7 @@ test('add a deduction payroll item to an employee as admin', function () {
         'joined_date' => now()
     ]);
 
-    $response = $this->post('/api/admin/payrollitem/deduction', [
+    $response = $this->post('/api/payrollitem/deduction', [
         'employeeId' => $employeeId,
         'amount' => 500,
         'description' => 'Tax deduction',
@@ -161,7 +161,7 @@ test('add a allowance payroll item to an employee as admin', function () {
         'joined_date' => now()
     ]);
 
-    $response = $this->post('/api/admin/payrollitem/allowance', [
+    $response = $this->post('/api/payrollitem/allowance', [
         'employeeId' => $employeeId,
         'amount' => 500,
         'description' => 'Housing allowance',
@@ -182,7 +182,7 @@ test('add a commission payroll item to an employee as admin', function () {
         'joined_date' => now()
     ]);
 
-    $response = $this->post('/api/admin/payrollitem/commission', [
+    $response = $this->post('/api/payrollitem/commission', [
         'employeeId' => $employeeId,
         'amount' => 500,
         'description' => 'Sales commission',
@@ -213,7 +213,7 @@ test('update an existing payroll item of an employee as admin', function () {
         'created_date' => now(),
     ]);
 
-    $response = $this->put('/api/admin/payrollitem/' . $payrollItemId, [
+    $response = $this->put('/api/payrollitem/' . $payrollItemId, [
         'employeeId' => $employeeId,
         'itemType' => 'BONUS',
         'amount' => 2000,
@@ -246,6 +246,6 @@ test('delete an existing payroll item of an employee as admin', function () {
         'created_date' => now(),
     ]);
 
-    $response = $this->delete('/api/admin/payrollitem/' . $payrollItemid);
+    $response = $this->delete('/api/payrollitem/' . $payrollItemid);
     $response->assertStatus(200);
 });

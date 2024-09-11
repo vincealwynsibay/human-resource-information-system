@@ -522,8 +522,6 @@ class EmployeeController extends Controller
             }
         }
 
-
-
         if ($employee == null) {
             return response()->json([
                 'errors' => [
@@ -531,12 +529,6 @@ class EmployeeController extends Controller
                 ]
             ], 404);
         }
-
-        // DB::table("tblemployee")->where('id', $id)->update([
-        //     'JobTitleID' => $request->jobTitle,
-        //     'EmploymentStatusID' => $request->employmentStatus,
-        //     'DepartmentID' => $request->department,
-        // ]);
 
         DB::select('CALL procUpdateEmployeeJobDetailsByID(?, ?, ?, ?)', [
             $id,
@@ -614,7 +606,6 @@ class EmployeeController extends Controller
         // check if employee is a subordinate to current user
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
-
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
@@ -624,8 +615,6 @@ class EmployeeController extends Controller
                 ], 404);
             }
         }
-
-
 
         if ($employee == null) {
             return response()->json([

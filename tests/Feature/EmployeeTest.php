@@ -10,49 +10,49 @@ test('get all employees', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $response = $this->get('/api/admin/employee');
+    $response = $this->get('/api/employee');
     $response->assertStatus(200);
 });
 
 test('search for employees by full name', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->get('/api/admin/employee?name=John Doe');
+    $response = $this->get('/api/employee?name=John Doe');
     $response->assertStatus(200);
 });
 
 test('search for employees by employment status', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->get('/api/admin/employee?employmentStatus=1');
+    $response = $this->get('/api/employee?employmentStatus=1');
     $response->assertStatus(200);
 });
 
 test('search for employees by job title', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->get('/api/admin/employee?jobTitle=1');
+    $response = $this->get('/api/employee?jobTitle=1');
     $response->assertStatus(200);
 });
 
 test('search for employees by department', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->get('/api/admin/employee?department=1');
+    $response = $this->get('/api/employee?department=1');
     $response->assertStatus(200);
 });
 
 test('search for employees by id', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->get('/api/admin/employee?id=1');
+    $response = $this->get('/api/employee?id=1');
     $response->assertStatus(200);
 });
 
 test('create a new employee', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->post('/api/admin/employee', [
+    $response = $this->post('/api/employee', [
         'firstname' => fake()->firstName,
         'lastname' => fake()->lastName,
         'middlename' => fake()->firstName
@@ -63,7 +63,7 @@ test('create a new employee', function () {
 test('get an employee by id', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->get('/api/admin/employee/1');
+    $response = $this->get('/api/employee/1');
     $response->assertStatus(200);
 });
 
@@ -84,7 +84,7 @@ test('assign employee to a supervisor as admin', function () {
         'joined_date' => Date::now()
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $employeeId . '/assignSupervisor', [
+    $response = $this->put('/api/employee/' . $employeeId . '/assignSupervisor', [
         'supervisor' => $supervisorId
     ]);
     $response->assertStatus(200);
@@ -107,11 +107,11 @@ test('remove assigned supervisor from an employee', function () {
         'joined_date' => Date::now()
     ]);
 
-    $this->put('/api/admin/employee/' . $employeeId . '/assignSupervisor', [
+    $this->put('/api/employee/' . $employeeId . '/assignSupervisor', [
         'supervisor' => $supervisorId
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $employeeId . '/removeSupervisor', [
+    $response = $this->put('/api/employee/' . $employeeId . '/removeSupervisor', [
         'supervisor' => $supervisorId
     ]);
     $response->assertStatus(200);
@@ -127,7 +127,7 @@ test('update an employee', function () {
         'joined_date' => Date::now()
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $id, [
+    $response = $this->put('/api/employee/' . $id, [
         'firstname' => fake()->firstName,
         'lastname' => fake()->lastName,
         'middlename' => fake()->firstName
@@ -145,7 +145,7 @@ test('update an employee\'s personal details', function () {
         'joined_date' => Date::now()
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $id . '/personalDetails', [
+    $response = $this->put('/api/employee/' . $id . '/personalDetails', [
         'firstname' => fake()->firstName,
         'lastname' => fake()->lastName,
         'middlename' => fake()->firstName
@@ -163,7 +163,7 @@ test('update an employee\'s contact details', function () {
         'joined_date' => Date::now()
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $id . '/contactDetails', [
+    $response = $this->put('/api/employee/' . $id . '/contactDetails', [
         'email' => fake()->email,
         'phone' => fake()->phoneNumber,
         'address' => fake()->address
@@ -181,7 +181,7 @@ test('update an employee\'s job details', function () {
         'joined_date' => Date::now()
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $id . '/jobDetails', [
+    $response = $this->put('/api/employee/' . $id . '/jobDetails', [
         'employmentStatus' => 1,
         'jobTitle' => 1,
         'department' => 1
@@ -199,7 +199,7 @@ test('update an employee\'s image', function () {
         'joined_date' => Date::now()
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $id . '/image', [
+    $response = $this->put('/api/employee/' . $id . '/image', [
         'image' => UploadedFile::fake()->image('avatar.jpg')
     ]);
     $response->assertStatus(200);
@@ -222,7 +222,7 @@ test('assign work shift as admin', function () {
         'end_time1' => '17:00:00'
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $employeeId . '/assignWorkShift', [
+    $response = $this->put('/api/employee/' . $employeeId . '/assignWorkShift', [
         'workShift' => $workShiftId
     ]);
     $response->assertStatus(200);
@@ -245,11 +245,11 @@ test('remove work shift as admin', function () {
         'end_time1' => '17:00:00'
     ]);
 
-    $this->put('/api/admin/employee/' . $employeeId . '/assignWorkShift', [
+    $this->put('/api/employee/' . $employeeId . '/assignWorkShift', [
         'workShift' => $workShiftId
     ]);
 
-    $response = $this->put('/api/admin/employee/' . $employeeId . '/removeWorkShift', [
+    $response = $this->put('/api/employee/' . $employeeId . '/removeWorkShift', [
         'workShift' => $workShiftId
     ]);
     $response->assertStatus(200);
@@ -265,7 +265,7 @@ test('delete an employee', function () {
         'joined_date' => Date::now()
     ]);
 
-    $response = $this->delete('/api/admin/employee/' . $id);
+    $response = $this->delete('/api/employee/' . $id);
     $response->assertStatus(200);
 });
 

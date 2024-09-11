@@ -5,7 +5,7 @@ use App\Models\User;
 test('get work week', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->get('/api/workweek/nice');
+    $response = $this->get('/api/workweek/');
 
     $response->assertStatus(200);
 });

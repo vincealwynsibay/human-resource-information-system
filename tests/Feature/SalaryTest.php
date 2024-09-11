@@ -17,7 +17,7 @@ test('add salary', function () {
 
     $employee = User::factory()->create();
 
-    $response = $this->post("/api/admin/employee/{$employee->EmployeeID}/salary", [
+    $response = $this->post("/api/employee/{$employee->EmployeeID}/salary", [
         'paygradeId' => '1',
         'amount' => 16000,
         'change_reason' => 'Promotion'
@@ -37,7 +37,7 @@ test('update salary', function () {
         'change_reason' => 'Initial Salary',
     ]);
 
-    $response = $this->put("/api/admin/employee/{$employee->EmployeeID}/salary/{$salaryId}", [
+    $response = $this->put("/api/employee/{$employee->EmployeeID}/salary/{$salaryId}", [
         'paygradeId' => '1',
         'amount' => '19000',
         'change_reason' => 'Promotion'
@@ -57,6 +57,6 @@ test('delete salary', function () {
         'amount' => 10000,
         'change_reason' => 'Initial Salary',
     ]);
-    $response = $this->delete("/api/admin/employee/{$employee->EmployeeID}/salary/{$salaryId}");
+    $response = $this->delete("/api/employee/{$employee->EmployeeID}/salary/{$salaryId}");
     $response->assertStatus(200);
 });

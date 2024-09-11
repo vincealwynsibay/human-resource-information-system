@@ -63,14 +63,14 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request, )
     {
-        $request->merge(['user_id' => $request->route('user_id')]);
+        $request->merge(['userId' => $request->route('userId')]);
         $validated = $request->validate([
-            'user_id' => 'required|exists:tbluser,id'
+            'userId' => 'required|exists:tbluser,id'
         ]);
 
-        DB::select('CALL procDeleteUserByID(?)', [$validated['user_id']]);
+        DB::select('CALL procDeleteUserByID(?)', [$validated['userId']]);
 
         return response()->json([
             'message' => 'User deleted successfully'
