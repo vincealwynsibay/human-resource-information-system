@@ -207,6 +207,7 @@ class AttendanceController extends Controller
                 Date::today()
             ])[0];
         }
+        $currentDate = Date::now();
 
         $employeeWorkShift = DB::select('CALL procGetEmployeeWorkShifts(?)', [$user->EmployeeID])[0] ?? null;
         $workShift = DB::select('CALL procGetWorkShift(?)', [$employeeWorkShift->WorkShiftID])[0] ?? null;
@@ -439,9 +440,22 @@ class AttendanceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
         $attendance = DB::select('CALL procGetEmployeeAttendanceByID(?)', [$id])[0] ?? null;
+
+        $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $attendance->EmployeeID]);
+
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $attendance->EmployeeID != $request->user()->id) {
+                return response()->json([
+                    'errors' => [
+                        'Authorization' => ['You cannot update other\'s details']
+                    ]
+                ], 404);
+            }
+        }
 
         if ($attendance == null) {
             return response()->json(['message' => 'Attendance not found'], 404);
@@ -468,6 +482,7 @@ class AttendanceController extends Controller
 
         $attendance = DB::select('CALL procGetEmployeeAttendanceByID(?)', [$id])[0] ?? null;
         $employee = DB::select('CALL procGetEmployee(?)', [$attendance->EmployeeID])[0] ?? null;
+
         $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
             $request->user()->EmployeeID,
             $employee->id
