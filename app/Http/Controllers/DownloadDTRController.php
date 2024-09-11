@@ -19,9 +19,7 @@ class DownloadDTRController extends Controller
         $employee = DB::select('CALL procGetEmployee(?)', [$employee_id])[0] ?? null;
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -46,9 +44,7 @@ class DownloadDTRController extends Controller
         $employee = DB::select('CALL procGetEmployee(?)', [$employee_id])[0] ?? null;
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -62,9 +58,7 @@ class DownloadDTRController extends Controller
 
         if ($workShift == null) {
             return response()->json([
-                'errors' => [
-                    'WorkShift' => ['Employee does not have a work shift']
-                ]
+                'message' => ['Employee does not have a work shift']
             ], 404);
         }
 

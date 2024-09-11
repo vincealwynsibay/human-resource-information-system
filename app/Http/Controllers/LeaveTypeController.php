@@ -47,9 +47,7 @@ class LeaveTypeController extends Controller
 
         if ($leaveType == null) {
             return response()->json([
-                'errors' => [
-                    'Leave Type' => ['Leave Type does not exist']
-                ]
+                'Leave Type' => ['Leave Type does not exist']
             ], 404);
         }
 
@@ -72,9 +70,7 @@ class LeaveTypeController extends Controller
 
         if ($leaveType == null) {
             return response()->json([
-                'errors' => [
-                    'Leave Type' => ['Leave Type does not exist']
-                ]
+                'Leave Type' => ['Leave Type does not exist']
             ], 404);
         }
 

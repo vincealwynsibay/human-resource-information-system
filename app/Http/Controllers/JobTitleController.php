@@ -53,9 +53,7 @@ class JobTitleController extends Controller
 
         if ($jobTitle == null) {
             return response()->json([
-                'errors' => [
-                    'Job Title' => ['Job Title does not exist']
-                ]
+                'Job Title' => ['Job Title does not exist']
             ], 404);
         }
 
@@ -79,9 +77,7 @@ class JobTitleController extends Controller
 
         if ($jobTitle == null) {
             return response()->json([
-                'errors' => [
-                    'Job Title' => ['Job Title does not exist']
-                ]
+                'Job Title' => ['Job Title does not exist']
             ], 404);
         }
 

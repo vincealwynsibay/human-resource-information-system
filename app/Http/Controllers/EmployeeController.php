@@ -104,18 +104,15 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot view other employees\'s details']
-                    ]
+
+                    'message' => ['You cannot view other employees\'s details']
                 ], 404);
             }
         }
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -131,18 +128,14 @@ class EmployeeController extends Controller
 
         if ($request->supervisor == $id) {
             return response()->json([
-                'errors' => [
-                    'Supervisor' => ['Employee cannot be their own supervisor']
-                ]
+                'message' => ['Employee cannot be their own supervisor']
             ], 400);
         }
 
         $employee = DB::select('CALL procGetEmployee(?)', [$id])[0];
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -163,9 +156,7 @@ class EmployeeController extends Controller
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -191,18 +182,15 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -228,9 +216,8 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
@@ -238,9 +225,7 @@ class EmployeeController extends Controller
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -282,9 +267,8 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
@@ -292,9 +276,7 @@ class EmployeeController extends Controller
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -338,9 +320,8 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
@@ -349,9 +330,7 @@ class EmployeeController extends Controller
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -397,9 +376,8 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
@@ -407,9 +385,7 @@ class EmployeeController extends Controller
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -456,9 +432,8 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
@@ -467,9 +442,7 @@ class EmployeeController extends Controller
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -515,18 +488,15 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -559,18 +529,15 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 
@@ -609,18 +576,15 @@ class EmployeeController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $employee->id != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot dekete other\'s details']
-                    ]
+
+                    'message' => ['You cannot dekete other\'s details']
                 ], 404);
             }
         }
 
         if ($employee == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not exist']
-                ]
+                'message' => ['Employee does not exist']
             ], 404);
         }
 

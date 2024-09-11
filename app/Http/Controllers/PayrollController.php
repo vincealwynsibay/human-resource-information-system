@@ -40,9 +40,8 @@ class PayrollController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($employeeId != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }
@@ -76,9 +75,7 @@ class PayrollController extends Controller
         $basicSalary = DB::select('CALL procGetEmployeeSalary(?)', [$request->employeeId])[0] ?? null;
         if ($basicSalary == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not have a salary']
-                ]
+                'message' => ['Employee does not have a salary']
             ], 404);
         }
 
@@ -88,9 +85,7 @@ class PayrollController extends Controller
 
         if ($workShift == null) {
             return response()->json([
-                'errors' => [
-                    'Employee' => ['Employee does not have a work shift']
-                ]
+                'message' => ['Employee does not have a work shift']
             ], 404);
         }
 
@@ -98,9 +93,7 @@ class PayrollController extends Controller
 
         if ($workDaysAmount == 0) {
             return response()->json([
-                'errors' => [
-                    'WorkDays' => ['No work days found']
-                ]
+                'message' => ['No work days found']
             ], 404);
         }
 
@@ -244,18 +237,15 @@ class PayrollController extends Controller
 
         if ($payroll == null) {
             return response()->json([
-                'errors' => [
-                    'Payroll' => ['Payroll not found']
-                ]
+                'message' => ['Payroll not found']
             ], 404);
         }
 
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($payroll->EmployeeID != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+
+                    'message' => ['You cannot update other\'s details']
                 ], 404);
             }
         }

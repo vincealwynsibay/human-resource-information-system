@@ -64,9 +64,7 @@ class WorkShiftController extends Controller
 
         if ($workShift == null) {
             return response()->json([
-                'errors' => [
-                    'WorkShift' => ['WorkShift does not exist']
-                ]
+                'message' => ['WorkShift does not exist']
             ], 404);
         }
 
@@ -94,9 +92,7 @@ class WorkShiftController extends Controller
 
         if ($workShift == null) {
             return response()->json([
-                'errors' => [
-                    'WorkShift' => ['WorkShift does not exist']
-                ]
+                'message' => ['WorkShift does not exist']
             ], 404);
         }
 

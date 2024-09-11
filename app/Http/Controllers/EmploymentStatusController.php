@@ -49,9 +49,7 @@ class EmploymentStatusController extends Controller
 
         if ($employmentStatus == null) {
             return response()->json([
-                'errors' => [
-                    'EmploymentStatus' => ['EmploymentStatus does not exist']
-                ]
+                'message' => ['EmploymentStatus does not exist']
             ], 404);
         }
 
@@ -74,9 +72,7 @@ class EmploymentStatusController extends Controller
 
         if ($employmentStatus == null) {
             return response()->json([
-                'errors' => [
-                    'EmploymentStatus' => ['EmploymentStatus does not exist']
-                ]
+                'message' => ['EmploymentStatus does not exist']
             ], 404);
         }
 

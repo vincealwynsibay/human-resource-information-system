@@ -47,9 +47,7 @@ class UserController extends Controller
 
         if (!Hash::check($validated['oldPassword'], $request->user()->password)) {
             return response()->json([
-                'errors' => [
-                    'Password' => ["Old password is incorrect"]
-                ]
+                'message' => ["Old password is incorrect"]
             ], 401);
         }
 

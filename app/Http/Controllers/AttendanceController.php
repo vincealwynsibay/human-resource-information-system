@@ -295,11 +295,12 @@ class AttendanceController extends Controller
         $workShift = DB::select('CALL procGetWorkShift(?)', [$employeeWorkShift->WorkShiftID])[0] ?? null;
 
         if ($workShift == null) {
-            return response()->json([
-                'errors' => [
-                    'WorkShift' => ['Employee does not have a work shift']
-                ]
-            ], 404);
+            return response()->json(
+                [
+                    'message' => 'Employee does not have a work shift'
+                ],
+                404
+            );
         }
 
         $currentDate = Date::now();
@@ -388,9 +389,7 @@ class AttendanceController extends Controller
 
             } else if (empty($today)) {
                 return response()->json([
-                    'errors' => [
-                        'Attendance' => ['No attendance record for today']
-                    ]
+                    'message' => 'No attendance record for today'
                 ], 404);
             }
 
@@ -450,9 +449,7 @@ class AttendanceController extends Controller
         if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
             if ($subordinate == null && $attendance->EmployeeID != $request->user()->id) {
                 return response()->json([
-                    'errors' => [
-                        'Authorization' => ['You cannot update other\'s details']
-                    ]
+                    'message' => 'You cannot update other\'s details'
                 ], 404);
             }
         }
@@ -462,7 +459,7 @@ class AttendanceController extends Controller
         }
 
         return response()->json([
-            'Attendance' => $attendance
+            'attendance' => $attendance
         ]);
     }
 

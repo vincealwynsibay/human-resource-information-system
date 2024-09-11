@@ -56,9 +56,7 @@ class HolidayController extends Controller
 
         if ($holiday == null) {
             return response()->json([
-                'errors' => [
-                    'Holiday' => ['Holiday does not exist']
-                ]
+                'message' => ['Holiday does not exist']
             ], 404);
         }
 
@@ -84,9 +82,7 @@ class HolidayController extends Controller
 
         if ($holiday == null) {
             return response()->json([
-                'errors' => [
-                    'Holiday' => ['Holiday does not exist']
-                ]
+                'message' => ['Holiday does not exist']
             ], 404);
         }
 

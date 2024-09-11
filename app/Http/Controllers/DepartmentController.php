@@ -49,9 +49,7 @@ class DepartmentController extends Controller
 
         if ($department == null) {
             return response()->json([
-                'errors' => [
-                    'Department' => ['Department does not exist']
-                ]
+                'message' => ['Department does not exist']
             ], 404);
         }
 
@@ -74,9 +72,8 @@ class DepartmentController extends Controller
 
         if ($department == null) {
             return response()->json([
-                'errors' => [
-                    'Department' => ['Department does not exist']
-                ]
+
+                'message' => ['Department does not exist']
             ], 404);
         }
 
