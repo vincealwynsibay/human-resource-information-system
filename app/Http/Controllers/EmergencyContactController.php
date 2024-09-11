@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\RoleEnum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -10,8 +11,17 @@ class EmergencyContactController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($employeeId)
+    public function index(Request $request, $employeeId)
     {
+        $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
+            $request->user()->EmployeeID,
+            $employeeId
+        ])[0] ?? null;
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $employee = DB::select('CALL procGetEmployee(?)', [$employeeId])[0] ?? null;
 
         if ($employee == null) {
@@ -36,6 +46,15 @@ class EmergencyContactController extends Controller
             'email' => 'required|email'
         ]);
 
+        $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
+            $request->user()->EmployeeID,
+            $employeeId
+        ])[0] ?? null;
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         DB::select('CALL procInsertEmployeeEmergencyContact(?, ?, ?, ?, ?)', [
             $employeeId,
             $validated['name'],
@@ -50,7 +69,7 @@ class EmergencyContactController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id, string $emergencyContactId)
+    public function update(Request $request, string $employeeId, string $emergencyContactId)
     {
         $validated = $request->validate([
             'name' => 'nullable|string',
@@ -58,6 +77,15 @@ class EmergencyContactController extends Controller
             'mobile_no' => 'nullable|string',
             'email' => 'nullable|email'
         ]);
+
+        $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
+            $request->user()->EmployeeID,
+            $employeeId
+        ])[0] ?? null;
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $emergencyContact = DB::select('CALL procGetEmployeeEmergencyContact(?)', [$emergencyContactId])[0] ?? null;
 
@@ -83,8 +111,17 @@ class EmergencyContactController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id, string $emergencyContactId)
+    public function destroy(Request $request, string $employeeId, string $emergencyContactId)
     {
+        $subordinate = DB::select('CALL procGetEmployeeSupervisor(?, ?)', [
+            $request->user()->EmployeeID,
+            $employeeId
+        ])[0] ?? null;
+
+        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $emergencyContact = DB::select('CALL procGetEmployeeEmergencyContact(?)', [$emergencyContactId])[0] ?? null;
 
         if ($emergencyContact == null) {
