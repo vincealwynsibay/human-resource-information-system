@@ -1,66 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Human Resource Information System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Process Flowchart
 
-## About Laravel
+### Profile Creation
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+![Profile Creation Flowchart](/public/images/ProfileCreationDark.png)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Schedule
 
-## Learning Laravel
+![Schedule Flowchart](/public/images/Schedule.png)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Overtime
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+![Overtime Flowchart](/public/images/OvertimeDark.png)
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Leave
 
-### Premium Partners
+![Leave Flowchart](/public/images/LeaveDark.png)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
 
-## Contributing
+### Attendance
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+![Attendance Flowchart](/public/images/AttendanceDark.png)
 
-## Code of Conduct
+### Payroll
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+![Payroll Flowchart](/public/images/PayrollDark.png)
 
-## Security Vulnerabilities
+## Process List
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Job Title**
+1. Create, Update, or Delete Job Title 
+	- POST/PUT/DELETE /api/jobtitle (admin)
+2. Assign/Change employee job title 
+	- PUT /api/employee/{id}/jobDetails (admin)
 
-## License
+**Employment Status**
+1. Create, Update, or Delete Employment Status
+	- POST/PUT/DELETE /api/employmentstatus/ (admin)
+2. Assign/Update employee Employment Status
+	- PUT /api/employee/{id}/employmentstatus/ (admin)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Department**
+1. Create, Update, or Delete Department
+	- POST/PUT/DELETE /api/department/ (admin)
+2. Assign/Update employee Department as admin or employee
+	- PUT /api/employee/{id}/department/ (admin)
+
+**Employee Certificates**
+1. Add, Update, or Delete Employee Certificate 
+	- POST/PUT/DELETE /api/employee/{employeeId}/certificates (admin/supervisor/employee)
+
+**Work Experience**
+1. Add, Update, or Delete to Employee Work Experiences as admin or employee
+	- POST/PUT/DELETE /api/employee/{employeeId}/workexperience (admin/supervisor/employee)
+
+**Emergency Contact**
+1. Add, Update, or Delete to Employee Emergency Contacts as admin or employee
+	- POST/PUT/DELETE /api/employee/{employeeId}/emergencycontact (admin/supervisor/employee)
+
+**Education**
+1. Create, Update, or Delete Education
+	- POST/PUT/DELETE /api/education (admin)
+1. Assign/Update/Remove Employee Education as admin or employee
+	- POST/PUT/DELETE /api/employee/{employeeId}/education (admin/supervisor/employee)
+
+**Employee**
+1. Create a new employee with optional personal, contact, and job details
+	- POST /api/employee (admin)
+2. Update personal, contact, job, and contribution details of employee
+	- PUT /api/employee/{employeeId}/ (admin/supervisor/employee)
+
+**USER CREATION**
+1. Create a user with reference to an existing employee
+	- POST /api/user (admin)
+- Admins also have access to all available employee features
+
+**Work Week**
+1. Setup work week schedule for company as admin
+	- Adding new work week schedule will invalidate current one
+2. Get or Update work week
+	- GET/PUT /api/workweek (admin)
+
+**Holiday**
+1. Create, Update, or Delete Holiday
+	- POST/PUT/DELETE /api/holiday (admin)
+
+**Work Shift**
+ 1. Create, Update, or Delete workshift 
+ 	- POST/PUT/DELETE /api/workshift (admin)
+ 2. Add/Remove Employee Workshift as Admin or Supervisor
+ 	- PUT /api/employee/assignWorkShift or /api/employee/removeWorkShift (admin/supervisor) 
+
+**Leave**
+1. Assign Leave Entitlements by Leave Type to User
+	- POST /api/leaveentitlement (admin)
+2. Employee can apply for a paid leave using leave entitlements (if no entitlement, it is considered an unpaid leave); 
+	- POST /api/leave (employee)
+3. Leave requests can be approved/rejected by admin or supervisor of employee
+	- POST /api/leave/approve or /api/leave/reject (admin/supervisor)
+4. Approved Leave will deduct the entitlement amount on the leave entitlement with the approved leave leave type
+
+**Overtime**
+1. Employee can apply for overtime with duration
+	- POST /api/overtime (employee)
+2. Overtime requests can be approved/rejected by admin or supervisor of employee
+	- POST /api/overtime/approve or /api/overtime/reject (admin/supervisor)
+3. With approved overtime, the employee will be able to time in/time out on overtime of attendance record. The final overtime duration will depend on time in and out.
+
+**Attendance**
+1. Time In/Time Out as employee
+	- based on time, the relevant session will be added session1 - am or session2 - pm
+	- POST /api/attendance/timein or /api/attendance/timeout (employee)
+2. Update/Delete existing attendance item .
+	- PUT/DELETE /api/attendance/{attendanceId} (admin/supervisor/employee)
+3. Get employee attendance summary as employee, supervisor, admin.
+	- GET /api/employee/{employeeId/attendanceSummary (admin/supervisor/employee)
+4. Print employee DTR as employee or admin.
+	- GET /api/employee/{employeeId/downloadDtr
+5. Missing attendance on a date will be considered absent if have a work week, not a holiday, or there is no existing leave
+
+**Salary**
+1. Create/Update/Delete paygrade as admin
+	- POST/PUT/DELETE /api/paygrade
+2. Create/Update a basic salary within pay grade to employee as admin
+	- POST/PUT /api/employee/{employeeId}/salary (admin)
+
+**Payroll**
+1. Employee payroll will depend on payroll items like ledger (basic salary, bonus, allowance, deductions)
+2. Assign bonus, allowance, deductions payroll items to user as admin
+	- Taxes and Contributions are considered as deductions
+	- Absences, Unpaid leaves, and Undertime are considered as deductions
+	- Overtime Duration will be multiplied to hourly rate as bonus
+	- POST/PUT/DELETE /api/payrollitem (admin)
+3. Get Payrolls or export with date
+	- GET /api/payroll/ or /api/payroll/export (admin)
+
