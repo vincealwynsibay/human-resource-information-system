@@ -9,7 +9,7 @@
 
 ### Schedule
 
-![Schedule Flowchart](/public/images/Schedule.png)
+![Schedule Flowchart](/public/images/ScheduleDark.png)
 
 
 ### Overtime
