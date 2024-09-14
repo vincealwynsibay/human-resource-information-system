@@ -30,8 +30,6 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/dtr', [DownloadDTRController::class, '__invoke']);
-
 Route::group(['prefix' => "user", 'middleware' => ['auth:sanctum']], function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/', [UserController::class, 'index']);
