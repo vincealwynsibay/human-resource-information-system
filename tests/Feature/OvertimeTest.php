@@ -90,10 +90,19 @@ test('apply for overtime', function () {
     $response->assertStatus(200);
 });
 
+function pendingOvertime(int $employeeId, string $status = 'PENDING'): int
+{
+    return DB::table('tblovertime')->insertGetId([
+        'EmployeeID' => $employeeId, 'reason' => 'Month-end close', 'duration' => 2,
+        'status' => $status, 'date_created' => now(), 'requested_date' => '2021-01-01',
+    ]);
+}
+
 test('update overtime', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->put('/api/overtime/1', [
+    $id = pendingOvertime($user->EmployeeID);
+    $response = $this->put('/api/overtime/' . $id, [
         'requestedDate' => '2021-01-01',
         'duration' => 2,
         'reason' => 'Need to work extra hours',
@@ -106,9 +115,24 @@ test('update overtime', function () {
 test('delete overtime', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    $response = $this->delete('/api/overtime/1');
+    $response = $this->delete('/api/overtime/' . pendingOvertime($user->EmployeeID));
     $response->assertJson(['message' => 'Overtime deleted successfully']);
     $response->assertStatus(200);
+});
+
+test('an approved overtime request cannot be changed or withdrawn', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $id = pendingOvertime($user->EmployeeID, 'APPROVED');
+    $this->putJson('/api/overtime/' . $id, ['requestedDate' => '2021-01-02', 'duration' => 9, 'reason' => 'x'])->assertStatus(400);
+    $this->deleteJson('/api/overtime/' . $id)->assertStatus(400);
+    expect((float) DB::table('tblovertime')->where('id', $id)->value('duration'))->toEqual(2.0);
+});
+
+test('an employee cannot request overtime for someone else', function () {
+    $user = User::factory()->create(['RoleID' => 2]);
+    $this->actingAs($user);
+    $this->postJson('/api/overtime', ['employeeId' => 2, 'reason' => 'x', 'duration' => 1, 'requestedDate' => '2021-01-01'])->assertStatus(403);
 });
 
 

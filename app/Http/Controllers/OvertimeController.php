@@ -62,6 +62,10 @@ class OvertimeController extends Controller
             'requestedDate' => 'required|date',
         ]);
 
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && $request->employeeId != $request->user()->EmployeeID) {
+            return response()->json(['message' => ['You can only request overtime for yourself']], 403);
+        }
+
         $requestedDate = Date::createFromFormat('Y-m-d', $request->requestedDate);
 
         DB::select('CALL procApplyForOvertime(?, ?, ?, ?, ?)', [
@@ -114,6 +118,10 @@ class OvertimeController extends Controller
             'reason' => 'required|string',
         ]);
 
+        if ($refused = $this->refuseChange($request, $id)) {
+            return $refused;
+        }
+
         DB::select('CALL procUpdateOvertimeByID(?, ?, ?, ?)', [
             $id,
             $request->duration,
@@ -124,10 +132,29 @@ class OvertimeController extends Controller
         return response()->json(['message' => 'Overtime updated successfully']);
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        if ($refused = $this->refuseChange($request, $id)) {
+            return $refused;
+        }
         DB::select('CALL procDeleteOvertimeByID(?)', [$id]);
 
         return response()->json(['message' => 'Overtime deleted successfully']);
+    }
+
+    /**
+     * A overtime request the current user may change: their own, unless they are an admin, and only while it is pending.
+     * Returns the error response, or null when the change may go ahead.
+     */
+    private function refuseChange(Request $request, string $id)
+    {
+        $row = DB::table('tblovertime')->where('id', $id)->first();
+        if ($row == null || ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && $row->EmployeeID != $request->user()->EmployeeID)) {
+            return response()->json(['message' => ['Overtime request not found']], 404);
+        }
+        if ($row->status != OvertimeRequestEnum::PENDING->value) {
+            return response()->json(['message' => ['Only a pending overtime request can be changed']], 400);
+        }
+        return null;
     }
 }

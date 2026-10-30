@@ -117,7 +117,7 @@ test('create a payroll on day 15', function () {
 test('create a payroll on day 31', function () {
 
     // set date to end of month
-    $date = Carbon::create(2024, now()->month, 30);
+    $date = Carbon::create(2024, now()->month, 1)->endOfMonth()->startOfDay();
     Carbon::setTestNow($date);
     // create employee
 

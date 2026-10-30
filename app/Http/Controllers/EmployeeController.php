@@ -31,7 +31,7 @@ class EmployeeController extends Controller
 
 
         $employees = [];
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
             // call procGetEmployeesAsSuperVisor
             $employees = DB::select("CALL procGetEmployeesAsSuperVisor(?, ?, ?, ?, ?, ?, ?, ?)", [
                 $request->user()->EmployeeID,
@@ -42,7 +42,6 @@ class EmployeeController extends Controller
                 $request->department,
                 $sortField,
                 $sortOrder,
-                NULL
             ]);
 
         } else {
@@ -101,8 +100,8 @@ class EmployeeController extends Controller
         // check if employee is a subordinate to current user
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot view other employees\'s details']
@@ -179,8 +178,8 @@ class EmployeeController extends Controller
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -213,8 +212,8 @@ class EmployeeController extends Controller
         // check if employee is a subordinate to current user
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -264,8 +263,8 @@ class EmployeeController extends Controller
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -317,8 +316,8 @@ class EmployeeController extends Controller
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -373,8 +372,8 @@ class EmployeeController extends Controller
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -429,8 +428,8 @@ class EmployeeController extends Controller
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -485,8 +484,8 @@ class EmployeeController extends Controller
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -526,8 +525,8 @@ class EmployeeController extends Controller
         // check if employee is a subordinate to current user
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -573,8 +572,8 @@ class EmployeeController extends Controller
         // check if employee is a subordinate to current user
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $employee->id]);
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $employee->id != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $employee->id != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot dekete other\'s details']

@@ -75,6 +75,10 @@ class LeaveController extends Controller
             'reason' => 'required|string',
         ]);
 
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && $request->employeeId != $request->user()->EmployeeID) {
+            return response()->json(['message' => ['You can only apply for your own leave']], 403);
+        }
+
         // no of days between start and end date
         $startDate = Date::createFromFormat('Y-m-d', $request->startDate);
         $endDate = Date::createFromFormat('Y-m-d', $request->endDate);
@@ -188,6 +192,10 @@ class LeaveController extends Controller
             'reason' => 'nullable|string',
         ]);
 
+        if ($refused = $this->refuseChange($request, $id)) {
+            return $refused;
+        }
+
         DB::select('CALL procUpdateLeaveByID(?, ?, ?, ?)', [
             $id,
             $request->startDate,
@@ -201,9 +209,28 @@ class LeaveController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        if ($refused = $this->refuseChange($request, $id)) {
+            return $refused;
+        }
         DB::select('CALL procDeleteLeaveByID(?)', [$id]);
         return response()->json(['message' => 'Leave deleted successfully']);
+    }
+
+    /**
+     * A leave request the current user may change: their own, unless they are an admin, and only while it is pending.
+     * Returns the error response, or null when the change may go ahead.
+     */
+    private function refuseChange(Request $request, string $id)
+    {
+        $row = DB::table('tblleave')->where('id', $id)->first();
+        if ($row == null || ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && $row->EmployeeID != $request->user()->EmployeeID)) {
+            return response()->json(['message' => ['Leave request not found']], 404);
+        }
+        if ($row->status != LeaveRequestEnum::PENDING->value) {
+            return response()->json(['message' => ['Only a pending leave request can be changed']], 400);
+        }
+        return null;
     }
 }

@@ -37,8 +37,8 @@ class PayrollController extends Controller
             'toDate' => 'nullable|date',
         ]);
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($employeeId != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($employeeId != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']
@@ -241,8 +241,8 @@ class PayrollController extends Controller
             ], 404);
         }
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($payroll->EmployeeID != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($payroll->EmployeeID != $request->user()->EmployeeID) {
                 return response()->json([
 
                     'message' => ['You cannot update other\'s details']

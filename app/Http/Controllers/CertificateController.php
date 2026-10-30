@@ -20,7 +20,7 @@ class CertificateController extends Controller
             $employee->id
         ])[0] ?? null;
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -49,7 +49,7 @@ class CertificateController extends Controller
             $employeeId
         ])[0] ?? null;
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -79,7 +79,7 @@ class CertificateController extends Controller
             $employeeId
         ])[0] ?? null;
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -114,7 +114,7 @@ class CertificateController extends Controller
             $employeeId
         ])[0] ?? null;
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

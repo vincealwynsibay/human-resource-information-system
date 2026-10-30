@@ -25,7 +25,7 @@ class AttendanceController extends Controller
             'toDate' => 'required|date',
         ]);
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
             $attendances = DB::select('CALL procGetEmployeeAttendancesAsSupervisor(?, ?, ?, ?, ?)', [
                 $request->user()->EmployeeID,
                 $request->name,
@@ -51,7 +51,7 @@ class AttendanceController extends Controller
             'toDate' => 'required|date',
         ]);
 
-        $attendances = DB::select('CALL procGetEmployeeAttendancesAsEmployee(?, ?)', [
+        $attendances = DB::select('CALL procGetEmployeeAttendancesAsEmployee(?, ?, ?)', [
             $request->user()->EmployeeID,
             $validated['fromDate'],
             $validated['toDate']
@@ -74,7 +74,7 @@ class AttendanceController extends Controller
             $employee->id
         ])[0] ?? null;
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -139,7 +139,7 @@ class AttendanceController extends Controller
             $employee->id
         ])[0] ?? null;
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employeeId) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -446,8 +446,8 @@ class AttendanceController extends Controller
         $subordinate = DB::select('CALL procGetSubordinate(?,?)', [$request->user()->EmployeeID, $attendance->EmployeeID]);
 
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value) {
-            if ($subordinate == null && $attendance->EmployeeID != $request->user()->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value) {
+            if ($subordinate == null && $attendance->EmployeeID != $request->user()->EmployeeID) {
                 return response()->json([
                     'message' => 'You cannot update other\'s details'
                 ], 404);
@@ -485,7 +485,7 @@ class AttendanceController extends Controller
             $employee->id
         ])[0] ?? null;
 
-        if ($request->user()->roleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employee->id) {
+        if ($request->user()->RoleID == RoleEnum::EMPLOYEE->value && !$subordinate && $request->user()->EmployeeID != $employee->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

@@ -345,6 +345,7 @@ test('update an assigned employee\'s personal details as a supervisor', function
         'middlename' => fake()->firstName,
         'joined_date' => Date::now()
     ]);
+    DB::table('tblemployeesupervisor')->insert(['SupervisorID' => $user->EmployeeID, 'SubordinateID' => $id]);
 
     $response = $this->put('/api/employee/' . $id . '/personalDetails', [
         'firstname' => fake()->firstName,
@@ -352,6 +353,23 @@ test('update an assigned employee\'s personal details as a supervisor', function
         'middlename' => fake()->firstName
     ]);
     $response->assertStatus(200);
+});
+
+test('an employee cannot update an employee they do not supervise', function () {
+    $user = User::factory()->create([
+        'RoleID' => 2
+    ]);
+    $this->actingAs($user);
+    $id = DB::table('tblemployee')->insertGetId([
+        'firstname' => fake()->firstName,
+        'lastname' => fake()->lastName,
+        'middlename' => fake()->firstName,
+        'joined_date' => Date::now()
+    ]);
+
+    $response = $this->putJson('/api/employee/' . $id . '/personalDetails', ['firstname' => 'Changed', 'lastname' => 'Changed']);
+    $response->assertStatus(404);
+    expect(DB::table('tblemployee')->where('id', $id)->value('firstname'))->not->toBe('Changed');
 });
 
 test('update an assigned employee\'s contact details as a supervisor', function () {
@@ -365,6 +383,7 @@ test('update an assigned employee\'s contact details as a supervisor', function 
         'middlename' => fake()->firstName,
         'joined_date' => Date::now()
     ]);
+    DB::table('tblemployeesupervisor')->insert(['SupervisorID' => $user->EmployeeID, 'SubordinateID' => $id]);
 
     $response = $this->put('/api/employee/' . $id . '/contactDetails', [
         'email' => fake()->email,
