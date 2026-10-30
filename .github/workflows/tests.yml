@@ -1,0 +1,70 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  payroll:
+    name: Payroll engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, zip, mbstring, pdo_sqlite
+          coverage: none
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: cp .env.example .env && php artisan key:generate
+      - name: Payroll tests (SQLite)
+        run: php vendor/bin/pest --testsuite Payroll
+      - name: Golden cases and BIR alphalist files
+        run: php tests/Payroll/run-golden.php
+
+  hr:
+    name: HR API
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: hrisroot
+          MYSQL_DATABASE: hris_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -phrisroot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: hris_test
+      DB_USERNAME: root
+      DB_PASSWORD: hrisroot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, zip, mbstring, pdo_mysql
+          coverage: none
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: cp .env.example .env && php artisan key:generate
+      - name: Feature and unit tests (MySQL 8)
+        run: php vendor/bin/pest --testsuite Feature,Unit
+
+  web:
+    name: Web build
+    runs-on: ubuntu-latest
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx vite build
