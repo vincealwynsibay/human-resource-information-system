@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
-Route::get('/', function () {
-    return ['Laravel' => app()->version()];
-});
+require __DIR__ . '/app.php';
 
 Route::get('/exportPayroll', [PayrollController::class, 'export']);
 

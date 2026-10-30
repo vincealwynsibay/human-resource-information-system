@@ -8,7 +8,7 @@ test('example', function () {
     $this->actingAs($user);
     $response = $this->get('/');
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
 });
 
 test('get all holidays', function () {
