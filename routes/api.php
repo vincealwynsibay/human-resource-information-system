@@ -26,6 +26,8 @@ use App\Http\Controllers\WorkWeekController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+require __DIR__ . '/payroll.php';
+
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -117,6 +119,13 @@ Route::group(['prefix' => "leaveentitlement", 'middleware' => ['auth:sanctum', '
     Route::put('/{id}', [LeaveEntitlementController::class, 'update']);
     Route::put('/{id}/daysUsed', [LeaveEntitlementController::class, 'updateDaysUsed']);
     Route::delete('/{id}', [LeaveEntitlementController::class, 'destroy']);
+});
+
+// Read-only for every signed-in employee: the leave types they can apply for and their own entitlements.
+// Registered after the admin-only groups above so these definitions are the ones used.
+Route::middleware(['auth:sanctum', 'role:employee'])->group(function () {
+    Route::get('/leavetype', [LeaveTypeController::class, 'index']);
+    Route::get('/leaveentitlement/me', [LeaveEntitlementController::class, 'getUserLeaveEntitlements']);
 });
 
 // LEAVE
