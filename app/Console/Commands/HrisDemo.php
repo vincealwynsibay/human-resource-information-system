@@ -20,13 +20,14 @@ use InvalidArgumentException;
  * leavers, 13th month and the year-end adjustment, all paid) and this year to date (the latest period a draft, the
  * one before it waiting for approval). HR data adds supervisors, leave history for both years, and the last three
  * months of time records and overtime, which those months' runs are computed from. Logins: admin (prepares payroll),
- * approver (approves it) and employee. Every name and number is invented. Only the demo employees' rows are replaced.
+ * approver (approves it) and employee. Every name and number is invented. Only the demo employees' rows are replaced,
+ * unless --fresh rebuilds the whole database first, as the public demo does every night (config/demo.php).
  */
 class HrisDemo extends Command
 {
-    protected $signature = 'hris:demo {--password=demo1234 : Password for the demo logins}';
+    protected $signature = 'hris:demo {--password= : Password for the demo logins (default: config demo.password)} {--fresh : Drop every table and rebuild the database first}';
 
-    protected $description = 'Load a fictional company into a local database for trying out hris (never in production)';
+    protected $description = 'Load a fictional company for trying out the app (in production only when the public demo is on)';
 
     /** Months of time records up to today, this month included. Runs in those months are computed from them. */
     private const ATTENDANCE_MONTHS = 3;
@@ -36,13 +37,13 @@ class HrisDemo extends Command
 
     public function handle(): int
     {
-        if (app()->isProduction()) {
-            $this->error('hris:demo only runs outside production.');
+        if (app()->isProduction() && !config('demo.enabled')) {
+            $this->error('hris:demo runs in production only on the public demo server (HRIS_DEMO=true): it replaces data.');
             return self::FAILURE;
         }
-        $this->call('migrate', ['--force' => true]);
+        $this->call($this->option('fresh') ? 'migrate:fresh' : 'migrate', ['--force' => true]);
         $fullSchema = Schema::hasTable('tblemployee');
-        if (!$fullSchema) {
+        if (!$fullSchema && !Schema::hasTable('tbluser')) {
             // A database without the app's MySQL schema gets the login table only; the HR side needs the schema.
             Schema::create('tbluser', function (Blueprint $t) {
                 $t->id();
@@ -67,7 +68,8 @@ class HrisDemo extends Command
                 ['id' => 2, 'name' => 'EMPLOYEE', 'description' => 'User with an employee account'],
             ]);
         }
-        $password = Hash::make($this->option('password'));
+        $plain = $this->option('password') ?: config('demo.password');
+        $password = Hash::make($plain);
         foreach ([['admin', 1, 101], ['approver', 1, 102], ['employee', 2, 105]] as [$username, $role, $employee]) {
             DB::table('tbluser')->updateOrInsert(['username' => $username], ['password' => $password, 'RoleID' => $role, 'EmployeeID' => $employee, 'status' => 'Active']);
         }
@@ -88,7 +90,7 @@ class HrisDemo extends Command
         $runs = $this->payroll($people, $today, $attendanceFrom, $fullSchema, $admin, $approver);
 
         $this->info(sprintf('Demo company loaded: %d people, %d payroll runs from January %d to date%s.', count($people), $runs, (int) substr($today, 0, 4) - 1, $fullSchema ? ', leave history and the last ' . self::ATTENDANCE_MONTHS . ' months of time records' : ''));
-        $this->line('Sign in as admin (prepares payroll), approver (approves it) or employee, password ' . $this->option('password') . '. Every name and number is invented.');
+        $this->line('Sign in as admin (prepares payroll), approver (approves it) or employee, password ' . $plain . '. Every name and number is invented.');
         return self::SUCCESS;
     }
 

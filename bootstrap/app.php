@@ -22,7 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-            'role' => \App\Http\Middleware\RoleMiddleware::class
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'not-in-demo' => \App\Http\Middleware\BlockInDemo::class,
         ]);
 
 

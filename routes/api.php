@@ -36,10 +36,10 @@ Route::group(['prefix' => "user", 'middleware' => ['auth:sanctum']], function ()
     Route::middleware('role:admin')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/', [UserController::class, 'store']);
-        Route::delete('/{userId}', [UserController::class, 'destroy']);
+        Route::delete('/{userId}', [UserController::class, 'destroy'])->middleware('not-in-demo');
     });
     Route::middleware('role:employee')->group(function () {
-        Route::put('/', [UserController::class, 'changePassword']);
+        Route::put('/', [UserController::class, 'changePassword'])->middleware('not-in-demo');
     });
 });
 

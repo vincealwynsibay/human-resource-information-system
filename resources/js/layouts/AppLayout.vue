@@ -10,6 +10,7 @@ import { api, ensureCsrf } from '../lib/api';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
+const demo = computed(() => page.props.demo);
 const company = computed(() => page.props.app?.company ?? 'hris');
 const menuOpen = ref(false);
 
@@ -208,6 +209,9 @@ const navItems = computed(() => groups.value.flatMap((g) => g.items.map((i) => (
                     </div>
                 </Popover>
             </header>
+            <div v-if="demo" class="border-b border-line bg-info-soft px-4 py-2 text-center text-xs text-info sm:px-6">
+                Demo with a fictional company: change anything you like, it all resets tonight at {{ demo.resetAt }} (Manila time).
+            </div>
             <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8"><slot /></main>
         </div>
         <CommandPalette v-model:open="palette" :pages="navItems" :admin="!!user?.isAdmin" />

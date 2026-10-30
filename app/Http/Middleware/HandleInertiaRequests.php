@@ -39,6 +39,12 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'app' => ['name' => config('app.name'), 'company' => config('payroll.company_name')],
+            // The public demo: its shared logins for the sign-in page, and when everything resets.
+            'demo' => config('demo.enabled') ? ['resetAt' => config('demo.reset_at'), 'password' => config('demo.password'), 'logins' => [
+                ['username' => 'admin', 'role' => 'Payroll admin', 'does' => 'Prepares runs, people and filings'],
+                ['username' => 'approver', 'role' => 'Approver', 'does' => 'Approves what the admin prepared'],
+                ['username' => 'employee', 'role' => 'Employee', 'does' => 'Payslips, leave and time records'],
+            ]] : null,
             'auth' => [
                 'user' => $user ? ['id' => $user->id, 'employeeId' => $user->EmployeeID ?? null, 'username' => $user->username, 'isAdmin' => $user->hasRole('admin')] : null,
             ],
