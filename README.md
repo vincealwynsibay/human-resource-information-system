@@ -1,141 +1,110 @@
-# Human Resource Information System
+# Talia
 
-## Process Flowchart
+HR and payroll for Philippine companies: people, leave, overtime and time records, and payroll that follows Philippine
+law down to the centavo, from the payslip to the government filings.
 
-### Profile Creation
+[![tests](https://github.com/vincealwynsibay/human-resource-information-system/actions/workflows/tests.yml/badge.svg)](https://github.com/vincealwynsibay/human-resource-information-system/actions/workflows/tests.yml)
 
-![Profile Creation Flowchart](/public/images/ProfileCreationDark.png)
+## What it does
 
+**For HR**: employees with their job, department, supervisor and schedule; leave entitlements and requests; overtime
+requests; clock-in and clock-out time records; a dashboard of headcount, today's attendance and what is waiting for a
+decision.
 
-### Schedule
+**For payroll**:
 
-![Schedule Flowchart](/public/images/ScheduleDark.png)
+- Semi-monthly, monthly or weekly runs computed from the time records: absences, late and undertime, approved
+  overtime, rest-day and holiday premiums from the DOLE rules.
+- SSS (with EC and the MPF part), PhilHealth and Pag-IBIG contributions, and BIR withholding tax from the
+  Revenue Regulations 11-2018 tables. Minimum-wage earners are recognised from the regional wage orders and exempted.
+- Loans deducted each period, never beyond their balance.
+- Maker-checker approval: the person who prepares a run cannot approve it.
+- 13th-month pay, final pay on separation, and the year-end tax adjustment.
+- What goes out afterwards: payslip PDFs, a bank credit file, the BIR 1601-C worksheet, the SSS, PhilHealth and
+  Pag-IBIG contribution lists, Form 2316 figures and the BIR 1604-C alphalist file.
 
+**For employees**: their payslips (and PDFs), time records, leave and overtime requests.
 
-### Overtime
+## How the payroll is proven
 
-![Overtime Flowchart](/public/images/OvertimeDark.png)
+Payroll mistakes cost people money, so the figures are checked against things that are known to be right:
 
+- **5,462 recorded cases.** The engine began as a JavaScript project. Its results for contributions, tax, premiums,
+  minimum-wage status, payslips, loans, 13th month, final pay and the alphalist were recorded and the PHP engine has to
+  reproduce every one of them (`php tests/Payroll/run-golden.php`).
+- **Files the BIR accepted.** Two 1604-C alphalist files that the BIR accepted are rebuilt from their inputs and
+  compared byte for byte.
+- **One summary behind every report.** Form 2316, the alphalist and the monthly 1601-C are all built from the same
+  per-employee summary of the payslips, so the twelve monthly returns add up to the year-end ones. The contribution
+  lists are worked back from what the payslips actually deducted, so they cannot disagree with them.
+- **Sources in the data.** Each rate table carries the circular or regulation it comes from
+  ([resources/payroll](resources/payroll/ATTRIBUTION.md)); the BIR withholding tables are transcribed from Annex E of
+  RR 11-2018 itself, because a public dataset had rounded them to whole pesos.
 
-### Leave
+The test suites run on every push: the payroll engine on SQLite, the HR API against MySQL 8 with the real schema, and
+the front-end build.
 
-![Leave Flowchart](/public/images/LeaveDark.png)
+## What changed in the original HR code
 
+The HR side started in 2024 as a Laravel API on MySQL stored procedures ([how it works](docs/hr-processes.md)). Bringing
+it back to life turned up real problems, now fixed and covered by regression tests:
 
-### Attendance
+- **Employee restrictions were never enforced.** The role checks read `$user->roleID`, but the column is `RoleID`, so
+  every employee-only restriction was skipped. Ownership checks also compared records with the login id instead of the employee id.
+- **Employees could act on other people's requests**: file leave and overtime for someone else, and edit or delete any
+  request. Requests now belong to their employee, and only pending ones can change.
+- **Six stored procedures the controllers call were missing** from the schema, and several list procedures had
+  inverted filters and a constant sort.
 
-![Attendance Flowchart](/public/images/AttendanceDark.png)
+The HR side is moving from stored procedures to Eloquent one area at a time, with those tests as the safety net.
 
-### Payroll
+## How it is built
 
-![Payroll Flowchart](/public/images/PayrollDark.png)
+- **Laravel 12** API with Sanctum session authentication.
+- **Vue 3 with Inertia** and Tailwind CSS 4 for the app.
+- **The payroll engine** (`app/Payroll`) is plain PHP working on arrays: it does not touch the database or the
+  framework, which is what lets the recorded cases run against it directly. `PayrollService` connects it to the
+  database: runs, approvals, loans and year-end.
+- **Filings** (`app/Payroll/Filings`, `app/Payroll/Alphalist`) build the government reports from saved payslips; bank
+  file layouts plug in through `config/payroll.php` (`app/Payroll/Bank`).
+- **PDFs** are rendered from Blade templates by headless Chromium (spatie/laravel-pdf).
 
-## Process List
+## Running it
 
-**Job Title**
-1. Create, Update, or Delete Job Title 
-	- POST/PUT/DELETE /api/jobtitle (admin)
-2. Assign/Change employee job title 
-	- PUT /api/employee/{id}/jobDetails (admin)
+You need PHP 8.4, Composer, Node 22 and Docker (for MySQL).
 
-**Employment Status**
-1. Create, Update, or Delete Employment Status
-	- POST/PUT/DELETE /api/employmentstatus/ (admin)
-2. Assign/Update employee Employment Status
-	- PUT /api/employee/{id}/employmentstatus/ (admin)
+```sh
+composer install
+npm install && npx vite build
+cp .env.example .env && php artisan key:generate
 
-**Department**
-1. Create, Update, or Delete Department
-	- POST/PUT/DELETE /api/department/ (admin)
-2. Assign/Update employee Department as admin or employee
-	- PUT /api/employee/{id}/department/ (admin)
+docker run -d --name hris-mysql -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=hris -p 33306:3306 mysql:8.0
+# in .env: DB_CONNECTION=mysql, DB_PORT=33306, DB_DATABASE=hris, DB_USERNAME=root, DB_PASSWORD=secret
 
-**Employee Certificates**
-1. Add, Update, or Delete Employee Certificate 
-	- POST/PUT/DELETE /api/employee/{employeeId}/certificates (admin/supervisor/employee)
+php artisan hris:demo --fresh   # the schema, then a fictional company with 22 months of history
+php artisan serve
+```
 
-**Work Experience**
-1. Add, Update, or Delete to Employee Work Experiences as admin or employee
-	- POST/PUT/DELETE /api/employee/{employeeId}/workexperience (admin/supervisor/employee)
+Sign in as `admin` (prepares payroll), `approver` (approves it) or `employee`, password `demo1234`. Every name and
+number in the demo company is invented.
 
-**Emergency Contact**
-1. Add, Update, or Delete to Employee Emergency Contacts as admin or employee
-	- POST/PUT/DELETE /api/employee/{employeeId}/emergencycontact (admin/supervisor/employee)
+Loading the schema uses the `mysql` command-line client, so it needs to be on your PATH.
 
-**Education**
-1. Create, Update, or Delete Education
-	- POST/PUT/DELETE /api/education (admin)
-1. Assign/Update/Remove Employee Education as admin or employee
-	- POST/PUT/DELETE /api/employee/{employeeId}/education (admin/supervisor/employee)
+### Tests
 
-**Employee**
-1. Create a new employee with optional personal, contact, and job details
-	- POST /api/employee (admin)
-2. Update personal, contact, job, and contribution details of employee
-	- PUT /api/employee/{employeeId}/ (admin/supervisor/employee)
+```sh
+php vendor/bin/pest --testsuite Payroll    # the payroll engine and API, on SQLite
+php tests/Payroll/run-golden.php           # the recorded cases and the BIR-accepted files
+php vendor/bin/pest --testsuite Feature    # the HR API, on the MySQL database in .env.testing
+```
 
-**USER CREATION**
-1. Create a user with reference to an existing employee
-	- POST /api/user (admin)
-- Admins also have access to all available employee features
+### Deploying
 
-**Work Week**
-1. Setup work week schedule for company as admin
-	- Adding new work week schedule will invalidate current one
-2. Get or Update work week
-	- GET/PUT /api/workweek (admin)
+[deploy/](deploy/README.md) runs the public demo on one small server with Docker: the app, MySQL, a nightly rebuild of
+the demo and automatic HTTPS.
 
-**Holiday**
-1. Create, Update, or Delete Holiday
-	- POST/PUT/DELETE /api/holiday (admin)
+## Accuracy
 
-**Work Shift**
- 1. Create, Update, or Delete workshift 
- 	- POST/PUT/DELETE /api/workshift (admin)
- 2. Add/Remove Employee Workshift as Admin or Supervisor
- 	- PUT /api/employee/assignWorkShift or /api/employee/removeWorkShift (admin/supervisor) 
-
-**Leave**
-1. Assign Leave Entitlements by Leave Type to User
-	- POST /api/leaveentitlement (admin)
-2. Employee can apply for a paid leave using leave entitlements (if no entitlement, it is considered an unpaid leave); 
-	- POST /api/leave (employee)
-3. Leave requests can be approved/rejected by admin or supervisor of employee
-	- POST /api/leave/approve or /api/leave/reject (admin/supervisor)
-4. Approved Leave will deduct the entitlement amount on the leave entitlement with the approved leave leave type
-
-**Overtime**
-1. Employee can apply for overtime with duration
-	- POST /api/overtime (employee)
-2. Overtime requests can be approved/rejected by admin or supervisor of employee
-	- POST /api/overtime/approve or /api/overtime/reject (admin/supervisor)
-3. With approved overtime, the employee will be able to time in/time out on overtime of attendance record. The final overtime duration will depend on time in and out.
-
-**Attendance**
-1. Time In/Time Out as employee
-	- based on time, the relevant session will be added session1 - am or session2 - pm
-	- POST /api/attendance/timein or /api/attendance/timeout (employee)
-2. Update/Delete existing attendance item .
-	- PUT/DELETE /api/attendance/{attendanceId} (admin/supervisor/employee)
-3. Get employee attendance summary as employee, supervisor, admin.
-	- GET /api/employee/{employeeId/attendanceSummary (admin/supervisor/employee)
-4. Print employee DTR as employee or admin.
-	- GET /api/employee/{employeeId/downloadDtr
-5. Missing attendance on a date will be considered absent if have a work week, not a holiday, or there is no existing leave
-
-**Salary**
-1. Create/Update/Delete paygrade as admin
-	- POST/PUT/DELETE /api/paygrade
-2. Create/Update a basic salary within pay grade to employee as admin
-	- POST/PUT /api/employee/{employeeId}/salary (admin)
-
-**Payroll**
-1. Employee payroll will depend on payroll items like ledger (basic salary, bonus, allowance, deductions)
-2. Assign bonus, allowance, deductions payroll items to user as admin
-	- Taxes and Contributions are considered as deductions
-	- Absences, Unpaid leaves, and Undertime are considered as deductions
-	- Overtime Duration will be multiplied to hourly rate as bonus
-	- POST/PUT/DELETE /api/payrollitem (admin)
-3. Get Payrolls or export with date
-	- GET /api/payroll/ or /api/payroll/export (admin)
-
+The rates follow the issuances cited in each table, as of the dates they carry. Minimum wages change whenever a regional
+board issues a new wage order, and contribution tables are reviewed each January; check them before relying on a figure.
+The filings are worksheets for entering in the agencies' own systems, not the official forms.
