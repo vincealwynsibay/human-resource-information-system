@@ -404,6 +404,7 @@ test('update an assigned employee\'s image as a supervisor', function () {
         'middlename' => fake()->firstName,
         'joined_date' => Date::now()
     ]);
+    DB::table('tblemployeesupervisor')->insert(['SupervisorID' => $user->EmployeeID, 'SubordinateID' => $id]);
 
     $response = $this->put('/api/employee/' . $id . '/image', [
         'image' => UploadedFile::fake()->image('avatar.jpg')

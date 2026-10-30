@@ -51,6 +51,12 @@ jobs:
           extensions: gd, zip, mbstring, pdo_mysql
           coverage: none
       - run: composer install --no-interaction --no-progress --prefer-dist
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Puppeteer and Chrome, for the PDF downloads
+        run: npm ci
       - run: cp .env.example .env && php artisan key:generate
       - name: Feature and unit tests (MySQL 8)
         run: php vendor/bin/pest --testsuite Feature,Unit
