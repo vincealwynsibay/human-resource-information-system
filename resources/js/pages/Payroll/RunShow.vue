@@ -6,7 +6,7 @@ import Drawer from '../../components/Drawer.vue';
 import StatCard from '../../components/StatCard.vue';
 import SkeletonRows from '../../components/SkeletonRows.vue';
 import Icon from '../../components/Icon.vue';
-import { api, errorMessage } from '../../lib/api';
+import { api, blobErrorMessage, download, errorMessage } from '../../lib/api';
 import { confirm, toast } from '../../lib/feedback';
 import { FREQUENCY_LABEL, KIND_LABEL, amount, date, peso, period } from '../../lib/format';
 
@@ -91,6 +91,33 @@ async function saveAdjust() {
     }
 }
 
+// Payslip PDFs and the bank credit file.
+async function save(key, url, done) {
+    busy.value = key;
+    try {
+        await download(url);
+        if (done) toast(done);
+    } catch (e) {
+        toast(await blobErrorMessage(e), 'error', 6000);
+    } finally {
+        busy.value = '';
+    }
+}
+const final = computed(() => ['APPROVED', 'PAID'].includes(run.value?.status));
+const bank = ref(null);
+const bankOpen = ref(false);
+const bankError = ref('');
+async function openBank() {
+    bankOpen.value = true;
+    bank.value = null;
+    bankError.value = '';
+    try {
+        bank.value = await api('get', `/payroll/runs/${props.id}/bank`);
+    } catch (e) {
+        bankError.value = errorMessage(e);
+    }
+}
+
 const timeline = computed(() => {
     const r = run.value;
     if (!r) return [];
@@ -123,6 +150,10 @@ const timeline = computed(() => {
                 </template>
             </div>
             <div v-if="run" class="flex flex-wrap gap-2">
+                <button v-if="run.status !== 'CANCELLED'" class="btn-ghost" :disabled="!!busy" :title="final ? undefined : 'Not final yet: each page is marked as such'" @click="save('pdf', `/payroll/runs/${props.id}/payslips/pdf`)">
+                    <Icon name="download" :size="16" />{{ busy === 'pdf' ? 'Preparing…' : 'Payslips (PDF)' }}
+                </button>
+                <button v-if="final" class="btn-ghost" :disabled="!!busy" @click="openBank"><Icon name="file" :size="16" />Bank file</button>
                 <button v-for="a in available.more" :key="a" :class="ACTIONS[a].tone === 'danger' ? 'btn-danger' : 'btn-ghost'" :disabled="!!busy" @click="act(a)">
                     <Icon v-if="ACTIONS[a].icon" :name="ACTIONS[a].icon" :size="16" />{{ busy === a ? 'Working…' : ACTIONS[a].label }}
                 </button>
@@ -184,7 +215,10 @@ const timeline = computed(() => {
                                             </template>
                                         </div>
                                         <p v-for="(n, i) in s.data.notes" :key="i" class="mt-3 text-xs text-muted">{{ n }}</p>
-                                        <button v-if="run.status === 'DRAFT' && run.kind === 'regular'" class="btn-ghost mt-4 px-3 py-1.5 text-xs" @click="openAdjust(s)">Add allowance or deduction</button>
+                                        <div class="mt-4 flex flex-wrap gap-2">
+                                            <button class="btn-ghost px-3 py-1.5 text-xs" :disabled="!!busy" @click="save(`pdf-${s.id}`, `/payroll/runs/${props.id}/payslips/${encodeURIComponent(s.employee_id)}/pdf`)"><Icon name="download" :size="14" />{{ busy === `pdf-${s.id}` ? 'Preparing…' : 'Payslip PDF' }}</button>
+                                            <button v-if="run.status === 'DRAFT' && run.kind === 'regular'" class="btn-ghost px-3 py-1.5 text-xs" @click="openAdjust(s)">Add allowance or deduction</button>
+                                        </div>
                                     </td>
                                 </tr>
                             </template>
@@ -207,6 +241,31 @@ const timeline = computed(() => {
             </aside>
         </div>
     </template>
+
+    <Drawer :open="bankOpen" title="Bank file" :subtitle="run ? `Net pay for ${period(run.period_start, run.period_end)}, paid ${date(run.pay_date)}` : ''" @close="bankOpen = false">
+        <div v-if="bankError" class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger" role="alert">{{ bankError }}</div>
+        <div v-else-if="!bank" class="space-y-3"><div class="skeleton h-16" /><div class="skeleton h-24" /></div>
+        <template v-else>
+            <div class="grid grid-cols-2 gap-3">
+                <StatCard label="To credit" :value="peso(bank.meta.total)" :hint="`${bank.meta.count} account(s)`" />
+                <StatCard label="Reference" :value="bank.meta.reference" />
+            </div>
+            <div v-if="bank.missing.length" class="mt-4 rounded-lg border border-warn/30 bg-warn-soft px-3 py-2.5 text-sm text-warn" role="status">
+                <p class="font-medium">{{ bank.missing.length }} {{ bank.missing.length === 1 ? 'person has' : 'people have' }} no bank account on file ({{ peso(bank.missingTotal) }}). Pay them another way, or add an account to their pay profile.</p>
+                <ul class="mt-1.5 space-y-0.5">
+                    <li v-for="m in bank.missing" :key="m.employeeId" class="flex justify-between gap-4"><Link :href="`/payroll/employees?edit=${m.employeeId}`" class="hover:underline">{{ m.name }}</Link><span class="num">{{ amount(m.amount) }}</span></li>
+                </ul>
+            </div>
+            <h3 class="mt-6 mb-2 text-sm font-semibold">Download</h3>
+            <div class="space-y-2">
+                <button v-for="f in bank.formats" :key="f.key" class="flex w-full items-center justify-between rounded-lg border border-line px-3 py-2.5 text-left text-sm hover:bg-surface-2" :disabled="!!busy || !bank.meta.count" @click="save(`bank-${f.key}`, `/payroll/runs/${props.id}/bank/${f.key}`, 'Bank file downloaded. Check the total against your bank portal before uploading.')">
+                    <span><span class="font-medium">{{ f.label }}</span> <span class="text-muted">.{{ f.extension }}</span></span>
+                    <Icon name="download" :size="16" class="text-muted" />
+                </button>
+            </div>
+            <p class="mt-4 text-xs text-muted">These are generic layouts, not a particular bank's. Each bank gives its own upload format to corporate clients; it can be added once you have it.</p>
+        </template>
+    </Drawer>
 
     <Drawer :open="!!adjusting" :title="adjusting ? `Adjust ${adjusting.name}` : ''" subtitle="Tax and contributions are computed again with these lines." wide @close="adjusting = null">
         <section v-for="[key, title, withTax] in [['allowances', 'Allowances and other pay', true], ['otherDeductions', 'Other deductions', false]]" :key="key" class="mb-6">

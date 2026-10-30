@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/payroll/runs/{id}', fn (string $id) => Inertia::render('Payroll/RunShow', ['id' => $id]))->whereUuid('id');
         Route::get('/payroll/employees', fn () => Inertia::render('Payroll/Employees'));
         Route::get('/payroll/loans', fn () => Inertia::render('Payroll/Loans'));
+        Route::get('/payroll/filings', fn () => Inertia::render('Payroll/Filings'));
         Route::get('/payroll/year-end', fn () => Inertia::render('Payroll/YearEnd'));
     });
 });

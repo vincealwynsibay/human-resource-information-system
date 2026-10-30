@@ -3,13 +3,16 @@ import { Head } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 import PageHeader from '../../components/PageHeader.vue';
 import EmptyState from '../../components/EmptyState.vue';
-import { api, errorMessage } from '../../lib/api';
+import Icon from '../../components/Icon.vue';
+import { api, blobErrorMessage, download, errorMessage } from '../../lib/api';
+import { toast } from '../../lib/feedback';
 import { KIND_LABEL, amount, date, peso, period } from '../../lib/format';
 
 const loading = ref(true);
 const error = ref('');
 const slips = ref([]);
 const selected = ref(null);
+const saving = ref(false);
 
 onMounted(async () => {
     try {
@@ -21,6 +24,17 @@ onMounted(async () => {
         loading.value = false;
     }
 });
+
+async function savePdf() {
+    saving.value = true;
+    try {
+        await download(`/payroll/my/payslips/${selected.value.id}/pdf`);
+    } catch (e) {
+        toast(await blobErrorMessage(e), 'error');
+    } finally {
+        saving.value = false;
+    }
+}
 </script>
 
 <template>
@@ -51,6 +65,7 @@ onMounted(async () => {
                 <div class="text-right">
                     <p class="text-xs text-muted">Net pay</p>
                     <p class="num text-2xl font-semibold text-accent">{{ peso(selected.net) }}</p>
+                    <button class="btn-ghost mt-2 px-3 py-1.5 text-xs" :disabled="saving" @click="savePdf"><Icon name="download" :size="14" />{{ saving ? 'Preparing…' : 'Download PDF' }}</button>
                 </div>
             </div>
             <div class="mt-5 grid gap-8 sm:grid-cols-2">

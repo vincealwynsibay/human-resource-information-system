@@ -22,6 +22,10 @@ async function load() {
         const [p, o] = await Promise.all([api('get', '/payroll/profiles'), api('get', '/payroll/profiles/options')]);
         items.value = p.items;
         options.value = o;
+        // A link such as ?edit=112 (from a run's bank file) opens that profile.
+        const wanted = new URLSearchParams(window.location.search).get('edit');
+        const match = wanted && items.value.find((x) => x.employeeId === wanted);
+        if (match && !drawer.value) edit(match);
     } catch (e) {
         error.value = errorMessage(e);
     } finally {
@@ -42,7 +46,7 @@ const drawer = ref(false);
 const editingId = ref(null);
 const saving = ref(false);
 const formError = ref('');
-const blank = () => ({ employeeId: '', name: '', lastName: '', firstName: '', middleName: '', payBasis: 'monthly', rate: '', region: 'NCR', sector: 'non_agri', minimumWageEarner: 'auto', hireDate: '', birthDate: '', employmentStatus: 'R', dailyRateFactor: 261, tin: '', sss: '', philhealth: '', pagibig: '' });
+const blank = () => ({ employeeId: '', name: '', lastName: '', firstName: '', middleName: '', payBasis: 'monthly', rate: '', region: 'NCR', sector: 'non_agri', minimumWageEarner: 'auto', hireDate: '', birthDate: '', employmentStatus: 'R', dailyRateFactor: 261, tin: '', sss: '', philhealth: '', pagibig: '', bankName: '', accountNumber: '', accountName: '' });
 const form = reactive(blank());
 
 function edit(p) {
@@ -52,7 +56,7 @@ function edit(p) {
         employeeId: p.employeeId, name: p.name, lastName: p.lastName ?? '', firstName: p.firstName ?? '', middleName: p.middleName ?? '',
         payBasis: p.payBasis ?? 'monthly', rate: rateOf(p)[0] ?? '', region: p.region ?? '', sector: p.sector ?? 'non_agri',
         minimumWageEarner: p.minimumWageEarner === true ? 'yes' : p.minimumWageEarner === 'auto' ? 'auto' : 'no',
-        hireDate: p.hireDate ?? '', birthDate: p.birthDate ?? '', employmentStatus: p.employmentStatus ?? 'R', dailyRateFactor: p.dailyRateFactor ?? 261, ...(p.ids ?? {}),
+        hireDate: p.hireDate ?? '', birthDate: p.birthDate ?? '', employmentStatus: p.employmentStatus ?? 'R', dailyRateFactor: p.dailyRateFactor ?? 261, ...(p.ids ?? {}), ...(p.bank ?? {}),
     } : {});
     drawer.value = true;
 }
@@ -68,6 +72,7 @@ async function save() {
             payBasis: form.payBasis, rate: form.rate, region: form.region, sector: form.sector, minimumWageEarner: form.minimumWageEarner,
             hireDate: form.hireDate, birthDate: form.birthDate, employmentStatus: form.employmentStatus, dailyRateFactor: form.dailyRateFactor,
             ids: { tin: form.tin, sss: form.sss, philhealth: form.philhealth, pagibig: form.pagibig },
+            bank: { bankName: form.bankName, accountNumber: form.accountNumber, accountName: form.accountName },
         });
         toast(`${form.name}'s pay profile is saved.`);
         drawer.value = false;
@@ -142,9 +147,9 @@ async function runImport(dryRun) {
         </header>
         <div class="overflow-x-auto">
             <table class="w-full min-w-[46rem] text-sm">
-                <thead><tr><th class="th">Employee</th><th class="th">Pay</th><th class="th">Region</th><th class="th">Tax status</th><th class="th">Hired</th><th class="th">TIN</th></tr></thead>
+                <thead><tr><th class="th">Employee</th><th class="th">Pay</th><th class="th">Region</th><th class="th">Tax status</th><th class="th">Hired</th><th class="th">TIN</th><th class="th">Bank</th></tr></thead>
                 <tbody>
-                    <SkeletonRows v-if="loading" :rows="8" :cols="6" />
+                    <SkeletonRows v-if="loading" :rows="8" :cols="7" />
                     <tr v-for="p in filtered" v-else :key="p.employeeId" class="cursor-pointer hover:bg-surface-2" @click="edit(p)">
                         <td class="td"><p class="font-medium">{{ p.name }}</p><p class="text-xs text-muted">ID {{ p.employeeId }}</p></td>
                         <td class="td"><span class="num">₱{{ amount(rateOf(p)[0]) }}</span> <span class="text-muted">{{ rateOf(p)[1] }}</span><p class="text-xs text-muted">{{ BASIS[p.payBasis ?? 'monthly'] }}</p></td>
@@ -157,6 +162,10 @@ async function runImport(dryRun) {
                         <td class="td">
                             <span v-if="p.ids?.tin" class="num">{{ p.ids.tin }}</span>
                             <span v-else class="inline-flex items-center gap-1 text-xs text-warn"><Icon name="alert" :size="13" />missing</span>
+                        </td>
+                        <td class="td">
+                            <span v-if="p.bank">{{ p.bank.bankName }}<span class="num text-xs text-muted"> ···{{ p.bank.accountNumber.slice(-4) }}</span></span>
+                            <span v-else class="inline-flex items-center gap-1 text-xs text-warn"><Icon name="alert" :size="13" />no account</span>
                         </td>
                     </tr>
                 </tbody>
@@ -213,6 +222,12 @@ async function runImport(dryRun) {
             <div><label class="label" for="sss">SSS</label><input id="sss" v-model="form.sss" class="input num" /></div>
             <div><label class="label" for="ph">PhilHealth</label><input id="ph" v-model="form.philhealth" class="input num" /></div>
             <div><label class="label" for="pi">Pag-IBIG</label><input id="pi" v-model="form.pagibig" class="input num" /></div>
+
+            <p class="mt-2 text-xs font-semibold tracking-wide text-muted uppercase sm:col-span-2">Bank account for pay</p>
+            <div><label class="label" for="bn">Bank</label><input id="bn" v-model="form.bankName" class="input" placeholder="e.g. BDO Unibank" /></div>
+            <div><label class="label" for="an">Account number</label><input id="an" v-model="form.accountNumber" class="input num" inputmode="numeric" /></div>
+            <div class="sm:col-span-2"><label class="label" for="ah">Account name <span class="font-normal text-muted">(if not the employee's own name)</span></label><input id="ah" v-model="form.accountName" class="input" /></div>
+            <p class="-mt-2 text-xs text-muted sm:col-span-2">Leave the account number empty for someone paid in cash or by cheque; the bank file lists them separately.</p>
         </div>
         <div v-if="formError" class="mt-5 rounded-lg border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm text-danger" role="alert">{{ formError }}</div>
         <template #footer>
