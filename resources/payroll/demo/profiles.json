@@ -19,7 +19,10 @@
    "sss": "9901123456",
    "philhealth": "990109876543",
    "pagibig": "980107654321"
-  }
+  },
+  "department": "Executive",
+  "jobTitle": "General Manager",
+  "gender": "Male"
  },
  {
   "id": "102",
@@ -41,7 +44,10 @@
    "sss": "9902123493",
    "philhealth": "990209876596",
    "pagibig": "980207654382"
-  }
+  },
+  "department": "Finance",
+  "jobTitle": "Finance Manager",
+  "gender": "Female"
  },
  {
   "id": "103",
@@ -63,7 +69,10 @@
    "sss": "9903123530",
    "philhealth": "990309876649",
    "pagibig": "980307654443"
-  }
+  },
+  "department": "Finance",
+  "jobTitle": "Senior Accountant",
+  "gender": "Female"
  },
  {
   "id": "104",
@@ -85,7 +94,10 @@
    "sss": "9904123567",
    "philhealth": "990409876702",
    "pagibig": "980407654504"
-  }
+  },
+  "department": "Human Resources",
+  "jobTitle": "HR Generalist",
+  "gender": "Male"
  },
  {
   "id": "105",
@@ -107,7 +119,10 @@
    "sss": "9905123604",
    "philhealth": "990509876755",
    "pagibig": "980507654565"
-  }
+  },
+  "department": "Finance",
+  "jobTitle": "Payroll Officer",
+  "gender": "Female"
  },
  {
   "id": "106",
@@ -129,7 +144,10 @@
    "sss": "9906123641",
    "philhealth": "990609876808",
    "pagibig": "980607654626"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Branch Manager, Cebu",
+  "gender": "Male"
  },
  {
   "id": "107",
@@ -151,7 +169,10 @@
    "sss": "9907123678",
    "philhealth": "990709876861",
    "pagibig": "980707654687"
-  }
+  },
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "gender": "Female"
  },
  {
   "id": "108",
@@ -173,7 +194,10 @@
    "sss": "9908123715",
    "philhealth": "990809876914",
    "pagibig": "980807654748"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Inventory Clerk",
+  "gender": "Male"
  },
  {
   "id": "109",
@@ -195,7 +219,10 @@
    "sss": "9909123752",
    "philhealth": "990909876967",
    "pagibig": "980907654809"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "gender": "Female"
  },
  {
   "id": "110",
@@ -217,7 +244,10 @@
    "sss": "9910123789",
    "philhealth": "991009877020",
    "pagibig": "981007654870"
-  }
+  },
+  "department": "Technology",
+  "jobTitle": "IT Manager",
+  "gender": "Male"
  },
  {
   "id": "111",
@@ -239,7 +269,10 @@
    "sss": "9911123826",
    "philhealth": "991109877073",
    "pagibig": "981107654931"
-  }
+  },
+  "department": "Sales",
+  "jobTitle": "Sales Manager",
+  "gender": "Female"
  },
  {
   "id": "112",
@@ -261,7 +294,10 @@
    "sss": "9912123863",
    "philhealth": "991209877126",
    "pagibig": "981207654992"
-  }
+  },
+  "department": "Sales",
+  "jobTitle": "Store Supervisor",
+  "gender": "Male"
  },
  {
   "id": "113",
@@ -283,7 +319,10 @@
    "sss": "9913123900",
    "philhealth": "991309877179",
    "pagibig": "981307655053"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Operations Manager",
+  "gender": "Female"
  },
  {
   "id": "114",
@@ -305,7 +344,10 @@
    "sss": "9914123937",
    "philhealth": "991409877232",
    "pagibig": "981407655114"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Warehouse Supervisor",
+  "gender": "Male"
  },
  {
   "id": "115",
@@ -327,7 +369,10 @@
    "sss": "9915123974",
    "philhealth": "991509877285",
    "pagibig": "981507655175"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Driver",
+  "gender": "Male"
  },
  {
   "id": "116",
@@ -349,7 +394,10 @@
    "sss": "9916124011",
    "philhealth": "991609877338",
    "pagibig": "981607655236"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "gender": "Male"
  },
  {
   "id": "117",
@@ -371,7 +419,10 @@
    "sss": "9917124048",
    "philhealth": "991709877391",
    "pagibig": "981707655297"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Driver",
+  "gender": "Male"
  },
  {
   "id": "118",
@@ -393,7 +444,10 @@
    "sss": "9918124085",
    "philhealth": "991809877444",
    "pagibig": "981807655358"
-  }
+  },
+  "department": "Sales",
+  "jobTitle": "Merchandiser",
+  "gender": "Male"
  },
  {
   "id": "119",
@@ -415,7 +469,10 @@
    "sss": "9919124122",
    "philhealth": "991909877497",
    "pagibig": "981907655419"
-  }
+  },
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "gender": "Female"
  },
  {
   "id": "120",
@@ -437,7 +494,10 @@
    "sss": "9920124159",
    "philhealth": "992009877550",
    "pagibig": "982007655480"
-  }
+  },
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "gender": "Male"
  },
  {
   "id": "121",
@@ -459,7 +519,10 @@
    "sss": "9921124196",
    "philhealth": "992109877603",
    "pagibig": "982107655541"
-  }
+  },
+  "department": "Human Resources",
+  "jobTitle": "Recruiter",
+  "gender": "Female"
  },
  {
   "id": "122",
@@ -481,7 +544,10 @@
    "sss": "9922124233",
    "philhealth": "992209877656",
    "pagibig": "982207655602"
-  }
+  },
+  "department": "Technology",
+  "jobTitle": "Software Developer",
+  "gender": "Male"
  },
  {
   "id": "123",
@@ -503,7 +569,10 @@
    "sss": "9923124270",
    "philhealth": "992309877709",
    "pagibig": "982307655663"
-  }
+  },
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "gender": "Female"
  },
  {
   "id": "124",
@@ -525,6 +594,1419 @@
    "sss": "9924124307",
    "philhealth": "992409877762",
    "pagibig": "982407655724"
+  },
+  "department": "Operations",
+  "jobTitle": "Delivery Helper",
+  "gender": "Male"
+ },
+ {
+  "id": "125",
+  "name": "Emmanuel Macaraeg",
+  "lastName": "Macaraeg",
+  "firstName": "Emmanuel",
+  "middleName": "Aguilar",
+  "payBasis": "monthly",
+  "monthlySalary": 38500,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2016-10-13",
+  "birthDate": "1989-02-11",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Finance",
+  "jobTitle": "Accountant",
+  "ids": {
+   "tin": "912547882",
+   "sss": "9912564071",
+   "philhealth": "991253379592",
+   "pagibig": "981253484538"
+  }
+ },
+ {
+  "id": "126",
+  "name": "Kristine Robles",
+  "lastName": "Robles",
+  "firstName": "Kristine",
+  "middleName": "Rivera",
+  "payBasis": "monthly",
+  "monthlySalary": 34000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2025-12-20",
+  "birthDate": "1998-06-03",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Finance",
+  "jobTitle": "Accountant",
+  "ids": {
+   "tin": "912617202",
+   "sss": "9912673461",
+   "philhealth": "991266659229",
+   "pagibig": "981267594516"
+  }
+ },
+ {
+  "id": "127",
+  "name": "Vincent Panganiban",
+  "lastName": "Panganiban",
+  "firstName": "Vincent",
+  "middleName": "Castillo",
+  "payBasis": "monthly",
+  "monthlySalary": 41500,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2020-11-20",
+  "birthDate": "1981-11-06",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Finance",
+  "jobTitle": "Accountant",
+  "ids": {
+   "tin": "912710644",
+   "sss": "9912769955",
+   "philhealth": "991272243088",
+   "pagibig": "981274030711"
+  }
+ },
+ {
+  "id": "128",
+  "name": "Vincent Mercado",
+  "lastName": "Mercado",
+  "firstName": "Vincent",
+  "middleName": "Garcia",
+  "payBasis": "monthly",
+  "monthlySalary": 22000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2024-02-20",
+  "birthDate": "1987-02-26",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Finance",
+  "jobTitle": "Accounts Payable Clerk",
+  "ids": {
+   "tin": "912875092",
+   "sss": "9912861677",
+   "philhealth": "991289306880",
+   "pagibig": "981281797483"
+  }
+ },
+ {
+  "id": "129",
+  "name": "Rodel Pascual",
+  "lastName": "Pascual",
+  "firstName": "Rodel",
+  "middleName": "Rivera",
+  "payBasis": "monthly",
+  "monthlySalary": 21500,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2023-02-01",
+  "birthDate": "1985-07-20",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Finance",
+  "jobTitle": "Accounts Payable Clerk",
+  "ids": {
+   "tin": "912945267",
+   "sss": "9912939146",
+   "philhealth": "991296275053",
+   "pagibig": "981292622238"
+  }
+ },
+ {
+  "id": "130",
+  "name": "Danilo Esguerra",
+  "lastName": "Esguerra",
+  "firstName": "Danilo",
+  "middleName": "Aguilar",
+  "payBasis": "monthly",
+  "monthlySalary": 70000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2020-09-01",
+  "birthDate": "1988-06-22",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Human Resources",
+  "jobTitle": "HR Manager",
+  "ids": {
+   "tin": "913028795",
+   "sss": "9913094655",
+   "philhealth": "991302368107",
+   "pagibig": "981301665774"
+  }
+ },
+ {
+  "id": "131",
+  "name": "Reynaldo Ramos",
+  "lastName": "Ramos",
+  "firstName": "Reynaldo",
+  "middleName": "Lopez",
+  "payBasis": "monthly",
+  "monthlySalary": 23500,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2026-02-02",
+  "birthDate": "1974-07-27",
+  "employmentStatus": "P",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Human Resources",
+  "jobTitle": "HR Assistant",
+  "ids": {
+   "tin": "913148201",
+   "sss": "9913157535",
+   "philhealth": "991318122862",
+   "pagibig": "981312474818"
+  }
+ },
+ {
+  "id": "132",
+  "name": "Nestor Galang",
+  "lastName": "Galang",
+  "firstName": "Nestor",
+  "middleName": "Torres",
+  "payBasis": "monthly",
+  "monthlySalary": 21000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2025-07-06",
+  "birthDate": "1976-04-03",
+  "employmentStatus": "P",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Human Resources",
+  "jobTitle": "HR Assistant",
+  "ids": {
+   "tin": "913247936",
+   "sss": "9913249058",
+   "philhealth": "991327915831",
+   "pagibig": "981323907362"
+  }
+ },
+ {
+  "id": "133",
+  "name": "Nestor Lacsamana",
+  "lastName": "Lacsamana",
+  "firstName": "Nestor",
+  "middleName": "Castillo",
+  "payBasis": "monthly",
+  "monthlySalary": 60500,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2020-08-01",
+  "birthDate": "1988-02-06",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Technology",
+  "jobTitle": "Software Developer",
+  "ids": {
+   "tin": "913342344",
+   "sss": "9913354475",
+   "philhealth": "991331649175",
+   "pagibig": "981339582322"
+  },
+  "separationDate": "2025-05-31",
+  "separationCause": "resignation"
+ },
+ {
+  "id": "134",
+  "name": "Lovely Robles",
+  "lastName": "Robles",
+  "firstName": "Lovely",
+  "middleName": "Lopez",
+  "payBasis": "monthly",
+  "monthlySalary": 49000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2023-06-06",
+  "birthDate": "1988-03-03",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Technology",
+  "jobTitle": "Software Developer",
+  "ids": {
+   "tin": "913416313",
+   "sss": "9913461916",
+   "philhealth": "991341599852",
+   "pagibig": "981341778695"
+  }
+ },
+ {
+  "id": "135",
+  "name": "Jomar Lacsamana",
+  "lastName": "Lacsamana",
+  "firstName": "Jomar",
+  "middleName": "Lopez",
+  "payBasis": "monthly",
+  "monthlySalary": 48000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2020-02-01",
+  "birthDate": "1979-11-06",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Technology",
+  "jobTitle": "Software Developer",
+  "ids": {
+   "tin": "913591948",
+   "sss": "9913594412",
+   "philhealth": "991353233737",
+   "pagibig": "981359385852"
+  }
+ },
+ {
+  "id": "136",
+  "name": "Rodel Umali",
+  "lastName": "Umali",
+  "firstName": "Rodel",
+  "middleName": "Castillo",
+  "payBasis": "monthly",
+  "monthlySalary": 59500,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2026-04-06",
+  "birthDate": "1989-01-27",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Technology",
+  "jobTitle": "Software Developer",
+  "ids": {
+   "tin": "913613393",
+   "sss": "9913692799",
+   "philhealth": "991361846828",
+   "pagibig": "981363730418"
+  }
+ },
+ {
+  "id": "137",
+  "name": "Joshua Pascual",
+  "lastName": "Pascual",
+  "firstName": "Joshua",
+  "middleName": "Fernandez",
+  "payBasis": "monthly",
+  "monthlySalary": 30000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2025-02-13",
+  "birthDate": "1990-09-27",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Technology",
+  "jobTitle": "IT Support Specialist",
+  "ids": {
+   "tin": "913741478",
+   "sss": "9913748190",
+   "philhealth": "991374884849",
+   "pagibig": "981371753053"
+  }
+ },
+ {
+  "id": "138",
+  "name": "Charmaine Bernal",
+  "lastName": "Bernal",
+  "firstName": "Charmaine",
+  "middleName": "Rivera",
+  "payBasis": "monthly",
+  "monthlySalary": 28000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2025-03-03",
+  "birthDate": "1982-12-14",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Technology",
+  "jobTitle": "IT Support Specialist",
+  "ids": {
+   "tin": "913899324",
+   "sss": "9913888037",
+   "philhealth": "991386594515",
+   "pagibig": "981383639805"
+  }
+ },
+ {
+  "id": "139",
+  "name": "Maricel Catapang",
+  "lastName": "Catapang",
+  "firstName": "Maricel",
+  "middleName": "Garcia",
+  "payBasis": "monthly",
+  "monthlySalary": 33500,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2016-03-01",
+  "birthDate": "1984-01-09",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Sales",
+  "jobTitle": "Account Executive",
+  "ids": {
+   "tin": "913916099",
+   "sss": "9913911492",
+   "philhealth": "991391814525",
+   "pagibig": "981396131950"
+  }
+ },
+ {
+  "id": "140",
+  "name": "Lovely Esguerra",
+  "lastName": "Esguerra",
+  "firstName": "Lovely",
+  "middleName": "Rivera",
+  "payBasis": "monthly",
+  "monthlySalary": 34000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2025-12-01",
+  "birthDate": "1981-05-12",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Sales",
+  "jobTitle": "Account Executive",
+  "ids": {
+   "tin": "914087316",
+   "sss": "9914088486",
+   "philhealth": "991409342767",
+   "pagibig": "981409325603"
+  }
+ },
+ {
+  "id": "141",
+  "name": "Bryan Catapang",
+  "lastName": "Catapang",
+  "firstName": "Bryan",
+  "middleName": "Garcia",
+  "payBasis": "monthly",
+  "monthlySalary": 38000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2021-11-13",
+  "birthDate": "1979-04-23",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Account Executive",
+  "ids": {
+   "tin": "914186649",
+   "sss": "9914125445",
+   "philhealth": "991414466142",
+   "pagibig": "981411626344"
+  }
+ },
+ {
+  "id": "142",
+  "name": "Christian Dela Paz",
+  "lastName": "Dela Paz",
+  "firstName": "Christian",
+  "middleName": "Reyes",
+  "payBasis": "monthly",
+  "monthlySalary": 37000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2026-06-01",
+  "birthDate": "2000-07-23",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Account Executive",
+  "ids": {
+   "tin": "914267821",
+   "sss": "9914259086",
+   "philhealth": "991422434230",
+   "pagibig": "981422110480"
+  }
+ },
+ {
+  "id": "143",
+  "name": "Rodel Gutierrez",
+  "lastName": "Gutierrez",
+  "firstName": "Rodel",
+  "middleName": "Castillo",
+  "payBasis": "daily",
+  "dailyRate": 750,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2016-06-20",
+  "birthDate": "1973-01-01",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "914364825",
+   "sss": "9914394593",
+   "philhealth": "991432716178",
+   "pagibig": "981438420645"
+  }
+ },
+ {
+  "id": "144",
+  "name": "Hazel Umali",
+  "lastName": "Umali",
+  "firstName": "Hazel",
+  "middleName": "Torres",
+  "payBasis": "daily",
+  "dailyRate": 710,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2016-04-06",
+  "birthDate": "1995-05-07",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "914484142",
+   "sss": "9914485466",
+   "philhealth": "991443284818",
+   "pagibig": "981444959001"
+  }
+ },
+ {
+  "id": "145",
+  "name": "Ronald Santiago",
+  "lastName": "Santiago",
+  "firstName": "Ronald",
+  "middleName": "Morales",
+  "payBasis": "daily",
+  "dailyRate": 720,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2023-07-01",
+  "birthDate": "1983-04-08",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "914531746",
+   "sss": "9914560436",
+   "philhealth": "991452568772",
+   "pagibig": "981453998392"
+  }
+ },
+ {
+  "id": "146",
+  "name": "Nestor Aquino",
+  "lastName": "Aquino",
+  "firstName": "Nestor",
+  "middleName": "Morales",
+  "payBasis": "daily",
+  "dailyRate": 715,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2021-03-01",
+  "birthDate": "1991-08-01",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "914690734",
+   "sss": "9914622568",
+   "philhealth": "991467877252",
+   "pagibig": "981461880510"
+  },
+  "separationDate": "2025-09-30",
+  "separationCause": "resignation"
+ },
+ {
+  "id": "147",
+  "name": "Ronald Panganiban",
+  "lastName": "Panganiban",
+  "firstName": "Ronald",
+  "middleName": "Aguilar",
+  "payBasis": "daily",
+  "dailyRate": 705,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2024-04-01",
+  "birthDate": "1978-05-27",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "914753808",
+   "sss": "9914776754",
+   "philhealth": "991473555007",
+   "pagibig": "981479146151"
+  }
+ },
+ {
+  "id": "148",
+  "name": "Reynaldo Aquino",
+  "lastName": "Aquino",
+  "firstName": "Reynaldo",
+  "middleName": "Rivera",
+  "payBasis": "daily",
+  "dailyRate": 730,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2016-04-06",
+  "birthDate": "1973-01-01",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "914890316",
+   "sss": "9914819088",
+   "philhealth": "991486490774",
+   "pagibig": "981483831291"
+  }
+ },
+ {
+  "id": "149",
+  "name": "Maricel Gutierrez",
+  "lastName": "Gutierrez",
+  "firstName": "Maricel",
+  "middleName": "Lopez",
+  "payBasis": "monthly",
+  "monthlySalary": 22000,
+  "region": "Region VII",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2026-08-03",
+  "birthDate": "2003-01-22",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "914919188",
+   "sss": "9914977841",
+   "philhealth": "991496446685",
+   "pagibig": "981492361471"
+  }
+ },
+ {
+  "id": "150",
+  "name": "Renato Yambao",
+  "lastName": "Yambao",
+  "firstName": "Renato",
+  "middleName": "Castillo",
+  "payBasis": "monthly",
+  "monthlySalary": 22000,
+  "region": "Region VII",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2018-03-20",
+  "birthDate": "1981-11-12",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "915027761",
+   "sss": "9915089452",
+   "philhealth": "991503731914",
+   "pagibig": "981506293114"
+  }
+ },
+ {
+  "id": "151",
+  "name": "Francis Tolentino",
+  "lastName": "Tolentino",
+  "firstName": "Francis",
+  "middleName": "Rivera",
+  "payBasis": "monthly",
+  "monthlySalary": 18500,
+  "region": "Region VII",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2025-04-13",
+  "birthDate": "1974-02-13",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "915193600",
+   "sss": "9915147798",
+   "philhealth": "991514873786",
+   "pagibig": "981517333529"
+  }
+ },
+ {
+  "id": "152",
+  "name": "Jerome Bernal",
+  "lastName": "Bernal",
+  "firstName": "Jerome",
+  "middleName": "Lopez",
+  "payBasis": "monthly",
+  "monthlySalary": 19000,
+  "region": "Region VII",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2022-07-13",
+  "birthDate": "1977-07-18",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Sales Associate",
+  "ids": {
+   "tin": "915248617",
+   "sss": "9915268549",
+   "philhealth": "991521237396",
+   "pagibig": "981529075068"
+  }
+ },
+ {
+  "id": "153",
+  "name": "Nestor Esguerra",
+  "lastName": "Esguerra",
+  "firstName": "Nestor",
+  "middleName": "Torres",
+  "payBasis": "monthly",
+  "monthlySalary": 31000,
+  "region": "Region VII",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2018-05-06",
+  "birthDate": "2001-07-22",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Store Supervisor",
+  "ids": {
+   "tin": "915343650",
+   "sss": "9915373722",
+   "philhealth": "991531171132",
+   "pagibig": "981532917847"
+  },
+  "separationDate": "2026-01-31",
+  "separationCause": "resignation"
+ },
+ {
+  "id": "154",
+  "name": "Andrea Manalo",
+  "lastName": "Manalo",
+  "firstName": "Andrea",
+  "middleName": "Aguilar",
+  "payBasis": "daily",
+  "dailyRate": 610,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2023-07-06",
+  "birthDate": "1988-03-06",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "915473899",
+   "sss": "9915496294",
+   "philhealth": "991541030592",
+   "pagibig": "981542560787"
+  }
+ },
+ {
+  "id": "155",
+  "name": "Francis Navarro",
+  "lastName": "Navarro",
+  "firstName": "Francis",
+  "middleName": "Morales",
+  "payBasis": "daily",
+  "dailyRate": 650,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2024-03-13",
+  "birthDate": "2000-06-06",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "915530445",
+   "sss": "9915557585",
+   "philhealth": "991556665020",
+   "pagibig": "981553379611"
+  }
+ },
+ {
+  "id": "156",
+  "name": "Paolo Panganiban",
+  "lastName": "Panganiban",
+  "firstName": "Paolo",
+  "middleName": "Perez",
+  "payBasis": "daily",
+  "dailyRate": 620,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2021-02-01",
+  "birthDate": "1983-05-23",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "915626672",
+   "sss": "9915689762",
+   "philhealth": "991566835122",
+   "pagibig": "981565449745"
+  }
+ },
+ {
+  "id": "157",
+  "name": "Emmanuel Umali",
+  "lastName": "Umali",
+  "firstName": "Emmanuel",
+  "middleName": "Perez",
+  "payBasis": "daily",
+  "dailyRate": 635,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2026-09-01",
+  "birthDate": "1994-01-17",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "915732827",
+   "sss": "9915794790",
+   "philhealth": "991576007498",
+   "pagibig": "981571399189"
+  }
+ },
+ {
+  "id": "158",
+  "name": "Ariel Gutierrez",
+  "lastName": "Gutierrez",
+  "firstName": "Ariel",
+  "middleName": "Torres",
+  "payBasis": "daily",
+  "dailyRate": 620,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2023-03-13",
+  "birthDate": "1981-10-21",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "915828781",
+   "sss": "9915819201",
+   "philhealth": "991585257194",
+   "pagibig": "981581462448"
+  }
+ },
+ {
+  "id": "159",
+  "name": "Maricel Mendoza",
+  "lastName": "Mendoza",
+  "firstName": "Maricel",
+  "middleName": "Fernandez",
+  "payBasis": "daily",
+  "dailyRate": 605,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2024-04-20",
+  "birthDate": "1997-03-05",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "915936138",
+   "sss": "9915929468",
+   "philhealth": "991597887390",
+   "pagibig": "981592036457"
+  }
+ },
+ {
+  "id": "160",
+  "name": "Kristine Navarro",
+  "lastName": "Navarro",
+  "firstName": "Kristine",
+  "middleName": "Perez",
+  "payBasis": "daily",
+  "dailyRate": 615,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2025-07-01",
+  "birthDate": "1987-11-20",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "916096136",
+   "sss": "9916030874",
+   "philhealth": "991605544650",
+   "pagibig": "981609798048"
+  }
+ },
+ {
+  "id": "161",
+  "name": "Joshua Gutierrez",
+  "lastName": "Gutierrez",
+  "firstName": "Joshua",
+  "middleName": "Fernandez",
+  "payBasis": "daily",
+  "dailyRate": 640,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2023-10-13",
+  "birthDate": "1987-02-04",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "916189906",
+   "sss": "9916181172",
+   "philhealth": "991612988223",
+   "pagibig": "981617708738"
+  }
+ },
+ {
+  "id": "162",
+  "name": "Lorenzo Quizon",
+  "lastName": "Quizon",
+  "firstName": "Lorenzo",
+  "middleName": "Lopez",
+  "payBasis": "daily",
+  "dailyRate": 615,
+  "region": "Region III",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2018-07-06",
+  "birthDate": "1989-10-14",
+  "employmentStatus": "C",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "916256146",
+   "sss": "9916211569",
+   "philhealth": "991624412196",
+   "pagibig": "981621497961"
+  }
+ },
+ {
+  "id": "163",
+  "name": "Maricel Ramos",
+  "lastName": "Ramos",
+  "firstName": "Maricel",
+  "middleName": "Aguilar",
+  "payBasis": "daily",
+  "dailyRate": 620,
+  "region": "Region III",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2025-02-13",
+  "birthDate": "1989-11-23",
+  "employmentStatus": "C",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "916338607",
+   "sss": "9916374173",
+   "philhealth": "991631735496",
+   "pagibig": "981638890500"
+  }
+ },
+ {
+  "id": "164",
+  "name": "Divina Navarro",
+  "lastName": "Navarro",
+  "firstName": "Divina",
+  "middleName": "Torres",
+  "payBasis": "daily",
+  "dailyRate": 610,
+  "region": "Region III",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2019-03-01",
+  "birthDate": "1986-03-16",
+  "employmentStatus": "C",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "916462778",
+   "sss": "9916422875",
+   "philhealth": "991644341809",
+   "pagibig": "981644132521"
+  },
+  "separationDate": "2026-04-30",
+  "separationCause": "resignation"
+ },
+ {
+  "id": "165",
+  "name": "Nikka Bautista",
+  "lastName": "Bautista",
+  "firstName": "Nikka",
+  "middleName": "Perez",
+  "payBasis": "daily",
+  "dailyRate": 605,
+  "region": "Region III",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2025-12-13",
+  "birthDate": "1996-04-08",
+  "employmentStatus": "C",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Warehouse Staff",
+  "ids": {
+   "tin": "916529652",
+   "sss": "9916546157",
+   "philhealth": "991651873206",
+   "pagibig": "981654792947"
+  }
+ },
+ {
+  "id": "166",
+  "name": "Marites Mendoza",
+  "lastName": "Mendoza",
+  "firstName": "Marites",
+  "middleName": "Reyes",
+  "payBasis": "daily",
+  "dailyRate": 780,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2023-10-20",
+  "birthDate": "1995-04-13",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Driver",
+  "ids": {
+   "tin": "916677867",
+   "sss": "9916652993",
+   "philhealth": "991664301694",
+   "pagibig": "981667685812"
+  }
+ },
+ {
+  "id": "167",
+  "name": "Grace Dela Paz",
+  "lastName": "Dela Paz",
+  "firstName": "Grace",
+  "middleName": "Fernandez",
+  "payBasis": "daily",
+  "dailyRate": 780,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2019-05-13",
+  "birthDate": "1972-12-16",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Driver",
+  "ids": {
+   "tin": "916786851",
+   "sss": "9916731949",
+   "philhealth": "991673286212",
+   "pagibig": "981679983861"
+  }
+ },
+ {
+  "id": "168",
+  "name": "Marvin Manalo",
+  "lastName": "Manalo",
+  "firstName": "Marvin",
+  "middleName": "Aguilar",
+  "payBasis": "daily",
+  "dailyRate": 780,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2025-06-20",
+  "birthDate": "1997-11-09",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Operations",
+  "jobTitle": "Driver",
+  "ids": {
+   "tin": "916865095",
+   "sss": "9916854948",
+   "philhealth": "991688548308",
+   "pagibig": "981683438818"
+  }
+ },
+ {
+  "id": "169",
+  "name": "Camille Esguerra",
+  "lastName": "Esguerra",
+  "firstName": "Camille",
+  "middleName": "Castillo",
+  "payBasis": "daily",
+  "dailyRate": 760,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2016-03-20",
+  "birthDate": "1986-04-01",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Driver",
+  "ids": {
+   "tin": "916934712",
+   "sss": "9916982674",
+   "philhealth": "991699269933",
+   "pagibig": "981698526249"
+  }
+ },
+ {
+  "id": "170",
+  "name": "Trisha Panganiban",
+  "lastName": "Panganiban",
+  "firstName": "Trisha",
+  "middleName": "Aguilar",
+  "payBasis": "daily",
+  "dailyRate": 695,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2026-10-01",
+  "birthDate": "1981-08-28",
+  "employmentStatus": "P",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Delivery Helper",
+  "ids": {
+   "tin": "917030143",
+   "sss": "9917063771",
+   "philhealth": "991703538264",
+   "pagibig": "981707529440"
+  }
+ },
+ {
+  "id": "171",
+  "name": "Andrea Lacsamana",
+  "lastName": "Lacsamana",
+  "firstName": "Andrea",
+  "middleName": "Rivera",
+  "payBasis": "daily",
+  "dailyRate": 695,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2025-02-13",
+  "birthDate": "1985-12-05",
+  "employmentStatus": "P",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Delivery Helper",
+  "ids": {
+   "tin": "917131177",
+   "sss": "9917146183",
+   "philhealth": "991715391640",
+   "pagibig": "981715636833"
+  }
+ },
+ {
+  "id": "172",
+  "name": "Andrea Ramos",
+  "lastName": "Ramos",
+  "firstName": "Andrea",
+  "middleName": "Morales",
+  "payBasis": "daily",
+  "dailyRate": 695,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2022-08-13",
+  "birthDate": "1982-01-23",
+  "employmentStatus": "P",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Delivery Helper",
+  "ids": {
+   "tin": "917233723",
+   "sss": "9917243584",
+   "philhealth": "991728500678",
+   "pagibig": "981723031581"
+  }
+ },
+ {
+  "id": "173",
+  "name": "Liza Zamora",
+  "lastName": "Zamora",
+  "firstName": "Liza",
+  "middleName": "Aguilar",
+  "payBasis": "daily",
+  "dailyRate": 695,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2020-05-06",
+  "birthDate": "1998-06-17",
+  "employmentStatus": "P",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Delivery Helper",
+  "ids": {
+   "tin": "917369988",
+   "sss": "9917387178",
+   "philhealth": "991735327346",
+   "pagibig": "981734341436"
+  }
+ },
+ {
+  "id": "174",
+  "name": "Liza Alcantara",
+  "lastName": "Alcantara",
+  "firstName": "Liza",
+  "middleName": "Torres",
+  "payBasis": "monthly",
+  "monthlySalary": 23000,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2020-03-06",
+  "birthDate": "1998-01-19",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Inventory Clerk",
+  "ids": {
+   "tin": "917483326",
+   "sss": "9917459424",
+   "philhealth": "991743969831",
+   "pagibig": "981745160604"
+  }
+ },
+ {
+  "id": "175",
+  "name": "Princess Esguerra",
+  "lastName": "Esguerra",
+  "firstName": "Princess",
+  "middleName": "Torres",
+  "payBasis": "monthly",
+  "monthlySalary": 22500,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2022-05-01",
+  "birthDate": "1993-02-25",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Operations",
+  "jobTitle": "Inventory Clerk",
+  "ids": {
+   "tin": "917514019",
+   "sss": "9917552703",
+   "philhealth": "991752525327",
+   "pagibig": "981759642574"
+  },
+  "separationDate": "2026-07-31",
+  "separationCause": "resignation"
+ },
+ {
+  "id": "176",
+  "name": "Alvin Tolentino",
+  "lastName": "Tolentino",
+  "firstName": "Alvin",
+  "middleName": "Lopez",
+  "payBasis": "monthly",
+  "monthlySalary": 23000,
+  "region": "Region IV-A",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2016-06-01",
+  "birthDate": "1975-04-19",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Operations",
+  "jobTitle": "Inventory Clerk",
+  "ids": {
+   "tin": "917671419",
+   "sss": "9917629113",
+   "philhealth": "991763959599",
+   "pagibig": "981767012981"
+  }
+ },
+ {
+  "id": "177",
+  "name": "Nestor Mercado",
+  "lastName": "Mercado",
+  "firstName": "Nestor",
+  "middleName": "Lopez",
+  "payBasis": "monthly",
+  "monthlySalary": 35000,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": false,
+  "hireDate": "2019-02-01",
+  "birthDate": "2003-04-10",
+  "employmentStatus": "R",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Executive",
+  "jobTitle": "Executive Assistant",
+  "ids": {
+   "tin": "917723721",
+   "sss": "9917797219",
+   "philhealth": "991774544507",
+   "pagibig": "981779619752"
+  }
+ },
+ {
+  "id": "178",
+  "name": "Bea Dela Paz",
+  "lastName": "Dela Paz",
+  "firstName": "Bea",
+  "middleName": "Perez",
+  "payBasis": "hourly",
+  "hourlyRate": 110,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2024-05-13",
+  "birthDate": "2001-01-27",
+  "employmentStatus": "CP",
+  "nationality": "FILIPINO",
+  "gender": "Female",
+  "department": "Sales",
+  "jobTitle": "Merchandiser",
+  "ids": {
+   "tin": "917899608",
+   "sss": "9917821097",
+   "philhealth": "991782952178",
+   "pagibig": "981781891906"
+  }
+ },
+ {
+  "id": "179",
+  "name": "Marvin Pascual",
+  "lastName": "Pascual",
+  "firstName": "Marvin",
+  "middleName": "Reyes",
+  "payBasis": "hourly",
+  "hourlyRate": 95,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2019-03-01",
+  "birthDate": "1984-03-05",
+  "employmentStatus": "CP",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Merchandiser",
+  "ids": {
+   "tin": "917957075",
+   "sss": "9917945514",
+   "philhealth": "991791265214",
+   "pagibig": "981793305723"
+  }
+ },
+ {
+  "id": "180",
+  "name": "Lorenzo Panganiban",
+  "lastName": "Panganiban",
+  "firstName": "Lorenzo",
+  "middleName": "Garcia",
+  "payBasis": "hourly",
+  "hourlyRate": 105,
+  "region": "NCR",
+  "sector": "non_agri",
+  "minimumWageEarner": "auto",
+  "hireDate": "2021-03-20",
+  "birthDate": "1998-11-05",
+  "employmentStatus": "CP",
+  "nationality": "FILIPINO",
+  "gender": "Male",
+  "department": "Sales",
+  "jobTitle": "Merchandiser",
+  "ids": {
+   "tin": "918057728",
+   "sss": "9918054118",
+   "philhealth": "991802053679",
+   "pagibig": "981807137759"
   }
  }
 ]
