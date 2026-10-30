@@ -4,6 +4,7 @@
 // whose /payroll/{id} catch-alls would otherwise answer these paths.
 
 use App\Http\Controllers\Payroll\AttendanceController;
+use App\Http\Controllers\Payroll\DashboardController;
 use App\Http\Controllers\Payroll\LoanController;
 use App\Http\Controllers\Payroll\ProfileController;
 use App\Http\Controllers\Payroll\RunController;
@@ -15,6 +16,8 @@ Route::group(['prefix' => 'payroll', 'middleware' => ['auth:sanctum']], function
     Route::middleware('role:employee')->get('/my/attendance', [AttendanceController::class, 'mine']);
 
     Route::middleware('role:admin')->group(function () {
+        Route::get('/dashboard', DashboardController::class);
+        Route::get('/inbox', [DashboardController::class, 'inbox']);
         Route::get('/profiles', [ProfileController::class, 'index']);
         Route::get('/profiles/options', [ProfileController::class, 'options']);
         Route::post('/profiles/import', [ProfileController::class, 'import']);

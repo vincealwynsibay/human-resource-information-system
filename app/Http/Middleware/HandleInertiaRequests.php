@@ -38,7 +38,7 @@ class HandleInertiaRequests extends Middleware
         $user = $request->user();
         return [
             ...parent::share($request),
-            'app' => ['name' => config('app.name')],
+            'app' => ['name' => config('app.name'), 'company' => config('payroll.company_name')],
             'auth' => [
                 'user' => $user ? ['id' => $user->id, 'employeeId' => $user->EmployeeID ?? null, 'username' => $user->username, 'isAdmin' => $user->hasRole('admin')] : null,
             ],
