@@ -27,7 +27,7 @@ class DocumentsTest extends PayrollTestCase
     private function company(): void
     {
         $this->actAs('admin');
-        $this->profile('1', ['name' => 'Ana Reyes', 'payBasis' => 'monthly', 'monthlySalary' => 60000, 'region' => 'NCR', 'bank' => ['bankName' => 'BPI', 'accountNumber' => '1234-5678-90']]);
+        $this->profile('1', ['name' => 'Ana Reyes', 'lastName' => 'Reyes', 'firstName' => 'Ana', 'payBasis' => 'monthly', 'monthlySalary' => 60000, 'region' => 'NCR', 'ids' => ['sss' => '0123456789'], 'bank' => ['bankName' => 'BPI', 'accountNumber' => '1234-5678-90']]);
         $this->profile('2', ['name' => 'Ben Cruz', 'payBasis' => 'monthly', 'monthlySalary' => 18000, 'region' => 'NCR']);
         $this->profile('3', ['name' => 'Carl Ramos', 'payBasis' => 'daily', 'dailyRate' => 540, 'region' => 'Region VII', 'minimumWageEarner' => 'auto', 'bank' => ['bankName' => 'BDO Unibank', 'accountNumber' => '009876543210', 'accountName' => 'Carl R. Ramos']]);
     }
@@ -124,5 +124,39 @@ class DocumentsTest extends PayrollTestCase
 
         $this->get('/api/payroll/filings/1601c/2026/10/pdf')->assertOk();
         Pdf::assertRespondedWithPdf(fn (PdfBuilder $pdf) => self::has($pdf, ['BIR Form 1601-C worksheet', 'October 2026', 'Taxes withheld for remittance']));
+    }
+
+    public function test_contribution_reports_match_what_the_payslips_deducted(): void
+    {
+        Pdf::fake();
+        $this->company();
+        $run = $this->approvedRun(extra: ['defaults' => ['daysWorked' => 22]]);
+        $this->postJson('/api/payroll/runs', ['periodStart' => '2026-11-01', 'periodEnd' => '2026-11-30', 'frequency' => 'MONTHLY', 'defaults' => ['daysWorked' => 22]])->assertCreated();
+
+        $r = $this->getJson('/api/payroll/filings/contributions/2026/10')->assertOk()->json();
+        $deducted = fn (string $code) => array_sum(array_map(fn ($s) => array_sum(array_column(array_filter($s['data']['deductions'], fn ($d) => $d['code'] === $code), 'amount')), $run['payslips']));
+        $this->assertSame(3, $r['employees']);
+        $this->assertEqualsWithDelta($deducted('SSS'), $r['sss']['totals']['employee'], 0.001);
+        $this->assertEqualsWithDelta($deducted('PHILHEALTH'), $r['philhealth']['totals']['employee'], 0.001);
+        $this->assertEqualsWithDelta($deducted('PAGIBIG'), $r['pagibig']['totals']['employee'], 0.001);
+
+        // Ana earns 60,000: the top SSS salary credit (35,000, of which 15,000 goes to the MPF), PhilHealth on her full basic, Pag-IBIG capped at 10,000.
+        $ana = fn (string $agency) => collect($r[$agency]['rows'])->firstWhere('employeeId', '1');
+        $this->assertEquals(['msc' => 35000, 'employee' => 1750, 'employer' => 3500, 'ec' => 30, 'employeeMpf' => 750, 'employerMpf' => 1500, 'number' => '0123456789', 'partial' => false],
+            array_intersect_key($ana('sss'), array_flip(['msc', 'employee', 'employer', 'ec', 'employeeMpf', 'employerMpf', 'number', 'partial'])));
+        $this->assertEquals([60000, 1500, 1500], [$ana('philhealth')['base'], $ana('philhealth')['employee'], $ana('philhealth')['employer']]);
+        $this->assertEquals([10000, 200, 200], [$ana('pagibig')['base'], $ana('pagibig')['employee'], $ana('pagibig')['employer']]);
+        $this->assertContains('Ben Cruz', $r['sss']['missingNumbers']);
+        $this->assertNotContains('Ana Reyes', $r['sss']['missingNumbers']);
+
+        $this->assertSame([0, 1], array_values(array_intersect_key($this->getJson('/api/payroll/filings/contributions/2026/11')->json(), array_flip(['employees', 'openRuns']))));
+
+        $csv = $this->get('/api/payroll/filings/contributions/2026/10/sss.csv')->assertOk()->getContent();
+        $this->assertStringContainsString('1,0123456789,Reyes,Ana,,35000.00,1750.00,3500.00,30.00,5280.00,750.00,1500.00', $csv);
+        $this->get('/api/payroll/filings/contributions/2026/10/sss.csv')->assertHeader('content-disposition', 'attachment; filename="sss-2026-10.csv"');
+        $this->getJson('/api/payroll/filings/contributions/2026/10/gsis.csv')->assertNotFound();
+
+        $this->get('/api/payroll/filings/contributions/2026/10/pdf')->assertOk();
+        Pdf::assertRespondedWithPdf(fn (PdfBuilder $pdf) => self::has($pdf, ['SSS contributions (R-3)', 'PhilHealth premiums (RF-1)', 'Pag-IBIG contributions', 'Reyes, Ana']));
     }
 }

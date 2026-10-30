@@ -55,11 +55,6 @@ const groups = computed(() => {
             { label: 'Remittances & filings', href: '/payroll/filings', icon: 'file' },
             { label: 'Year-end & BIR', href: '/payroll/year-end', icon: 'calendar' },
         ] });
-        out.push({ name: 'Admin', icon: 'shield', items: [
-            { label: 'Access & roles', href: '/admin/access', icon: 'shield' },
-            { label: 'Activity log', href: '/admin/activity', icon: 'list' },
-            { label: 'Reference data', href: '/admin/reference', icon: 'book' },
-        ] });
     }
     out.push({ name: 'Me', icon: 'user', items: [
         { label: 'My attendance', href: '/me/attendance', icon: 'clock' },

@@ -46,6 +46,9 @@ Route::group(['prefix' => 'payroll', 'middleware' => ['auth:sanctum']], function
 
         Route::get('/filings/1601c/{year}/{month}', [FilingController::class, 'form1601c'])->whereNumber(['year', 'month']);
         Route::get('/filings/1601c/{year}/{month}/pdf', [FilingController::class, 'form1601cPdf'])->whereNumber(['year', 'month']);
+        Route::get('/filings/contributions/{year}/{month}', [FilingController::class, 'contributions'])->whereNumber(['year', 'month']);
+        Route::get('/filings/contributions/{year}/{month}/pdf', [FilingController::class, 'contributionsPdf'])->whereNumber(['year', 'month']);
+        Route::get('/filings/contributions/{year}/{month}/{agency}.csv', [FilingController::class, 'contributionsCsv'])->whereNumber(['year', 'month']);
 
         Route::get('/attendance/{employeeId}', [AttendanceController::class, 'summary']);
 
