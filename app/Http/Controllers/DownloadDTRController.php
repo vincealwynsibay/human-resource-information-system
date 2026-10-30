@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Enum\DayLengthEnum;
 use App\Enum\LeaveRequestEnum;
 use App\Services\AttendanceReportService;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;

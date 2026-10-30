@@ -1,0 +1,69 @@
+# The public demo on one small server: the app, a scheduler for the nightly rebuild, MySQL, and Caddy for HTTPS.
+# From this folder:  cp .env.example .env  (fill it in), then  docker compose up -d --build
+# First load:        docker compose exec app php artisan hris:demo --fresh
+name: talia
+
+services:
+  app:
+    image: talia:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - storage:/var/www/html/storage
+
+  # Runs `php artisan schedule:work`: the 03:00 rebuild of the demo (routes/console.php).
+  scheduler:
+    image: talia:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      AUTORUN_ENABLED: "false"
+    command: ["php", "/var/www/html/artisan", "schedule:work"]
+    stop_signal: SIGTERM
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - storage:/var/www/html/storage
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    # The schema's stored procedures are loaded with the mysql client, which must be able to log in.
+    command: ["--default-authentication-plugin=mysql_native_password"]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      TZ: Asia/Manila
+    volumes:
+      - mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - app
+
+volumes:
+  mysql:
+  storage:
+  caddy_data:
