@@ -1,0 +1,38 @@
+{
+	"year": 2025,
+	"source": {
+		"issuance": "Proclamation No. 727, s. 2024 (2025 holidays, signed 2024-10-30); No. 729, s. 2024 (INC anniversary, 2024-10-30); No. 839, s. 2025 (Eid'l Fitr, 2025-03-20); No. 911, s. 2025 (Eid'l Adha, 2025-05-21)",
+		"urls": [
+			"https://lawphil.net/executive/proc/proc2024/proc_727_2024.html",
+			"https://lawphil.net/executive/proc/proc2024/proc_729_2024.html",
+			"https://lawphil.net/executive/proc/proc2025/proc_839_2025.html",
+			"https://lawphil.net/executive/proc/proc2025/proc_911_2025.html"
+		],
+		"verified": "2026-10-29 against the lawphil.net texts",
+		"note": "One-off or local holidays proclaimed separately (for example a city foundation day) are not listed here; add them to this file if they apply to your workplace."
+	},
+	"holidays": [
+		{ "date": "2025-01-01", "name": "New Year's Day", "type": "regular" },
+		{ "date": "2025-01-29", "name": "Chinese New Year", "type": "special_non_working" },
+		{ "date": "2025-02-25", "name": "EDSA People Power Revolution Anniversary", "type": "special_working" },
+		{ "date": "2025-04-01", "name": "Eid'l Fitr", "type": "regular" },
+		{ "date": "2025-04-09", "name": "Araw ng Kagitingan", "type": "regular" },
+		{ "date": "2025-04-17", "name": "Maundy Thursday", "type": "regular" },
+		{ "date": "2025-04-18", "name": "Good Friday", "type": "regular" },
+		{ "date": "2025-04-19", "name": "Black Saturday", "type": "special_non_working" },
+		{ "date": "2025-05-01", "name": "Labor Day", "type": "regular" },
+		{ "date": "2025-06-06", "name": "Eid'l Adha", "type": "regular" },
+		{ "date": "2025-06-12", "name": "Independence Day", "type": "regular" },
+		{ "date": "2025-07-27", "name": "Iglesia ni Cristo Founding Anniversary", "type": "special_non_working" },
+		{ "date": "2025-08-21", "name": "Ninoy Aquino Day", "type": "special_non_working" },
+		{ "date": "2025-08-25", "name": "National Heroes Day", "type": "regular" },
+		{ "date": "2025-10-31", "name": "All Saints' Day Eve", "type": "special_non_working" },
+		{ "date": "2025-11-01", "name": "All Saints' Day", "type": "special_non_working" },
+		{ "date": "2025-11-30", "name": "Bonifacio Day", "type": "regular" },
+		{ "date": "2025-12-08", "name": "Feast of the Immaculate Conception of Mary", "type": "special_non_working" },
+		{ "date": "2025-12-24", "name": "Christmas Eve", "type": "special_non_working" },
+		{ "date": "2025-12-25", "name": "Christmas Day", "type": "regular" },
+		{ "date": "2025-12-30", "name": "Rizal Day", "type": "regular" },
+		{ "date": "2025-12-31", "name": "Last Day of the Year", "type": "special_non_working" }
+	]
+}

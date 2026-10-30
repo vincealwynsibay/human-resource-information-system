@@ -1,0 +1,48 @@
+{
+  "topic": "Worked monthly net-pay examples (employee-side), computed from the rate files",
+  "country": "PH",
+  "currency": "PHP",
+  "volatility": "stable",
+  "source": {
+    "issuance": "Derived from the data/ rate files (SSS Circular 2024-006, BIR RR 8-2018, PhilHealth PA2025-0002, HDMF Circular 460)",
+    "source_tier": "primary",
+    "last_verified": "2026-06-24",
+    "markdown": "ph/bir/income_tax_table_2025.md"
+  },
+  "notes": "Employee-side only; assumes a non-minimum-wage earner with no other bonuses/de-minimis. net_pay = monthly_salary - sss - philhealth - pagibig - withholding_tax. SSS caps at MSC 35,000; PhilHealth caps at 100,000; Pag-IBIG caps at MFS 10,000.",
+  "examples": [
+    {
+      "monthly_salary": 25000,
+      "employee_deductions": {
+        "sss": 1250,
+        "philhealth": 625,
+        "pagibig": 200,
+        "withholding_tax": 313.8
+      },
+      "taxable_income": 22925,
+      "net_pay": 22611.2
+    },
+    {
+      "monthly_salary": 50000,
+      "employee_deductions": {
+        "sss": 1750,
+        "philhealth": 1250,
+        "pagibig": 200,
+        "withholding_tax": 4568.4
+      },
+      "taxable_income": 46800,
+      "net_pay": 42231.6
+    },
+    {
+      "monthly_salary": 80000,
+      "employee_deductions": {
+        "sss": 1750,
+        "philhealth": 2000,
+        "pagibig": 200,
+        "withholding_tax": 10887.75
+      },
+      "taxable_income": 76050,
+      "net_pay": 65162.25
+    }
+  ]
+}

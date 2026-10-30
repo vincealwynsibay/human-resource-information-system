@@ -9,3 +9,7 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# BIR alphalist files are CRLF by specification: keep them byte for byte
+*.DAT -text
+*.dat -text

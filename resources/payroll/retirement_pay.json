@@ -1,0 +1,17 @@
+{
+	"topic": "Statutory retirement pay when there is no retirement plan",
+	"source": {
+		"issuance": "Labor Code Art. 287 as amended by RA 7641 (Retirement Pay Law), section 1",
+		"url": "https://lawphil.net/statutes/repacts/ra1992/ra_7641_1992.html",
+		"verified": "2026-10-29 against the lawphil.net text"
+	},
+	"rules": {
+		"min_age": 60,
+		"compulsory_age": 65,
+		"min_service_years": 5,
+		"fraction_counts_as_year_months": 6,
+		"half_month_salary_days": { "base": 15, "thirteenth_month_share": 2.5, "service_incentive_leave": 5 }
+	},
+	"notes": "One-half month salary means 15 days plus 1/12 of the 13th-month pay (2.5 days) plus the cash equivalent of not more than 5 days of service incentive leave: 22.5 days, unless the parties provide for broader inclusions. Retirement pay is at least one-half month salary for every year of service, a fraction of at least six months counting as one whole year.",
+	"tax_note": "The NIRC exempts retirement benefits when the employee has served the same employer at least 10 years, is at least 50 years old, and claims it only once. The engine marks the pay tax-exempt only when those three conditions hold; confirm the claim with a tax professional."
+}

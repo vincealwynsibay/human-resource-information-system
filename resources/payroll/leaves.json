@@ -1,0 +1,62 @@
+{
+  "topic": "Statutory leave durations (SIL, maternity, paternity, solo-parent, special leave for women, VAWC)",
+  "country": "PH",
+  "volatility": "stable",
+  "source": {
+    "issuance": "Labor Code Art. 95; RA 11210; RA 8187; RA 8972/RA 11861; RA 9710; RA 9262 (maternity tax exemption: BIR RMC 105-2019)",
+    "source_tier": "primary",
+    "last_verified": "2026-06-25",
+    "markdown": "ph/labor/leaves.md"
+  },
+  "notes": "Days are statutory minimums. Only the maternity cash benefit is paid by SSS (employer advances + 100% reimbursed) plus an employer salary differential; all other leaves are employer-paid. The maternity benefit + differential are income-tax exempt.",
+  "leaves": [
+    {
+      "type": "service_incentive_leave",
+      "days_per_year": 5,
+      "paid_by": "employer",
+      "eligibility_months": 12,
+      "convertible_to_cash": true,
+      "law": "Labor Code Art. 95"
+    },
+    {
+      "type": "maternity",
+      "days": 105,
+      "solo_parent_add_days": 15,
+      "unpaid_extension_days": 30,
+      "miscarriage_days": 60,
+      "allocatable_to_father_days": 7,
+      "paid_by": "SSS benefit + employer salary differential",
+      "tax_exempt": true,
+      "law": "RA 11210"
+    },
+    {
+      "type": "paternity",
+      "days": 7,
+      "paid_by": "employer",
+      "conditions": "married male, cohabiting, first 4 deliveries",
+      "law": "RA 8187"
+    },
+    {
+      "type": "solo_parent",
+      "days_per_year": 7,
+      "paid_by": "employer",
+      "eligibility_months": 6,
+      "cumulative": false,
+      "law": "RA 8972 as amended by RA 11861"
+    },
+    {
+      "type": "special_leave_for_women",
+      "duration_months": 2,
+      "paid_by": "employer",
+      "eligibility_months": 6,
+      "note": "two months with full pay after gynecological surgery (RA 9710 says \"two months\", not a fixed day count); not commutable to cash",
+      "law": "RA 9710 sec.18"
+    },
+    {
+      "type": "vawc",
+      "days_max": 10,
+      "paid_by": "employer",
+      "law": "RA 9262 sec.43"
+    }
+  ]
+}

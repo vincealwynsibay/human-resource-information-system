@@ -1,0 +1,23 @@
+{
+	"topic": "Separation pay for authorized causes",
+	"source": {
+		"issuance": "Labor Code (PD 442) Arts. 298-299 (formerly 283-284, renumbered by RA 10151); DOLE D.O. 147-15; DOLE Labor Advisory No. 06, s. 2020 for the 30-day final pay rule",
+		"via": "ph/labor/final_pay.md in open-payroll-data/philippines-payroll-data (last verified 2026-06-29)"
+	},
+	"rules": {
+		"fraction_counts_as_year_months": 6,
+		"final_pay_days": 30,
+		"sil_eligibility_months": 12
+	},
+	"causes": {
+		"labor_saving_device": { "label": "Labor-saving device", "months_per_year": 1, "minimum_months": 1 },
+		"redundancy": { "label": "Redundancy", "months_per_year": 1, "minimum_months": 1 },
+		"retrenchment": { "label": "Retrenchment to prevent losses", "months_per_year": 0.5, "minimum_months": 1 },
+		"closure_not_due_to_losses": { "label": "Closure or cessation (not due to serious losses)", "months_per_year": 0.5, "minimum_months": 1 },
+		"disease": { "label": "Disease (Art. 299)", "months_per_year": 0.5, "minimum_months": 1 },
+		"closure_serious_losses": { "label": "Closure due to serious business losses", "months_per_year": 0, "minimum_months": 0 },
+		"resignation": { "label": "Resignation", "months_per_year": 0, "minimum_months": 0 },
+		"just_cause": { "label": "Just cause dismissal", "months_per_year": 0, "minimum_months": 0 }
+	},
+	"notes": "Separation pay for authorized causes and disease is exempt from income tax (cause beyond the employee's control). Retirement pay (RA 7641) is not computed here."
+}

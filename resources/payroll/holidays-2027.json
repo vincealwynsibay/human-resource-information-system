@@ -1,0 +1,34 @@
+{
+	"year": 2027,
+	"source": {
+		"issuance": "Proclamation No. 1427, s. 2026 (signed 2026-09-08)",
+		"urls": ["https://lawphil.net/executive/proc/proc2026/proc_1427_2026.html"],
+		"verified": "2026-10-29 against the lawphil.net text",
+		"note": "In the proclamation's own listing, Chinese New Year, Black Saturday, All Souls' Day and Christmas Eve sit under the special working day heading, but its recitals and the press coverage describe them as additional special (non-working) days, as in the 2026 proclamation. They are entered as special non-working days; confirm against the signed copy if it matters for a payroll."
+	},
+	"pending": [
+		"Eid'l Fitr 2027 (regular holiday): the proclamation sets no date, a separate proclamation will. Add it here once issued.",
+		"Eid'l Adha 2027 (regular holiday): same. Add it here once issued."
+	],
+	"holidays": [
+		{ "date": "2027-01-01", "name": "New Year's Day", "type": "regular" },
+		{ "date": "2027-02-06", "name": "Chinese New Year", "type": "special_non_working" },
+		{ "date": "2027-02-25", "name": "EDSA People Power Revolution Anniversary", "type": "special_working" },
+		{ "date": "2027-03-25", "name": "Maundy Thursday", "type": "regular" },
+		{ "date": "2027-03-26", "name": "Good Friday", "type": "regular" },
+		{ "date": "2027-03-27", "name": "Black Saturday", "type": "special_non_working" },
+		{ "date": "2027-04-09", "name": "Araw ng Kagitingan", "type": "regular" },
+		{ "date": "2027-05-01", "name": "Labor Day", "type": "regular" },
+		{ "date": "2027-06-12", "name": "Independence Day", "type": "regular" },
+		{ "date": "2027-08-21", "name": "Ninoy Aquino Day", "type": "special_non_working" },
+		{ "date": "2027-08-30", "name": "National Heroes Day", "type": "regular" },
+		{ "date": "2027-11-01", "name": "All Saints' Day", "type": "special_non_working" },
+		{ "date": "2027-11-02", "name": "All Souls' Day", "type": "special_non_working" },
+		{ "date": "2027-11-30", "name": "Bonifacio Day", "type": "regular" },
+		{ "date": "2027-12-08", "name": "Feast of the Immaculate Conception of Mary", "type": "special_non_working" },
+		{ "date": "2027-12-24", "name": "Christmas Eve", "type": "special_non_working" },
+		{ "date": "2027-12-25", "name": "Christmas Day", "type": "regular" },
+		{ "date": "2027-12-30", "name": "Rizal Day", "type": "regular" },
+		{ "date": "2027-12-31", "name": "Last Day of the Year", "type": "special_non_working" }
+	]
+}
