@@ -57,6 +57,8 @@ jobs:
           cache: npm
       - name: Puppeteer and Chrome, for the PDF downloads
         run: npm ci
+      - name: Let Chrome use its sandbox (Ubuntu 24.04 blocks unprivileged user namespaces)
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - run: cp .env.example .env && php artisan key:generate
       - name: Feature and unit tests (MySQL 8)
         run: php vendor/bin/pest --testsuite Feature,Unit
