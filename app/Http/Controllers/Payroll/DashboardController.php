@@ -35,7 +35,10 @@ class DashboardController extends Controller
                 'overtime' => DB::table('tblovertime')->where('status', 'PENDING')->count(),
             ] : null,
             'upcoming' => $this->upcoming($today, $hr),
-            'profiles' => ['count' => DB::table('payroll_profiles')->count()],
+            // Leavers keep their pay profiles for the year-end filings; "on payroll" counts the people still employed.
+            'profiles' => ['count' => $hr
+                ? DB::table('payroll_profiles')->whereIn('employee_id', $this->employed($today)->pluck('id')->map(fn ($id) => (string) $id))->count()
+                : DB::table('payroll_profiles')->count()],
         ]);
     }
 
@@ -86,13 +89,20 @@ class DashboardController extends Controller
         return ['headcount' => (int) $byDept->sum('count'), 'byDepartment' => $byDept];
     }
 
-    /** Present, late, on leave and absent today, for employees with a work shift; absent only once the shift has started. */
+    /** Employees not separated as of a date. */
+    private function employed(string $date)
+    {
+        return DB::table('tblemployee')->where(fn ($q) => $q->whereNull('termination_date')->orWhere('termination_date', '>=', $date));
+    }
+
+    /** Present, late, on leave and absent today, for employees still employed with a work shift; absent only once the shift has started. */
     private function attendanceToday(string $today): array
     {
         $week = (array) (DB::table('tblworkweek')->orderByDesc('id')->first() ?? []);
         $dow = strtolower(date('D', strtotime($today)));
         $isWorkDay = (int) ($week[$dow] ?? 0) === 1 && Holidays::type($today, Holidays::calendar((int) substr($today, 0, 4))) === null;
         $shifts = DB::table('tblemployeeworkshift as ews')->join('tblworkshift as ws', 'ws.id', '=', 'ews.WorkShiftID')
+            ->whereIn('ews.EmployeeID', $this->employed($today)->select('id'))
             ->orderBy('ews.id')->get(['ews.EmployeeID', 'ws.start_time1'])->keyBy('EmployeeID');
         $records = DB::table('tblattendancerecord')->where('date', $today)->get()->keyBy('EmployeeID');
         $onLeave = DB::table('tblleave')->where('status', 'APPROVED')->where('start_date', '<=', "{$today} 23:59:59")->where('end_date', '>=', $today)->pluck('EmployeeID')->flip();
