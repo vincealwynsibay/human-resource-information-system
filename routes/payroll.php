@@ -5,6 +5,8 @@
 
 use App\Http\Controllers\Payroll\AttendanceController;
 use App\Http\Controllers\Payroll\DashboardController;
+use App\Http\Controllers\Payroll\DocumentController;
+use App\Http\Controllers\Payroll\FilingController;
 use App\Http\Controllers\Payroll\LoanController;
 use App\Http\Controllers\Payroll\ProfileController;
 use App\Http\Controllers\Payroll\RunController;
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'payroll', 'middleware' => ['auth:sanctum']], function () {
     Route::middleware('role:employee')->get('/my/payslips', [RunController::class, 'mine']);
     Route::middleware('role:employee')->get('/my/attendance', [AttendanceController::class, 'mine']);
+    Route::middleware('role:employee')->get('/my/payslips/{payslip}/pdf', [DocumentController::class, 'myPayslip'])->whereNumber('payslip');
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/dashboard', DashboardController::class);
@@ -36,6 +39,13 @@ Route::group(['prefix' => 'payroll', 'middleware' => ['auth:sanctum']], function
         Route::put('/runs/{run}/approve', [RunController::class, 'approve']);
         Route::put('/runs/{run}/pay', [RunController::class, 'pay']);
         Route::put('/runs/{run}/cancel', [RunController::class, 'cancel']);
+        Route::get('/runs/{run}/payslips/pdf', [DocumentController::class, 'runPayslips']);
+        Route::get('/runs/{run}/payslips/{employeeId}/pdf', [DocumentController::class, 'runPayslip']);
+        Route::get('/runs/{run}/bank', [DocumentController::class, 'bank']);
+        Route::get('/runs/{run}/bank/{format}', [DocumentController::class, 'bankDownload']);
+
+        Route::get('/filings/1601c/{year}/{month}', [FilingController::class, 'form1601c'])->whereNumber(['year', 'month']);
+        Route::get('/filings/1601c/{year}/{month}/pdf', [FilingController::class, 'form1601cPdf'])->whereNumber(['year', 'month']);
 
         Route::get('/attendance/{employeeId}', [AttendanceController::class, 'summary']);
 

@@ -22,7 +22,11 @@
   },
   "department": "Executive",
   "jobTitle": "General Manager",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001012013374"
+  }
  },
  {
   "id": "102",
@@ -47,7 +51,11 @@
   },
   "department": "Finance",
   "jobTitle": "Finance Manager",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001028503368"
+  }
  },
  {
   "id": "103",
@@ -72,7 +80,11 @@
   },
   "department": "Finance",
   "jobTitle": "Senior Accountant",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001035323224"
+  }
  },
  {
   "id": "104",
@@ -97,7 +109,11 @@
   },
   "department": "Human Resources",
   "jobTitle": "HR Generalist",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001046292302"
+  }
  },
  {
   "id": "105",
@@ -122,7 +138,11 @@
   },
   "department": "Finance",
   "jobTitle": "Payroll Officer",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001054274012"
+  }
  },
  {
   "id": "106",
@@ -147,7 +167,11 @@
   },
   "department": "Operations",
   "jobTitle": "Branch Manager, Cebu",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001066289303"
+  }
  },
  {
   "id": "107",
@@ -172,7 +196,11 @@
   },
   "department": "Sales",
   "jobTitle": "Sales Associate",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001076508387"
+  }
  },
  {
   "id": "108",
@@ -197,7 +225,11 @@
   },
   "department": "Operations",
   "jobTitle": "Inventory Clerk",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001083104706"
+  }
  },
  {
   "id": "109",
@@ -222,7 +254,11 @@
   },
   "department": "Operations",
   "jobTitle": "Warehouse Staff",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001091628064"
+  }
  },
  {
   "id": "110",
@@ -247,7 +283,11 @@
   },
   "department": "Technology",
   "jobTitle": "IT Manager",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001106508945"
+  }
  },
  {
   "id": "111",
@@ -272,7 +312,11 @@
   },
   "department": "Sales",
   "jobTitle": "Sales Manager",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001112426754"
+  }
  },
  {
   "id": "112",
@@ -297,7 +341,11 @@
   },
   "department": "Sales",
   "jobTitle": "Store Supervisor",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001128222361"
+  }
  },
  {
   "id": "113",
@@ -322,7 +370,11 @@
   },
   "department": "Operations",
   "jobTitle": "Operations Manager",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001133562435"
+  }
  },
  {
   "id": "114",
@@ -347,7 +399,11 @@
   },
   "department": "Operations",
   "jobTitle": "Warehouse Supervisor",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001148570141"
+  }
  },
  {
   "id": "115",
@@ -372,7 +428,11 @@
   },
   "department": "Operations",
   "jobTitle": "Driver",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001152658665"
+  }
  },
  {
   "id": "116",
@@ -397,7 +457,11 @@
   },
   "department": "Operations",
   "jobTitle": "Warehouse Staff",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001163864632"
+  }
  },
  {
   "id": "117",
@@ -422,7 +486,11 @@
   },
   "department": "Operations",
   "jobTitle": "Driver",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001176636030"
+  }
  },
  {
   "id": "118",
@@ -472,7 +540,11 @@
   },
   "department": "Sales",
   "jobTitle": "Sales Associate",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001193216258"
+  }
  },
  {
   "id": "120",
@@ -497,7 +569,11 @@
   },
   "department": "Sales",
   "jobTitle": "Sales Associate",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001209175738"
+  }
  },
  {
   "id": "121",
@@ -522,7 +598,11 @@
   },
   "department": "Human Resources",
   "jobTitle": "Recruiter",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001218105821"
+  }
  },
  {
   "id": "122",
@@ -547,7 +627,11 @@
   },
   "department": "Technology",
   "jobTitle": "Software Developer",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001222187767"
+  }
  },
  {
   "id": "123",
@@ -572,7 +656,11 @@
   },
   "department": "Operations",
   "jobTitle": "Warehouse Staff",
-  "gender": "Female"
+  "gender": "Female",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001238526757"
+  }
  },
  {
   "id": "124",
@@ -597,7 +685,11 @@
   },
   "department": "Operations",
   "jobTitle": "Delivery Helper",
-  "gender": "Male"
+  "gender": "Male",
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001249748970"
+  }
  },
  {
   "id": "125",
@@ -622,6 +714,10 @@
    "sss": "9912564071",
    "philhealth": "991253379592",
    "pagibig": "981253484538"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001254488154"
   }
  },
  {
@@ -647,6 +743,10 @@
    "sss": "9912673461",
    "philhealth": "991266659229",
    "pagibig": "981267594516"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001264946518"
   }
  },
  {
@@ -672,6 +772,10 @@
    "sss": "9912769955",
    "philhealth": "991272243088",
    "pagibig": "981274030711"
+  },
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001273100754"
   }
  },
  {
@@ -697,6 +801,10 @@
    "sss": "9912861677",
    "philhealth": "991289306880",
    "pagibig": "981281797483"
+  },
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001282338284"
   }
  },
  {
@@ -722,6 +830,10 @@
    "sss": "9912939146",
    "philhealth": "991296275053",
    "pagibig": "981292622238"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001297710777"
   }
  },
  {
@@ -747,6 +859,10 @@
    "sss": "9913094655",
    "philhealth": "991302368107",
    "pagibig": "981301665774"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001307144897"
   }
  },
  {
@@ -772,6 +888,10 @@
    "sss": "9913157535",
    "philhealth": "991318122862",
    "pagibig": "981312474818"
+  },
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001318626863"
   }
  },
  {
@@ -797,6 +917,10 @@
    "sss": "9913249058",
    "philhealth": "991327915831",
    "pagibig": "981323907362"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001327828138"
   }
  },
  {
@@ -824,7 +948,11 @@
    "pagibig": "981339582322"
   },
   "separationDate": "2025-05-31",
-  "separationCause": "resignation"
+  "separationCause": "resignation",
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001331396345"
+  }
  },
  {
   "id": "134",
@@ -849,6 +977,10 @@
    "sss": "9913461916",
    "philhealth": "991341599852",
    "pagibig": "981341778695"
+  },
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001345082114"
   }
  },
  {
@@ -874,6 +1006,10 @@
    "sss": "9913594412",
    "philhealth": "991353233737",
    "pagibig": "981359385852"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001356319669"
   }
  },
  {
@@ -899,6 +1035,10 @@
    "sss": "9913692799",
    "philhealth": "991361846828",
    "pagibig": "981363730418"
+  },
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001368351143"
   }
  },
  {
@@ -924,6 +1064,10 @@
    "sss": "9913748190",
    "philhealth": "991374884849",
    "pagibig": "981371753053"
+  },
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001377633891"
   }
  },
  {
@@ -949,6 +1093,10 @@
    "sss": "9913888037",
    "philhealth": "991386594515",
    "pagibig": "981383639805"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001387202502"
   }
  },
  {
@@ -974,6 +1122,10 @@
    "sss": "9913911492",
    "philhealth": "991391814525",
    "pagibig": "981396131950"
+  },
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001399237667"
   }
  },
  {
@@ -999,6 +1151,10 @@
    "sss": "9914088486",
    "philhealth": "991409342767",
    "pagibig": "981409325603"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001408237636"
   }
  },
  {
@@ -1024,6 +1180,10 @@
    "sss": "9914125445",
    "philhealth": "991414466142",
    "pagibig": "981411626344"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001419513934"
   }
  },
  {
@@ -1049,6 +1209,10 @@
    "sss": "9914259086",
    "philhealth": "991422434230",
    "pagibig": "981422110480"
+  },
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001426097684"
   }
  },
  {
@@ -1074,6 +1238,10 @@
    "sss": "9914394593",
    "philhealth": "991432716178",
    "pagibig": "981438420645"
+  },
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001432278908"
   }
  },
  {
@@ -1099,6 +1267,10 @@
    "sss": "9914485466",
    "philhealth": "991443284818",
    "pagibig": "981444959001"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001444594970"
   }
  },
  {
@@ -1124,6 +1296,10 @@
    "sss": "9914560436",
    "philhealth": "991452568772",
    "pagibig": "981453998392"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001458748016"
   }
  },
  {
@@ -1151,7 +1327,11 @@
    "pagibig": "981461880510"
   },
   "separationDate": "2025-09-30",
-  "separationCause": "resignation"
+  "separationCause": "resignation",
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001469974289"
+  }
  },
  {
   "id": "147",
@@ -1176,6 +1356,10 @@
    "sss": "9914776754",
    "philhealth": "991473555007",
    "pagibig": "981479146151"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001476569899"
   }
  },
  {
@@ -1201,6 +1385,10 @@
    "sss": "9914819088",
    "philhealth": "991486490774",
    "pagibig": "981483831291"
+  },
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001483067095"
   }
  },
  {
@@ -1226,6 +1414,10 @@
    "sss": "9914977841",
    "philhealth": "991496446685",
    "pagibig": "981492361471"
+  },
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001492810778"
   }
  },
  {
@@ -1251,6 +1443,10 @@
    "sss": "9915089452",
    "philhealth": "991503731914",
    "pagibig": "981506293114"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001505408295"
   }
  },
  {
@@ -1301,6 +1497,10 @@
    "sss": "9915268549",
    "philhealth": "991521237396",
    "pagibig": "981529075068"
+  },
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001528211771"
   }
  },
  {
@@ -1328,7 +1528,11 @@
    "pagibig": "981532917847"
   },
   "separationDate": "2026-01-31",
-  "separationCause": "resignation"
+  "separationCause": "resignation",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001536486317"
+  }
  },
  {
   "id": "154",
@@ -1353,6 +1557,10 @@
    "sss": "9915496294",
    "philhealth": "991541030592",
    "pagibig": "981542560787"
+  },
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001541735636"
   }
  },
  {
@@ -1378,6 +1586,10 @@
    "sss": "9915557585",
    "philhealth": "991556665020",
    "pagibig": "981553379611"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001559564723"
   }
  },
  {
@@ -1403,6 +1615,10 @@
    "sss": "9915689762",
    "philhealth": "991566835122",
    "pagibig": "981565449745"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001562023537"
   }
  },
  {
@@ -1428,6 +1644,10 @@
    "sss": "9915794790",
    "philhealth": "991576007498",
    "pagibig": "981571399189"
+  },
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001573055764"
   }
  },
  {
@@ -1453,6 +1673,10 @@
    "sss": "9915819201",
    "philhealth": "991585257194",
    "pagibig": "981581462448"
+  },
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001583985167"
   }
  },
  {
@@ -1478,6 +1702,10 @@
    "sss": "9915929468",
    "philhealth": "991597887390",
    "pagibig": "981592036457"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001595261705"
   }
  },
  {
@@ -1503,6 +1731,10 @@
    "sss": "9916030874",
    "philhealth": "991605544650",
    "pagibig": "981609798048"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001601077427"
   }
  },
  {
@@ -1528,6 +1760,10 @@
    "sss": "9916181172",
    "philhealth": "991612988223",
    "pagibig": "981617708738"
+  },
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001619109606"
   }
  },
  {
@@ -1553,6 +1789,10 @@
    "sss": "9916211569",
    "philhealth": "991624412196",
    "pagibig": "981621497961"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001621523159"
   }
  },
  {
@@ -1578,6 +1818,10 @@
    "sss": "9916374173",
    "philhealth": "991631735496",
    "pagibig": "981638890500"
+  },
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001634645904"
   }
  },
  {
@@ -1605,7 +1849,11 @@
    "pagibig": "981644132521"
   },
   "separationDate": "2026-04-30",
-  "separationCause": "resignation"
+  "separationCause": "resignation",
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001649057542"
+  }
  },
  {
   "id": "165",
@@ -1630,6 +1878,10 @@
    "sss": "9916546157",
    "philhealth": "991651873206",
    "pagibig": "981654792947"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001656011414"
   }
  },
  {
@@ -1655,6 +1907,10 @@
    "sss": "9916652993",
    "philhealth": "991664301694",
    "pagibig": "981667685812"
+  },
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001661798252"
   }
  },
  {
@@ -1680,6 +1936,10 @@
    "sss": "9916731949",
    "philhealth": "991673286212",
    "pagibig": "981679983861"
+  },
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001675914057"
   }
  },
  {
@@ -1705,6 +1965,10 @@
    "sss": "9916854948",
    "philhealth": "991688548308",
    "pagibig": "981683438818"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001689077678"
   }
  },
  {
@@ -1730,6 +1994,10 @@
    "sss": "9916982674",
    "philhealth": "991699269933",
    "pagibig": "981698526249"
+  },
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001695376183"
   }
  },
  {
@@ -1755,6 +2023,10 @@
    "sss": "9917063771",
    "philhealth": "991703538264",
    "pagibig": "981707529440"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001701915374"
   }
  },
  {
@@ -1780,6 +2052,10 @@
    "sss": "9917146183",
    "philhealth": "991715391640",
    "pagibig": "981715636833"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001711133642"
   }
  },
  {
@@ -1805,6 +2081,10 @@
    "sss": "9917243584",
    "philhealth": "991728500678",
    "pagibig": "981723031581"
+  },
+  "bank": {
+   "bankName": "Metrobank",
+   "accountNumber": "001729655339"
   }
  },
  {
@@ -1830,6 +2110,10 @@
    "sss": "9917387178",
    "philhealth": "991735327346",
    "pagibig": "981734341436"
+  },
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001736138793"
   }
  },
  {
@@ -1855,6 +2139,10 @@
    "sss": "9917459424",
    "philhealth": "991743969831",
    "pagibig": "981745160604"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001749214180"
   }
  },
  {
@@ -1882,7 +2170,11 @@
    "pagibig": "981759642574"
   },
   "separationDate": "2026-07-31",
-  "separationCause": "resignation"
+  "separationCause": "resignation",
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001754530042"
+  }
  },
  {
   "id": "176",
@@ -1907,6 +2199,10 @@
    "sss": "9917629113",
    "philhealth": "991763959599",
    "pagibig": "981767012981"
+  },
+  "bank": {
+   "bankName": "BPI",
+   "accountNumber": "001767887418"
   }
  },
  {
@@ -1932,6 +2228,10 @@
    "sss": "9917797219",
    "philhealth": "991774544507",
    "pagibig": "981779619752"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001776888246"
   }
  },
  {
@@ -1957,6 +2257,10 @@
    "sss": "9917821097",
    "philhealth": "991782952178",
    "pagibig": "981781891906"
+  },
+  "bank": {
+   "bankName": "UnionBank",
+   "accountNumber": "001781161356"
   }
  },
  {
@@ -1982,6 +2286,10 @@
    "sss": "9917945514",
    "philhealth": "991791265214",
    "pagibig": "981793305723"
+  },
+  "bank": {
+   "bankName": "LANDBANK",
+   "accountNumber": "001798276833"
   }
  },
  {
@@ -2007,6 +2315,10 @@
    "sss": "9918054118",
    "philhealth": "991802053679",
    "pagibig": "981807137759"
+  },
+  "bank": {
+   "bankName": "BDO Unibank",
+   "accountNumber": "001805153500"
   }
  }
 ]

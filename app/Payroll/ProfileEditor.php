@@ -52,6 +52,30 @@ class ProfileEditor
         return $out;
     }
 
+    /**
+     * Where net pay is deposited: `bankName`, `accountNumber` (6 to 20 digits after stripping dashes and spaces) and
+     * optionally `accountName` when the account is not in the employee's name. An empty account number clears it.
+     */
+    public static function validBank(array $bank): ?array
+    {
+        $number = preg_replace('/[\s-]/', '', Alphalist\Builder::str($bank['accountNumber'] ?? null));
+        if ($number === '') {
+            return null;
+        }
+        if (!preg_match('/^\d{6,20}$/', $number)) {
+            throw self::fail('The bank account number must be 6 to 20 digits');
+        }
+        $name = trim(Alphalist\Builder::str($bank['bankName'] ?? null));
+        if ($name === '' || mb_strlen($name) > 60) {
+            throw self::fail('The bank name is required with an account number, at most 60 characters');
+        }
+        $holder = trim(Alphalist\Builder::str($bank['accountName'] ?? null));
+        if (mb_strlen($holder) > 100) {
+            throw self::fail('The account name must be at most 100 characters');
+        }
+        return array_filter(['bankName' => $name, 'accountNumber' => $number, 'accountName' => $holder], fn ($v) => $v !== '');
+    }
+
     private static function parseMwe(mixed $v): bool|string
     {
         return match (true) {
@@ -65,7 +89,7 @@ class ProfileEditor
     /**
      * Apply a patch to a profile and return the updated copy. Accepts `payBasis`, a rate (`rate`, or the field named
      * for the basis: monthlySalary / dailyRate / hourlyRate), `hireDate`, `birthDate`, `region`, `sector`,
-     * `minimumWageEarner` (yes / no / auto), name parts, `nationality`, `regionNumber`, `employmentStatus` and `ids`.
+     * `minimumWageEarner` (yes / no / auto), name parts, `nationality`, `regionNumber`, `employmentStatus`, `ids` and `bank`.
      * Empty strings clear optional fields.
      */
     public static function update(array $profile, array $patch): array
@@ -188,6 +212,14 @@ class ProfileEditor
 
         if (isset($patch['ids'])) {
             $next['ids'] = self::validIds($patch['ids']);
+        }
+        if (array_key_exists('bank', $patch)) {
+            $bank = is_array($patch['bank']) ? self::validBank($patch['bank']) : null;
+            if ($bank) {
+                $next['bank'] = $bank;
+            } else {
+                unset($next['bank']);
+            }
         }
         return $next;
     }
